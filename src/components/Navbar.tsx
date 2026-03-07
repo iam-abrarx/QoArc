@@ -19,10 +19,10 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Services', href: '/services' },
-    { name: 'Portfolio', href: '/portfolio' },
+    { name: 'Services', href: '/#services' },
+    { name: 'Portfolio', href: '/#portfolio' },
     { name: 'QoArc Lab', href: '/lab' },
-    { name: 'About', href: '/about' },
+    { name: 'About', href: '/#about' },
   ];
 
   return (
