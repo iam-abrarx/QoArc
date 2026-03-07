@@ -28,16 +28,37 @@ function AdminContent() {
   
   const [newItem, setNewItem] = useState<Partial<PortfolioItem>>({
     name: '',
-    description: '',
-    url: '',
-    imageUrl: '',
     client: '',
-    problem: '',
+    slug: '',
+    description: '',
+    category: '',
+    industry: '',
+    services: [],
+    year: '',
+    techStack: [],
+    heroImage: '',
+    intro: '',
+    duration: '',
+    scope: '',
+    platform: '',
+    deliverables: [],
+    teamRole: '',
+    challenge: '',
+    goal: '',
     solution: '',
-    flowDiagramUrl: '',
-    fullStory: '',
+    keyFeatures: [],
+    designDirection: '',
+    outcome: '',
+    imageUrl: '',
+    galleryImages: [],
+    mobileMockups: [],
+    desktopMockups: [],
     videoUrl: '',
-    extraImages: []
+    url: '',
+    metaTitle: '',
+    metaDescription: '',
+    isFeatured: false,
+    status: 'published'
   });
 
   useEffect(() => {
@@ -95,16 +116,37 @@ function AdminContent() {
     setEditingId(null);
     setNewItem({
       name: '',
-      description: '',
-      url: '',
-      imageUrl: '',
       client: '',
-      problem: '',
+      slug: '',
+      description: '',
+      category: '',
+      industry: '',
+      services: [],
+      year: '',
+      techStack: [],
+      heroImage: '',
+      intro: '',
+      duration: '',
+      scope: '',
+      platform: '',
+      deliverables: [],
+      teamRole: '',
+      challenge: '',
+      goal: '',
       solution: '',
-      flowDiagramUrl: '',
-      fullStory: '',
+      keyFeatures: [],
+      designDirection: '',
+      outcome: '',
+      imageUrl: '',
+      galleryImages: [],
+      mobileMockups: [],
+      desktopMockups: [],
       videoUrl: '',
-      extraImages: []
+      url: '',
+      metaTitle: '',
+      metaDescription: '',
+      isFeatured: false,
+      status: 'published'
     });
     setShowEditor(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -113,7 +155,7 @@ function AdminContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItem.name || !newItem.description || !newItem.url || !newItem.imageUrl) {
-      alert('Please fill mandatory fields (Name, Description, URL, Image)');
+      alert('Please fill mandatory fields (Title, Summary, URL, Thumbnail)');
       return;
     }
 
@@ -127,23 +169,23 @@ function AdminContent() {
     setEditingId(null);
   };
 
-  const addGalleryImage = () => {
+  const updateArrayField = (field: keyof PortfolioItem, idx: number, val: string) => {
+    const arr = [...(newItem[field] as string[] || [])];
+    arr[idx] = val;
+    setNewItem(prev => ({ ...prev, [field]: arr }));
+  };
+
+  const addArrayItem = (field: keyof PortfolioItem) => {
     setNewItem(prev => ({
       ...prev,
-      extraImages: [...(prev.extraImages || []), '']
+      [field]: [...(prev[field] as string[] || []), '']
     }));
   };
 
-  const updateGalleryImage = (idx: number, val: string) => {
-    const next = [...(newItem.extraImages || [])];
-    next[idx] = val;
-    setNewItem(prev => ({ ...prev, extraImages: next }));
-  };
-
-  const removeGalleryImage = (idx: number) => {
+  const removeArrayItem = (field: keyof PortfolioItem, idx: number) => {
     setNewItem(prev => ({
       ...prev,
-      extraImages: (prev.extraImages || []).filter((_, i) => i !== idx)
+      [field]: (prev[field] as string[] || []).filter((_, i) => i !== idx)
     }));
   };
 
@@ -286,183 +328,195 @@ function AdminContent() {
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               {/* Main Content Area (Left 3/4) */}
-              <div className="lg:col-span-3 space-y-8">
-                {/* Blog Content Area */}
-                <div className="bg-bg-card border border-white/5 rounded-[48px] p-12 space-y-12 shadow-2xl relative overflow-hidden group">
-                  <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent-blue via-accent-purple to-accent-blue bg-[length:200%_auto] animate-gradient"></div>
-                  
-                  <div className="space-y-4">
-                    <label className="text-xs uppercase tracking-[0.3em] text-accent-blue font-black opacity-80">Headline</label>
-                    <input 
-                      value={newItem.name}
-                      onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                      type="text" 
-                      placeholder="Enter powerful project name..." 
-                      className="w-full bg-transparent border-b border-white/10 py-6 text-5xl font-display font-black focus:border-accent-blue outline-none transition-all placeholder:text-white/5 tracking-tighter"
-                    />
-                  </div>
+              <div className="lg:col-span-3 space-y-12">
+                {/* General Info Section */}
+                <div className="bg-bg-card border border-white/5 rounded-[48px] p-12 space-y-10 shadow-2xl relative overflow-hidden">
+                   <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent-blue via-accent-purple to-accent-blue bg-[length:200%_auto] animate-gradient"></div>
+                   <h3 className="text-2xl font-display font-bold flex items-center gap-3">
+                     <Layout className="text-accent-blue" size={24} /> General Information
+                   </h3>
+                   
+                   <div className="space-y-6">
+                     <label className="text-xs uppercase tracking-[0.3em] text-accent-blue font-black opacity-80">Project Title</label>
+                     <input 
+                       value={newItem.name}
+                       onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                       type="text" 
+                       placeholder="e.g. EcoEnergy Smart Dashboard" 
+                       className="w-full bg-transparent border-b border-white/10 py-4 text-4xl font-display font-black focus:border-accent-blue outline-none transition-all placeholder:text-white/5 tracking-tighter"
+                     />
+                   </div>
 
-                  <div className="space-y-6">
-                    <label className="text-xs uppercase tracking-[0.3em] text-text-muted font-bold flex items-center gap-2">
-                       <FileText size={18} className="text-accent-blue" /> The Narrative (Editor)
-                    </label>
-                    <div className="bg-bg-dark/40 border border-white/5 rounded-3xl p-8 focus-within:border-accent-blue/30 transition-all">
-                      <textarea 
-                        value={newItem.fullStory}
-                        onChange={(e) => setNewItem({ ...newItem, fullStory: e.target.value })}
-                        placeholder="Start your storytelling journey... Support rich text and immersive descriptions." 
-                        className="w-full bg-transparent outline-none min-h-[600px] font-sans text-xl leading-relaxed text-white/90 placeholder:text-white/5 resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-white/5">
-                    <div className="space-y-4">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold flex items-center gap-2">
-                         <AlertCircle size={14} className="text-red-500" /> Challenge
-                      </label>
-                      <textarea 
-                        value={newItem.problem}
-                        onChange={(e) => setNewItem({ ...newItem, problem: e.target.value })}
-                        placeholder="The friction points..." 
-                        className="w-full bg-bg-dark border border-white/5 rounded-2xl px-6 py-5 focus:border-red-500/30 outline-none min-h-[140px] transition-all text-sm leading-relaxed"
-                      />
-                    </div>
-                    <div className="space-y-4">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold flex items-center gap-2">
-                         <CheckCircle2 size={14} className="text-accent-blue" /> Innovation
-                      </label>
-                      <textarea 
-                        value={newItem.solution}
-                        onChange={(e) => setNewItem({ ...newItem, solution: e.target.value })}
-                        placeholder="The breakthrough..." 
-                        className="w-full bg-bg-dark border border-white/5 rounded-2xl px-6 py-5 focus:border-accent-blue/30 outline-none min-h-[140px] transition-all text-sm leading-relaxed"
-                      />
-                    </div>
-                  </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     <div className="space-y-3">
+                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Client Name</label>
+                       <input value={newItem.client} onChange={(e) => setNewItem({ ...newItem, client: e.target.value })} type="text" placeholder="Global Entity..." className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-sm transition-all" />
+                     </div>
+                     <div className="space-y-3">
+                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Project Slug</label>
+                       <input value={newItem.slug} onChange={(e) => setNewItem({ ...newItem, slug: e.target.value })} type="text" placeholder="eco-energy-smart" className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-sm transition-all" />
+                     </div>
+                     <div className="space-y-3">
+                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Category</label>
+                       <input value={newItem.category} onChange={(e) => setNewItem({ ...newItem, category: e.target.value })} type="text" placeholder="Web, App, AI..." className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-sm transition-all" />
+                     </div>
+                     <div className="space-y-3">
+                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Industry</label>
+                       <input value={newItem.industry} onChange={(e) => setNewItem({ ...newItem, industry: e.target.value })} type="text" placeholder="Healthcare, Fintech..." className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-sm transition-all" />
+                     </div>
+                     <div className="space-y-3">
+                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Year</label>
+                       <input value={newItem.year} onChange={(e) => setNewItem({ ...newItem, year: e.target.value })} type="text" placeholder="2024" className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-sm transition-all" />
+                     </div>
+                     <div className="space-y-3">
+                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Duration</label>
+                       <input value={newItem.duration} onChange={(e) => setNewItem({ ...newItem, duration: e.target.value })} type="text" placeholder="6 Months" className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-sm transition-all" />
+                     </div>
+                   </div>
                 </div>
 
-                {/* Immersive Media */}
+                {/* Structured Narrative Content Section */}
                 <div className="bg-bg-card border border-white/5 rounded-[48px] p-12 space-y-12">
-                  <h3 className="text-2xl font-display font-bold flex items-center gap-3">
-                    <PlayCircle className="text-accent-purple" size={28} /> Visual Assets
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div className="space-y-4">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Showcase Video ID/URL</label>
-                      <input 
-                        value={newItem.videoUrl}
-                        onChange={(e) => setNewItem({ ...newItem, videoUrl: e.target.value })}
-                        type="text" 
-                        placeholder="Vimeo or YouTube link..." 
-                        className="w-full bg-bg-dark border border-white/5 rounded-2xl px-6 py-5 focus:border-accent-purple/30 outline-none text-sm transition-all"
-                      />
-                    </div>
-                    <div className="space-y-4">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Architecture Abstract Image</label>
-                      <input 
-                        value={newItem.flowDiagramUrl}
-                        onChange={(e) => setNewItem({ ...newItem, flowDiagramUrl: e.target.value })}
-                        type="text" 
-                        placeholder="https://cloud.storage/flow.png" 
-                        className="w-full bg-bg-dark border border-white/5 rounded-2xl px-6 py-5 focus:border-accent-blue/30 outline-none text-sm transition-all"
-                      />
-                    </div>
-                  </div>
+                   <h3 className="text-2xl font-display font-bold flex items-center gap-3">
+                     <FileText className="text-accent-purple" size={24} /> Case Study Content
+                   </h3>
 
-                  <div className="space-y-8">
-                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Immersive Gallery</label>
-                      <button 
-                        onClick={addGalleryImage}
-                        className="text-xs font-black text-accent-blue hover:text-white bg-accent-blue/5 hover:bg-accent-blue px-4 py-2 rounded-xl transition-all flex items-center gap-2"
-                      >
-                        <Plus size={14} /> New Frame
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4">
-                      {newItem.extraImages?.map((img, idx) => (
-                        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} key={idx} className="flex items-center gap-4 group">
-                          <input 
-                            value={img}
-                            onChange={(e) => updateGalleryImage(idx, e.target.value)}
-                            type="text" 
-                            placeholder={`Gallery Image #${idx + 1}`} 
-                            className="flex-1 bg-bg-dark border border-white/5 rounded-2xl px-6 py-4 focus:border-accent-blue/30 outline-none text-sm transition-all"
-                          />
-                          <button 
-                            onClick={() => removeGalleryImage(idx)}
-                            className="w-12 h-12 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
+                   <div className="space-y-6">
+                     <label className="text-xs uppercase tracking-[0.3em] text-text-muted font-bold">Project Intro / Summary</label>
+                     <textarea value={newItem.description} onChange={(e) => setNewItem({ ...newItem, description: e.target.value })} placeholder="Brief high-level overview..." className="w-full bg-bg-dark border border-white/5 rounded-3xl px-8 py-6 focus:border-accent-blue outline-none min-h-[120px] text-lg leading-relaxed transition-all" />
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                     {[
+                       { label: 'The Challenge', key: 'challenge' as keyof PortfolioItem, color: 'red-500' },
+                       { label: 'The Goal', key: 'goal' as keyof PortfolioItem, color: 'accent-purple' },
+                       { label: 'The Solution', key: 'solution' as keyof PortfolioItem, color: 'accent-blue' },
+                       { label: 'Design Direction', key: 'designDirection' as keyof PortfolioItem, color: 'pink-500' },
+                       { label: 'Outcome / Result', key: 'outcome' as keyof PortfolioItem, color: 'green-500' }
+                     ].map((section) => (
+                       <div key={section.key} className="space-y-4">
+                         <label className={`text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold flex items-center gap-2`}>
+                            <span className={`w-2 h-2 rounded-full bg-${section.color}`}></span> {section.label}
+                         </label>
+                         <textarea 
+                           value={newItem[section.key] as string}
+                           onChange={(e) => setNewItem({ ...newItem, [section.key]: e.target.value })}
+                           placeholder={`Details for ${section.label}...`} 
+                           className="w-full bg-bg-dark border border-white/5 rounded-2xl px-6 py-5 focus:border-white/20 outline-none min-h-[160px] transition-all text-sm leading-relaxed"
+                         />
+                       </div>
+                     ))}
+                   </div>
+
+                   <div className="pt-10 border-t border-white/5 space-y-8">
+                     <div className="flex items-center justify-between">
+                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Key Features & Innovation</label>
+                       <button onClick={() => addArrayItem('keyFeatures')} className="text-[10px] font-black uppercase text-accent-blue bg-accent-blue/5 px-4 py-2 rounded-xl hover:bg-accent-blue hover:text-white transition-all">Add Feature</button>
+                     </div>
+                     <div className="grid grid-cols-1 gap-4">
+                       {newItem.keyFeatures?.map((feat, idx) => (
+                         <div key={idx} className="flex items-center gap-4 group">
+                           <input value={feat} onChange={(e) => updateArrayField('keyFeatures', idx, e.target.value)} type="text" className="flex-1 bg-bg-dark border border-white/5 rounded-2xl px-6 py-4 focus:border-accent-blue/30 outline-none text-sm" />
+                           <button onClick={() => removeArrayItem('keyFeatures', idx)} className="w-12 h-12 text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white rounded-xl transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"><Trash2 size={18} /></button>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                </div>
+
+                {/* Media & Visuals Section */}
+                <div className="bg-bg-card border border-white/5 rounded-[48px] p-12 space-y-12">
+                   <h3 className="text-2xl font-display font-bold flex items-center gap-3">
+                     <Image className="text-accent-blue" size={24} /> Visual Showcase
+                   </h3>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                     <div className="space-y-4">
+                        <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Thumbnail / Cover Image</label>
+                        <input value={newItem.imageUrl} onChange={(e) => setNewItem({ ...newItem, imageUrl: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-2xl px-6 py-4 outline-none text-xs" />
+                     </div>
+                     <div className="space-y-4">
+                        <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Hero Showcase Image</label>
+                        <input value={newItem.heroImage} onChange={(e) => setNewItem({ ...newItem, heroImage: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-2xl px-6 py-4 outline-none text-xs" />
+                     </div>
+                   </div>
+
+                   <div className="space-y-8">
+                     <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Production Gallery</label>
+                       <button onClick={() => addArrayItem('galleryImages')} className="text-[10px] font-black uppercase text-accent-blue bg-accent-blue/5 px-4 py-2 rounded-xl hover:bg-accent-blue hover:text-white transition-all">Add Image</button>
+                     </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {newItem.galleryImages?.map((img, idx) => (
+                           <div key={idx} className="flex items-center gap-4 group">
+                             <input value={img} onChange={(e) => updateArrayField('galleryImages', idx, e.target.value)} type="text" placeholder="Image URL..." className="flex-1 bg-bg-dark border border-white/5 rounded-2xl px-6 py-4 outline-none text-xs" />
+                             <button onClick={() => removeArrayItem('galleryImages', idx)} className="w-12 h-12 text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white rounded-xl transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"><Trash2 size={18} /></button>
+                           </div>
+                        ))}
+                     </div>
+                   </div>
                 </div>
               </div>
 
-              {/* Sidebar: Metadata */}
+              {/* Sidebar: Metadata & Publishing Controls */}
               <div className="space-y-8">
-                <div className="bg-bg-card border border-white/5 rounded-[40px] p-10 space-y-8 sticky top-32 shadow-2xl">
-                  <h3 className="text-xl font-display font-bold flex items-center gap-3">
-                    <Layout className="text-accent-purple" size={20} /> Data Matrix
-                  </h3>
-                  
-                  <div className="space-y-6 pt-4">
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Client Protocol</label>
-                      <input 
-                        value={newItem.client}
-                        onChange={(e) => setNewItem({ ...newItem, client: e.target.value })}
-                        type="text" 
-                        placeholder="Global Entity..."
-                        className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-sm transition-all"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Deployment Node (URL)</label>
-                      <input 
-                        value={newItem.url}
-                        onChange={(e) => setNewItem({ ...newItem, url: e.target.value })}
-                        type="text" 
-                        placeholder="https://live-system.io"
-                        className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-sm transition-all"
-                      />
-                    </div>
-                    <div className="space-y-5">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Master Thumb</label>
-                      <div className="aspect-video rounded-3xl overflow-hidden border border-white/10 bg-bg-dark group relative shadow-inner">
-                        {newItem.imageUrl ? (
-                          <>
-                            <img src={newItem.imageUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Master" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                          </>
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center text-white/5 gap-3">
-                            <Image size={40} strokeWidth={1} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Awaiting Texture</span>
-                          </div>
-                        )}
+                <div className="bg-bg-card border border-white/5 rounded-[40px] p-10 space-y-10 sticky top-32 shadow-2xl overflow-hidden">
+                  <div className="space-y-8">
+                    <h3 className="text-xl font-display font-bold flex items-center gap-3">
+                      <Rocket className="text-accent-blue" size={20} /> Publishing
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between bg-bg-dark/50 p-4 rounded-2xl border border-white/5">
+                        <span className="text-xs font-bold text-text-muted uppercase tracking-widest">Featured Project</span>
+                        <button 
+                          onClick={() => setNewItem({ ...newItem, isFeatured: !newItem.isFeatured })}
+                          className={`w-12 h-6 rounded-full transition-all relative ${newItem.isFeatured ? 'bg-accent-blue' : 'bg-white/10'}`}
+                        >
+                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${newItem.isFeatured ? 'left-7' : 'left-1'}`}></div>
+                        </button>
                       </div>
-                      <input 
-                        value={newItem.imageUrl}
-                        onChange={(e) => setNewItem({ ...newItem, imageUrl: e.target.value })}
-                        type="text" 
-                        placeholder="Hero image link..."
-                        className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none text-[11px] transition-all"
-                      />
+                      <div className="flex items-center justify-between bg-bg-dark/50 p-4 rounded-2xl border border-white/5">
+                        <span className="text-xs font-bold text-text-muted uppercase tracking-widest">Status</span>
+                        <select 
+                          value={newItem.status} 
+                          onChange={(e) => setNewItem({ ...newItem, status: e.target.value as 'draft' | 'published' })}
+                          className="bg-transparent text-xs font-black uppercase text-accent-blue outline-none"
+                        >
+                          <option value="published">Published</option>
+                          <option value="draft">Draft</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-8 pt-8 border-t border-white/5">
+                    <h3 className="text-xl font-display font-bold flex items-center gap-3">
+                      <Rocket className="text-accent-purple" size={20} /> Strategic Links
+                    </h3>
+                    <div className="space-y-3">
+                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Master Deployment Node</label>
+                      <input value={newItem.url} onChange={(e) => setNewItem({ ...newItem, url: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 outline-none text-sm" />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Abstract (Card Summary)</label>
-                      <textarea 
-                        value={newItem.description}
-                        onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                        placeholder="Brief system overview..."
-                        className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none min-h-[140px] text-xs leading-relaxed transition-all"
-                      />
+                      <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Video Showcase (Vimeo/YT)</label>
+                      <input value={newItem.videoUrl} onChange={(e) => setNewItem({ ...newItem, videoUrl: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 outline-none text-sm" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-8 pt-8 border-t border-white/5">
+                    <h3 className="text-xl font-display font-bold flex items-center gap-3">
+                      <Lock className="text-accent-blue" size={20} /> SEO Management
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Meta Title</label>
+                        <input value={newItem.metaTitle} onChange={(e) => setNewItem({ ...newItem, metaTitle: e.target.value })} type="text" className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 outline-none text-xs" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Meta Description</label>
+                        <textarea value={newItem.metaDescription} onChange={(e) => setNewItem({ ...newItem, metaDescription: e.target.value })} className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 outline-none text-xs min-h-[100px]" />
+                      </div>
                     </div>
                   </div>
                 </div>
