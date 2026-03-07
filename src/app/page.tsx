@@ -53,6 +53,17 @@ export default function Home() {
     ? portfolioItems 
     : portfolioItems.filter(item => item.category === filter);
 
+  // 5 items make up 2 rows (lg:col-span-2 combined with lg:col-span-1)
+  const [visibleRows, setVisibleRows] = useState(2);
+  const visibleItemsCount = Math.floor(visibleRows / 2) * 5 + (visibleRows % 2 === 1 ? 2 : 0);
+  const displayItems = filteredItems.slice(0, visibleItemsCount);
+  const hasMore = visibleItemsCount < filteredItems.length;
+
+  // Reset to 2 rows when filter changes
+  useEffect(() => {
+    setVisibleRows(2);
+  }, [filter]);
+
   const getSafeVideoUrl = (url: string | undefined) => {
     if (!url) return "";
     let embedUrl = url;
@@ -235,7 +246,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredItems.map((item, idx) => (
+            {displayItems.map((item, idx) => (
               <motion.div 
                 key={item.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -292,6 +303,21 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
+
+          {hasMore && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-12 text-center"
+            >
+              <button 
+                onClick={() => setVisibleRows(prev => prev + 1)}
+                className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] hover:border-white/10 px-8 py-3.5 rounded-xl font-bold text-sm transition-all"
+              >
+                Load More Projects
+              </button>
+            </motion.div>
+          )}
         </div>
       </section>
 
