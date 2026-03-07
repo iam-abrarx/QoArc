@@ -9,13 +9,14 @@ import {
   Lock, ArrowRight, Loader2, Mail, LayoutGrid, Download
 } from 'lucide-react';
 import { usePortfolio } from '@/context/PortfolioContext';
+import { PartnerLogo } from '@/context/PortfolioContext';
 import { PortfolioItem } from '@/lib/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAssetFromDB } from '@/lib/idb';
 
 function AdminContent() {
 
-  const { portfolioItems, addItem, updateItem, deleteItem, contactSubmissions, deleteSubmission } = usePortfolio();
+  const { portfolioItems, addItem, updateItem, deleteItem, contactSubmissions, deleteSubmission, partnerLogos, addPartnerLogo, deletePartnerLogo } = usePortfolio();
   
   const handleSeedData = () => {
     if (confirm('Forces-sync with real content (2GO, BANCAT, Liza Kalinina)? This will ensure these 3 projects are present.')) {
@@ -35,7 +36,9 @@ function AdminContent() {
   
   const [showEditor, setShowEditor] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'projects' | 'messages'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'messages' | 'logos'>('projects');
+  
+  const [newLogo, setNewLogo] = useState<Partial<PartnerLogo>>({ url: '', alt: '', isWide: false });
   
   const [newItem, setNewItem] = useState<Partial<PortfolioItem>>({
     name: '',
@@ -225,6 +228,24 @@ function AdminContent() {
     }
   };
 
+  const handleAddLogo = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newLogo.url) {
+      alert('Logo URL is required.');
+      return;
+    }
+    if (partnerLogos.length >= 9) {
+      alert('Maximum of 9 logos allowed in the grid.');
+      return;
+    }
+    addPartnerLogo({
+      url: newLogo.url,
+      alt: newLogo.alt || 'Partner Logo',
+      isWide: newLogo.isWide || false
+    });
+    setNewLogo({ url: '', alt: '', isWide: false });
+  };
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6">
@@ -281,6 +302,12 @@ function AdminContent() {
               <Layout size={16} /> Projects
             </button>
             <button 
+              onClick={() => { setActiveTab('logos'); setShowEditor(false); }}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${activeTab === 'logos' ? 'bg-accent-blue text-white shadow-lg shadow-accent-blue/20' : 'text-text-muted hover:text-white'}`}
+            >
+              <Image size={16} /> Partner Logos
+            </button>
+            <button 
               onClick={() => { setActiveTab('messages'); setShowEditor(false); }}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ${activeTab === 'messages' ? 'bg-accent-purple text-white shadow-lg shadow-accent-purple/20' : 'text-text-muted hover:text-white'}`}
             >
@@ -292,6 +319,7 @@ function AdminContent() {
               )}
             </button>
           </div>
+
           <button 
             onClick={handleLogout}
             className="group flex items-center gap-2 text-sm font-bold bg-white/5 hover:bg-red-500/10 hover:text-red-500 px-6 py-4 rounded-2xl transition-all border border-white/5"
@@ -328,7 +356,7 @@ function AdminContent() {
       )}
 
       <AnimatePresence mode="wait">
-        {showEditor ? (
+        {activeTab === 'projects' && showEditor ? (
           <motion.div 
             key="editor"
             initial={{ opacity: 0, scale: 0.98 }}
@@ -661,13 +689,14 @@ function AdminContent() {
               </div>
             )}
           </motion.div>
-        ) : (
+        ) : activeTab === 'messages' ? (
           <motion.div 
             key="messages"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="space-y-12 pb-32"
           >
+            {/* Messages Content omitted for brevity, keeping existing code */}
             <div className="flex items-center justify-between border-b border-white/5 pb-8 group">
               <h2 className="text-3xl font-display font-black flex items-center gap-5 tracking-tighter">
                 <Mail className="text-accent-purple group-hover:scale-110 transition-transform" size={32} /> Central Inquiries
@@ -777,8 +806,109 @@ function AdminContent() {
               </div>
             )}
           </motion.div>
+        ) : (
+          <motion.div 
+            key="logos"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-12 pb-32"
+          >
+            <div className="flex items-center justify-between border-b border-white/5 pb-8 group">
+              <h2 className="text-3xl font-display font-black flex items-center gap-5 tracking-tighter">
+                <Image className="text-accent-blue group-hover:scale-110 transition-transform" size={32} /> Partner Logos
+              </h2>
+              <div className="flex items-center gap-6">
+                 <span className="text-[10px] font-black text-text-muted uppercase tracking-[0.4em] bg-white/5 px-6 py-3 rounded-full border border-white/5">
+                  Grid Capacity: {partnerLogos.length} / 9
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-bg-card border border-white/5 rounded-[48px] p-12 shadow-2xl relative overflow-hidden">
+               <h3 className="text-2xl font-display font-bold flex items-center gap-3 mb-8">
+                 <PlusCircle className="text-accent-blue" size={24} /> Add New Logo
+               </h3>
+               <form onSubmit={handleAddLogo} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                 <div className="md:col-span-2 space-y-3">
+                   <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black opacity-80">Image URL</label>
+                   <input 
+                     type="text" 
+                     value={newLogo.url}
+                     onChange={e => setNewLogo({ ...newLogo, url: e.target.value })}
+                     placeholder="https://example.com/logo.png" 
+                     className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none transition-all"
+                     required
+                   />
+                 </div>
+                 <div className="space-y-3">
+                   <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black opacity-80">Alt Text (Optional)</label>
+                   <input 
+                     type="text" 
+                     value={newLogo.alt}
+                     onChange={e => setNewLogo({ ...newLogo, alt: e.target.value })}
+                     placeholder="Brand Name" 
+                     className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 focus:border-accent-blue outline-none transition-all"
+                   />
+                 </div>
+                 <div className="flex items-center gap-4 pb-2">
+                   <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                     <input 
+                       type="checkbox" 
+                       checked={newLogo.isWide}
+                       onChange={e => setNewLogo({ ...newLogo, isWide: e.target.checked })}
+                       className="w-5 h-5 rounded accent-accent-blue bg-bg-dark border-white/10"
+                     />
+                     Wide Format (Spans 2 columns)
+                   </label>
+                 </div>
+                 <div className="md:col-span-4 mt-6">
+                   <button 
+                     type="submit" 
+                     disabled={partnerLogos.length >= 9}
+                     className="bg-accent-blue text-white px-8 py-4 rounded-2xl font-black hover:scale-105 transition-all w-full md:w-auto shadow-xl shadow-accent-blue/20 disabled:opacity-50 disabled:hover:scale-100"
+                   >
+                     Add to Grid
+                   </button>
+                 </div>
+               </form>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {partnerLogos.map((logo) => (
+                <div key={logo.id} className={`bg-bg-dark border border-white/5 rounded-2xl p-6 relative group ${logo.isWide ? 'md:col-span-2' : ''}`}>
+                  <div className="aspect-[4/3] bg-white/[0.02] rounded-xl flex items-center justify-center p-6 relative overflow-hidden text-center">
+                     <img src={logo.url} alt={logo.alt} className="w-full h-full object-contain filter grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300" 
+                        onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdib3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSJ3aGl0ZSI+SW52YWxpZCBVUkw8L3RleHQ+PC9zdmc+'; }}
+                     />
+                  </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-white truncate max-w-[200px]">{logo.alt || 'Partner'}</p>
+                      <p className="text-xs text-text-muted">{logo.isWide ? 'Wide (2 Cols)' : 'Square (1 Col)'}</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        if (confirm('Remove this logo?')) deletePartnerLogo(logo.id);
+                      }}
+                      className="text-red-500 hover:text-red-400 p-2 bg-red-500/10 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {partnerLogos.length === 0 && (
+              <div className="text-center py-20 bg-bg-card/50 rounded-[40px] border-2 border-dashed border-white/5">
+                <Image className="mx-auto text-white/5 mb-6" size={60} strokeWidth={1} />
+                <p className="text-text-muted text-xl font-display font-medium">No partner logos configured.</p>
+              </div>
+            )}
+          </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }

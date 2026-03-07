@@ -13,14 +13,24 @@ export interface ContactSubmission {
   assets?: { id: string, name: string, size: number }[];
 }
 
+export interface PartnerLogo {
+  id: string;
+  url: string;
+  alt: string;
+  isWide: boolean;
+}
+
 interface PortfolioContextType {
   portfolioItems: PortfolioItem[];
   contactSubmissions: ContactSubmission[];
+  partnerLogos: PartnerLogo[];
   addItem: (item: Omit<PortfolioItem, 'id'>) => void;
   deleteItem: (id: string) => void;
   updateItem: (item: PortfolioItem) => void;
   addSubmission: (submission: Omit<ContactSubmission, 'id' | 'date'>) => void;
   deleteSubmission: (id: string) => void;
+  addPartnerLogo: (logo: Omit<PartnerLogo, 'id'>) => void;
+  deletePartnerLogo: (id: string) => void;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -28,6 +38,7 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
+  const [partnerLogos, setPartnerLogos] = useState<PartnerLogo[]>([]);
 
   useEffect(() => {
     const saved = localStorage.getItem('portfolioItems');
@@ -40,6 +51,11 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     const savedMsgs = localStorage.getItem('contactSubmissions');
     if (savedMsgs) {
       setContactSubmissions(JSON.parse(savedMsgs));
+    }
+
+    const savedLogos = localStorage.getItem('partnerLogos');
+    if (savedLogos) {
+      setPartnerLogos(JSON.parse(savedLogos));
     }
   }, []);
 
@@ -90,11 +106,26 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const addPartnerLogo = (logo: Omit<PartnerLogo, 'id'>) => {
+    const newLogo = { ...logo, id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}` };
+    setPartnerLogos(prev => {
+      const updated = [...prev, newLogo];
+      localStorage.setItem('partnerLogos', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
+  const deletePartnerLogo = (id: string) => {
+    setPartnerLogos(prev => {
+      const updated = prev.filter(l => String(l.id) !== String(id));
+      localStorage.setItem('partnerLogos', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   return (
     <PortfolioContext.Provider value={{ 
-      portfolioItems, contactSubmissions, addItem, deleteItem, updateItem, addSubmission, deleteSubmission 
+      portfolioItems, contactSubmissions, partnerLogos, addItem, deleteItem, updateItem, addSubmission, deleteSubmission, addPartnerLogo, deletePartnerLogo
     }}>
       {children}
     </PortfolioContext.Provider>

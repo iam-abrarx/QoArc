@@ -7,6 +7,7 @@ import {
   CheckCircle, Brush, Cloud, Layers, Users, Eye, Sparkles, ShieldCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { usePortfolio } from '@/context/PortfolioContext';
 
 const fadeInUp: any = {
   initial: { opacity: 0, y: 30 },
@@ -28,6 +29,7 @@ function PsychologyIcon(props: any) {
 
 export default function Home() {
   const [isAdmin] = useState(() => typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true');
+  const { partnerLogos } = usePortfolio();
 
   const services = [
     {
@@ -152,14 +154,22 @@ export default function Home() {
       <section id="portfolio" className="py-32 px-6 border-t border-white/5 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            {/* Left: Icon Grid (3 cols, 6 rows) */}
+            {/* Left: Dynamic Logo Grid (3x3) */}
             <motion.div {...fadeInUp} className="order-2 lg:order-1">
               <div className="grid grid-cols-3 gap-3 md:gap-4">
-                {Array.from({ length: 18 }).map((_, i) => (
-                  <div key={i} className="aspect-[4/3] bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-center hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors group cursor-pointer">
-                    <Sparkles className="text-white/10 group-hover:text-accent-blue/50 transition-colors" size={24} />
-                  </div>
-                ))}
+                {partnerLogos.length > 0 ? (
+                  partnerLogos.map((logo) => (
+                    <div key={logo.id} className={`aspect-[4/3] bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-center p-4 hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors group cursor-pointer ${logo.isWide ? 'col-span-2' : ''}`}>
+                      <img src={logo.url} alt={logo.alt} className="w-full h-full object-contain filter grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                    </div>
+                  ))
+                ) : (
+                  Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} className="aspect-[4/3] bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-center hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors group cursor-pointer">
+                      <Sparkles className="text-white/10 group-hover:text-accent-blue/50 transition-colors" size={24} />
+                    </div>
+                  ))
+                )}
               </div>
             </motion.div>
 
