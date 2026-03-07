@@ -37,59 +37,75 @@ export default function PortfolioPage() {
     <div className="bg-grid min-h-screen">
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <motion.div {...fadeInUp} className="mb-16">
-            <h1 className="text-5xl md:text-7xl font-display font-black mb-6 tracking-tight">
-              Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue via-accent-purple to-pink-500">Portfolio</span>
-            </h1>
-            <p className="text-xl text-text-muted max-w-2xl leading-relaxed">
-              Delivering high-impact digital solutions for visionary clients across the globe.
+          <motion.div {...fadeInUp} className="mb-20">
+            <h1 className="text-sm font-bold uppercase tracking-[0.3em] text-accent-blue mb-6">Our Work</h1>
+            <h2 className="text-5xl md:text-8xl font-display font-black mb-8 tracking-tighter leading-tight">
+              Selected <span className="text-gradient-blue text-transparent bg-clip-text">Projects</span>
+            </h2>
+            <p className="text-xl text-text-muted max-w-2xl leading-relaxed opacity-80">
+              Crafting high-performance digital systems for global organizations and visionaries.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {portfolioItems.map((item) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {portfolioItems.map((item, idx) => (
               <motion.div 
                 key={item.id}
-                {...fadeInUp}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
                 onClick={() => {
                   setSelectedItem(item);
                   document.body.style.overflow = 'hidden';
                 }}
-                className="group relative bg-bg-card border border-white/5 rounded-3xl overflow-hidden hover:border-accent-blue/30 transition-all duration-500 cursor-pointer"
+                className={`group relative bg-bg-card/40 backdrop-blur-xl border border-white/5 rounded-[40px] overflow-hidden hover:border-accent-blue/30 transition-all duration-700 cursor-pointer ${idx % 3 === 0 ? 'lg:col-span-2' : ''}`}
               >
-                {/* Quick Edit (Admin Only) */}
-                {isAdmin && (
-                  <Link 
-                    href={`/admin?edit=${item.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full bg-accent-blue text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
-                  >
-                    <Edit3 size={20} />
-                  </Link>
-                )}
-
                 {/* Image Container */}
-                <div className="aspect-video relative overflow-hidden">
+                <div className="aspect-[16/10] relative overflow-hidden">
                   <img src={item.imageUrl} alt={item.name} 
-                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
                        onError={(e) => (e.currentTarget.src = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=2670')} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg-dark to-transparent opacity-60"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/90 via-bg-dark/20 to-transparent opacity-80"></div>
                   
                   {item.client && (
-                    <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-md border border-white/10 px-4 py-1.5 rounded-full">
-                      <span className="text-xs font-bold text-white uppercase tracking-widest">{item.client}</span>
+                    <div className="absolute top-6 left-6 bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2 rounded-full">
+                      <span className="text-[10px] font-bold text-white/80 uppercase tracking-[0.2em]">{item.client}</span>
                     </div>
+                  )}
+
+                  {/* Absolute Edit Trigger for Admins (Positioned relative to image) */}
+                  {isAdmin && (
+                    <Link 
+                      href={`/admin?edit=${item.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-accent-blue/20 backdrop-blur-md border border-accent-blue/30 text-accent-blue flex items-center justify-center hover:bg-accent-blue hover:text-white transition-all shadow-xl"
+                    >
+                      <Edit3 size={16} />
+                    </Link>
                   )}
                 </div>
 
-                {/* Content */}
-                <div className="p-8">
-                  <h3 className="text-2xl font-bold mb-3 group-hover:text-accent-blue transition-colors">{item.name}</h3>
-                  <p className="text-text-muted mb-6 leading-relaxed line-clamp-2">
+                {/* Content Overlay */}
+                <div className="p-10 relative">
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {item.techStack?.map((tech, i) => (
+                      <span key={i} className="text-[9px] font-bold uppercase tracking-widest text-accent-blue px-3 py-1 rounded-full bg-accent-blue/5 border border-accent-blue/10">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 className="text-3xl font-display font-bold mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-accent-blue transition-all duration-500">{item.name}</h3>
+                  <p className="text-text-muted text-sm leading-relaxed mb-8 opacity-70 line-clamp-2">
                     {item.description}
                   </p>
-                  <div className="inline-flex items-center gap-2 text-sm font-bold text-accent-blue group-hover:gap-4 transition-all">
-                    Learn More <ArrowRight size={16} />
+                  <div className="flex items-center justify-between">
+                    <div className="inline-flex items-center gap-3 text-xs font-bold text-accent-blue uppercase tracking-widest group-hover:gap-5 transition-all">
+                      Case Study <ArrowRight size={14} />
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Rocket size={14} className="text-white" />
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -138,30 +154,27 @@ export default function PortfolioPage() {
               </div>
 
               <div className="p-8 md:p-12 space-y-16">
-                <div className="aspect-video rounded-3xl overflow-hidden border border-white/10">
-                  <img src={selectedItem.imageUrl} className="w-full h-full object-cover" alt={selectedItem.name} />
+                <div className="aspect-video rounded-[32px] overflow-hidden border border-white/5 shadow-2xl group/image relative">
+                  <img src={selectedItem.imageUrl} className="w-full h-full object-cover shadow-inner" alt={selectedItem.name} />
+                  <div className="absolute inset-0 bg-accent-blue/5 opacity-0 group-hover/image:opacity-100 transition-opacity"></div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div className="space-y-4">
-                    <h4 className="text-xl font-bold text-white flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center">
-                        <AlertCircle size={18} />
-                      </span>
-                      The Problem
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                  <div className="space-y-6">
+                    <h4 className="text-sm font-bold text-accent-blue uppercase tracking-[0.2em] flex items-center gap-4">
+                      <span className="w-8 h-[1px] bg-accent-blue opacity-50"></span>
+                      The Challenge
                     </h4>
-                    <p className="text-text-muted leading-relaxed text-lg">
+                    <p className="text-text-muted leading-relaxed text-xl font-light opacity-90">
                       {selectedItem.problem || 'Coming soon...'}
                     </p>
                   </div>
-                  <div className="space-y-4">
-                    <h4 className="text-xl font-bold text-white flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-accent-blue/10 text-accent-blue flex items-center justify-center">
-                        <CheckCircle2 size={18} />
-                      </span>
-                      Our Solution
+                  <div className="space-y-6">
+                    <h4 className="text-sm font-bold text-accent-purple uppercase tracking-[0.2em] flex items-center gap-4">
+                      <span className="w-8 h-[1px] bg-accent-purple opacity-50"></span>
+                      The Intelligence
                     </h4>
-                    <p className="text-text-muted leading-relaxed text-lg">
+                    <p className="text-text-muted leading-relaxed text-xl font-light opacity-90">
                       {selectedItem.solution || 'Coming soon...'}
                     </p>
                   </div>
@@ -216,11 +229,12 @@ export default function PortfolioPage() {
                   </div>
                 )}
 
-                <div className="pt-8 text-center border-t border-white/5">
+                <div className="pt-12 text-center">
                   <a href={selectedItem.url} target="_blank" rel="noopener noreferrer"
-                     className="inline-flex items-center gap-3 bg-white text-black px-10 py-4 rounded-full font-black text-xl hover:bg-accent-blue hover:text-white transition-all shadow-xl shadow-accent-blue/10">
-                    Launch Website <Rocket size={20} />
+                     className="inline-flex items-center gap-4 bg-white text-black px-12 py-5 rounded-full font-black text-xl hover:scale-105 transition-transform shadow-[0_20px_50px_rgba(255,255,255,0.1)] active:scale-95 group">
+                    Launch Experience <Rocket size={24} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
+                  <p className="text-[10px] text-text-muted mt-6 uppercase tracking-widest opacity-50">Secure External Link to Case Study Site</p>
                 </div>
               </div>
             </motion.div>
