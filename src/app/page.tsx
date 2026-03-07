@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Rocket, ArrowRight, Zap, Globe, Beaker, Brain, Bolt, ChevronRight } from 'lucide-react';
+import { Rocket, ArrowRight, Zap, Globe, Beaker, Brain, Bolt, ChevronRight, CheckCircle, Brush, Cloud, Layers, Users, Eye, Sparkles, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePortfolio } from '@/context/PortfolioContext';
 
@@ -22,8 +22,50 @@ const staggerContainer = {
   viewport: { once: true }
 };
 
+function PsychologyIcon(props: any) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .52 8.105 4 4 0 0 0 8 0 4 4 0 0 0 .52-8.105 4 4 0 0 0-2.526-5.77A3 3 0 1 0 12 5z" />
+      <path d="M9 13a4.5 4.5 0 0 0 3-4" />
+      <path d="M15 13a4.5 4.5 0 0 1-3-4" />
+      <path d="M12 9v10" />
+    </svg>
+  );
+}
+
 export default function Home() {
   const { portfolioItems } = usePortfolio();
+
+  const services = [
+    {
+      title: 'Web Design & Development',
+      description: 'Bespoke digital experiences engineered for maximum performance and conversion.',
+      icon: <Brush className="text-accent-blue" size={28} />,
+      accent: 'blue',
+      features: ['UI/UX Strategy', 'Responsive Systems', 'Brand Identity', 'Performance Audit']
+    },
+    {
+      title: 'AI Automation Solutions',
+      description: 'Leverage Generative AI to automate tasks, gain insights, and provide intelligent support.',
+      icon: <PsychologyIcon className="text-accent-purple" size={28} />,
+      accent: 'purple',
+      features: ['Custom AI Agents', 'Workflow Automation', 'Data Intelligence', 'Smart Chatbots']
+    },
+    {
+      title: 'SaaS Development',
+      description: 'End-to-end scalable Software-as-a-Service platforms, from architecture to deployment.',
+      icon: <Cloud className="text-accent-blue" size={28} />,
+      accent: 'blue',
+      features: ['Multi-tenant Arch', 'Cloud Infrastructure', 'API Ecosystems', 'Subscription Logic']
+    },
+    {
+      title: 'Custom Tech Solutions',
+      description: 'Unique business challenges require unique software tailored to your operational needs.',
+      icon: <Layers className="text-accent-purple" size={28} />,
+      accent: 'purple',
+      features: ['Legacy Migration', 'System Integration', 'Data Pipelines', 'Security Audits']
+    }
+  ];
 
   return (
     <div className="bg-grid min-h-screen">
@@ -66,8 +108,8 @@ export default function Home() {
             <Link href="/contact" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-2xl shadow-white/10 flex items-center justify-center gap-2">
               Start Your Project <Rocket size={20} />
             </Link>
-            <Link href="/services" className="w-full sm:w-auto glass px-10 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition-colors flex items-center justify-center">
-              Explore Services
+            <Link href="/portfolio" className="w-full sm:w-auto glass px-10 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition-colors flex items-center justify-center">
+              Explore Portfolio
             </Link>
           </motion.div>
         </div>
@@ -77,174 +119,146 @@ export default function Home() {
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent-purple/10 rounded-full blur-[120px] -z-10 animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
       </section>
 
-      {/* Services Preview */}
+      {/* ─── Services Section ─── */}
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
             <motion.div {...fadeInUp}>
-              <h2 className="text-sm font-bold uppercase tracking-widest text-accent-blue mb-4">Core Capabilities</h2>
-              <h3 className="text-4xl md:text-6xl font-display font-bold tracking-tight">Intelligent Solutions</h3>
+              <h2 className="text-sm font-bold uppercase tracking-widest text-accent-blue mb-4">Our Expertise</h2>
+              <h3 className="text-4xl md:text-6xl font-display font-bold tracking-tight">Premium <span className="text-gradient-blue">Services</span></h3>
             </motion.div>
             <Link href="/services" className="text-accent-blue font-bold flex items-center gap-2 hover:gap-4 transition-all">
               View All Services <ArrowRight size={20} />
             </Link>
           </div>
 
-          <motion.div 
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="whileInView"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24"
-          >
-            {[
-              { title: 'AI Automation', icon: <Zap className="text-accent-blue" />, desc: 'Automate complex business processes with custom AI agents and intelligent workflows.' },
-              { title: 'Web Apps', icon: <Globe className="text-accent-purple" />, desc: 'Scalable, high-performance web applications built with modern frameworks and robust backends.' },
-              { title: 'QoArc Lab', icon: <Beaker className="text-accent-blue" />, desc: 'Research-driven innovation exploring the frontiers of AI and computer science.' }
-            ].map((service, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {services.map((service, i) => (
               <motion.div 
                 key={i}
-                variants={fadeInUp}
-                className="group p-8 rounded-[32px] bg-bg-card border border-white/5 hover:border-accent-blue/50 transition-all duration-500"
+                {...fadeInUp}
+                className="group p-10 rounded-2xl bg-bg-card border border-white/5 hover:border-accent-blue/30 hover:-translate-y-1 transition-all duration-500"
               >
-                <div className="w-14 h-14 bg-accent-blue/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 bg-white/[0.04] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   {service.icon}
                 </div>
-                <h4 className="text-2xl font-display font-bold mb-4">{service.title}</h4>
-                <p className="text-text-muted leading-relaxed">
-                  {service.desc}
-                </p>
+                <h4 className="text-xl font-display font-bold mb-3">{service.title}</h4>
+                <p className="text-text-muted text-sm leading-relaxed mb-6">{service.description}</p>
+                <ul className="grid grid-cols-2 gap-3 text-xs font-medium text-white/60">
+                  {service.features.map((feature, j) => (
+                    <li key={j} className="flex items-center gap-1.5">
+                      <CheckCircle className="text-accent-blue" size={12} />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             ))}
-          </motion.div>
-
-          {/* Featured Projects */}
-          <div className="border-t border-white/5 pt-24">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-              <motion.div {...fadeInUp}>
-                <h2 className="text-sm font-bold uppercase tracking-widest text-accent-blue mb-4">Showcase</h2>
-                <h3 className="text-4xl md:text-6xl font-display font-bold tracking-tight">Featured Projects</h3>
-              </motion.div>
-              <Link href="/portfolio" className="text-accent-blue font-bold flex items-center gap-2 hover:gap-4 transition-all">
-                Explore Portfolio <ArrowRight size={20} />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {portfolioItems.slice(0, 2).map((item) => (
-                <motion.div 
-                  key={item.id}
-                  {...fadeInUp}
-                  className="group relative bg-bg-card border border-white/5 rounded-3xl overflow-hidden hover:border-accent-blue/30 transition-all duration-500"
-                >
-                  <div className="aspect-[16/10] relative overflow-hidden">
-                    <img src={item.imageUrl} alt={item.name} 
-                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg-dark to-transparent opacity-60"></div>
-                  </div>
-                  <div className="p-8">
-                    <h4 className="text-2xl font-bold mb-3 group-hover:text-accent-blue transition-colors">{item.name}</h4>
-                    <p className="text-text-muted mb-6 line-clamp-2">
-                      {item.description}
-                    </p>
-                    <Link href={`/portfolio?id=${item.id}`} className="inline-flex items-center gap-2 text-sm font-bold text-accent-blue group-hover:gap-4 transition-all">
-                      Learn More <ArrowRight size={16} />
-                    </Link>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Lab Highlight */}
-      <section className="py-24 px-6 bg-accent-blue/5 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div {...fadeInUp}>
-              <h2 className="text-4xl sm:text-6xl md:text-7xl font-display font-bold tracking-tight mb-8">Where Research Meets <span className="text-gradient-blue">Reality</span></h2>
-              <p className="text-xl text-text-muted mb-10 leading-relaxed">
-                QoArc Lab is our innovation engine. We don't just use technology; we advance it through rigorous research and experimental development.
-              </p>
-              <div className="space-y-6 mb-10">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-accent-blue/20 flex items-center justify-center shrink-0">
-                    <Beaker size={16} className="text-accent-blue" />
-                  </div>
-                  <div>
-                    <h5 className="font-bold mb-1">PFAS Discovery Engine</h5>
-                    <p className="text-sm text-text-muted">High-throughput screening of molecules using GNN-driven safety models.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center shrink-0">
-                    <Brain size={16} className="text-accent-purple" />
-                  </div>
-                  <div>
-                    <h5 className="font-bold mb-1">Dual Brain Architecture</h5>
-                    <p className="text-sm text-text-muted">A hybrid AI model trained on Tox21/ChEMBL chemical physics data.</p>
-                  </div>
-                </div>
-              </div>
-              <Link href="/lab" className="inline-flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-accent-blue hover:text-white transition-all">
-                Explore PFAS Research <Beaker size={20} />
-              </Link>
-            </motion.div>
-            
-            <motion.div {...fadeInUp} className="relative">
-              <div className="aspect-video rounded-[40px] bg-bg-card border border-white/10 p-1 overflow-hidden glow-blue">
-                <div className="w-full h-full rounded-[38px] bg-gradient-to-br from-zinc-900 to-black p-8 flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <div className="font-mono text-[10px] text-accent-blue">LAB_SESSION_042</div>
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                      <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                    </div>
-                  </div>
-                  <div className="font-mono text-sm text-text-muted space-y-2">
-                    <p>&gt; Initializing GNN_Dual_Brain...</p>
-                    <p>&gt; Loading dataset: Tox21_ChEMBL_PFAS</p>
-                    <p>&gt; Screening epoch 42/100... [||||||||||] 94%</p>
-                    <p className="text-accent-blue">&gt; Discovery complete. Unicorns found: 12</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                      <Bolt size={20} className="text-accent-blue" />
-                    </div>
-                    <div className="text-xs font-bold uppercase tracking-widest">Research Active</div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact CTA */}
+      {/* ─── Featured Projects ─── */}
       <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto bg-gradient-to-br from-accent-blue to-accent-purple rounded-[48px] p-12 md:p-24 text-center relative overflow-hidden glow-purple">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+            <motion.div {...fadeInUp}>
+              <h2 className="text-sm font-bold uppercase tracking-widest text-accent-blue mb-4">Showcase</h2>
+              <h3 className="text-4xl md:text-6xl font-display font-bold tracking-tight">Featured Projects</h3>
+            </motion.div>
+            <Link href="/portfolio" className="text-accent-blue font-bold flex items-center gap-2 hover:gap-4 transition-all">
+              Explore Portfolio <ArrowRight size={20} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {portfolioItems.slice(0, 2).map((item) => (
+              <motion.div 
+                key={item.id}
+                {...fadeInUp}
+                className="group relative bg-bg-card border border-white/5 rounded-2xl overflow-hidden hover:border-accent-blue/30 transition-all duration-500"
+              >
+                <div className="aspect-[16/10] relative overflow-hidden">
+                  <img src={item.imageUrl} alt={item.name} 
+                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#131618] to-transparent opacity-60"></div>
+                </div>
+                <div className="p-8">
+                  <h4 className="text-xl font-bold mb-2 group-hover:text-accent-blue transition-colors">{item.name}</h4>
+                  <p className="text-text-muted text-sm mb-4 line-clamp-2">{item.description}</p>
+                  <Link href={`/portfolio?id=${item.id}`} className="inline-flex items-center gap-2 text-xs font-bold text-accent-blue uppercase tracking-widest group-hover:gap-3 transition-all">
+                    Learn More <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── About Section ─── */}
+      <section className="py-24 px-6 bg-white/[0.01]">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
+            <motion.div {...fadeInUp}>
+              <h2 className="text-sm font-bold uppercase tracking-widest text-accent-blue mb-4">Our Story</h2>
+              <h3 className="text-4xl md:text-6xl font-display font-bold tracking-tight mb-6">Visionary <span className="text-gradient-blue">Team</span></h3>
+              <p className="text-lg text-text-muted leading-relaxed mb-8">
+                QoArc Studio was founded on the belief that technology should be as intuitive as it is powerful. We are a collective of designers, engineers, and researchers dedicated to building the future of digital systems.
+              </p>
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <h4 className="text-3xl font-bold mb-1">3+</h4>
+                  <p className="text-xs text-text-muted uppercase tracking-widest font-bold">Projects Delivered</p>
+                </div>
+                <div>
+                  <h4 className="text-3xl font-bold mb-1">6</h4>
+                  <p className="text-xs text-text-muted uppercase tracking-widest font-bold">Core Researchers</p>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div {...fadeInUp} className="relative">
+              <div className="aspect-square rounded-2xl bg-gradient-to-br from-accent-blue/20 to-accent-purple/20 border border-white/10 p-12 flex items-center justify-center">
+                <div className="text-center">
+                  <Users size={64} className="text-white mb-4 mx-auto" strokeWidth={1.5} />
+                  <div className="text-xl font-display font-bold">Driven by Innovation</div>
+                </div>
+              </div>
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent-blue/20 rounded-full blur-3xl animate-pulse"></div>
+            </motion.div>
+          </div>
+
+          {/* Values */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { title: 'Our Mission', desc: 'To empower businesses with intelligent digital systems that provide practical problem solutions and drive sustainable growth.', icon: <Eye className="text-accent-blue" /> },
+              { title: 'Our Vision', desc: 'To be the global leader in research-driven AI and automation solutions, shaping the future of technology.', icon: <Sparkles className="text-accent-purple" /> },
+              { title: 'Core Values', desc: 'Excellence, Integrity, Innovation, and a relentless focus on delivering measurable value to our partners.', icon: <ShieldCheck className="text-accent-blue" /> }
+            ].map((value, i) => (
+              <motion.div key={i} {...fadeInUp} className="p-6 rounded-2xl bg-bg-card border border-white/5">
+                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mb-4">
+                  {value.icon}
+                </div>
+                <h4 className="text-lg font-bold mb-2">{value.title}</h4>
+                <p className="text-text-muted text-sm leading-relaxed">{value.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Contact CTA ─── */}
+      <section className="py-24 px-6">
+        <div className="max-w-5xl mx-auto bg-gradient-to-br from-accent-blue to-accent-purple rounded-2xl p-12 md:p-20 text-center relative overflow-hidden">
           <motion.div {...fadeInUp} className="relative z-10">
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-display font-bold mb-8 leading-tight">Case Study: PFAS Safety Discovery</h2>
-            <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
-              We developed a custom GNN-driven discovery engine to identify non-toxic "Unicorn" alternatives to persistent "Forever Chemicals".
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-display font-bold mb-6 leading-tight">Ready to Build Your <br/>Next Vision?</h2>
+            <p className="text-lg text-white/80 mb-10 max-w-2xl mx-auto">
+              Let's turn your idea into a high-performance digital product. From concept to launch, we've got you covered.
             </p>
-            <div className="grid grid-cols-2 gap-8 mb-12 max-w-lg mx-auto">
-              <div className="text-center">
-                <div className="text-5xl font-black mb-2">5M</div>
-                <div className="text-xs uppercase tracking-widest font-bold opacity-70">Candidates Screened</div>
-              </div>
-              <div className="text-center">
-                <div className="text-5xl font-black mb-2">10/10</div>
-                <div className="text-xs uppercase tracking-widest font-bold opacity-70">Safety Score</div>
-              </div>
-            </div>
-            <Link href="/lab" className="inline-flex items-center gap-2 bg-white text-black px-12 py-5 rounded-full font-black text-xl hover:scale-105 transition-transform shadow-2xl">
-              Read Full Case Study <Beaker size={24} />
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-2xl">
+              Start a Conversation <Rocket size={20} />
             </Link>
           </motion.div>
-          {/* Tech pattern */}
           <div className="absolute inset-0 opacity-10 pointer-events-none bg-grid"></div>
         </div>
       </section>
