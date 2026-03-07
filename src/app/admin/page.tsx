@@ -6,11 +6,12 @@ import {
   PlusCircle, LogOut, ArrowLeft, Edit3, Trash2, List, 
   Rocket, PlayCircle, Image, FileText, ChevronRight, 
   Layout, Save, X, Plus, AlertCircle, CheckCircle2,
-  Lock, ArrowRight, Loader2, Mail, LayoutGrid
+  Lock, ArrowRight, Loader2, Mail, LayoutGrid, Download
 } from 'lucide-react';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { PortfolioItem } from '@/lib/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getAssetFromDB } from '@/lib/idb';
 
 function AdminContent() {
 
@@ -201,6 +202,27 @@ function AdminContent() {
       ...prev,
       [field]: (prev[field] as string[] || []).filter((_, i) => i !== idx)
     }));
+  };
+
+  const handleDownloadAsset = async (id: string, name: string) => {
+    try {
+      const file = await getAssetFromDB(id);
+      if (!file) {
+        alert("File not found in local browser storage.");
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert("Error retrieving file.");
+    }
   };
 
   if (!isLoggedIn) {
@@ -711,7 +733,31 @@ function AdminContent() {
                          <p className="text-2xl leading-[1.6] text-white/90 font-medium whitespace-pre-wrap tracking-tight italic">
                            "{msg.message}"
                          </p>
-                         <div className="absolute bottom-6 right-8 opacity-5">
+                         
+                         {msg.assets && msg.assets.length > 0 && (
+                           <div className="mt-8 space-y-4 relative z-10">
+                             <div className="text-[10px] uppercase font-black text-text-muted tracking-[0.4em]">Attached Assets</div>
+                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                               {msg.assets.map(asset => (
+                                 <button
+                                   key={asset.id}
+                                   onClick={() => handleDownloadAsset(asset.id, asset.name)}
+                                   className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-accent-blue/10 hover:border-accent-blue/30 transition-all text-left group"
+                                 >
+                                    <div className="flex flex-col overflow-hidden">
+                                      <p className="text-sm font-bold text-white truncate max-w-[200px]">{asset.name}</p>
+                                      <p className="text-[10px] text-text-muted">{(asset.size / 1024 / 1024).toFixed(2)} MB</p>
+                                    </div>
+                                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-accent-blue group-hover:text-white text-text-muted transition-colors flex-shrink-0">
+                                      <Download size={16} />
+                                    </div>
+                                 </button>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+                         
+                         <div className="absolute bottom-6 right-8 opacity-5 pointer-events-none">
                             <Mail size={120} />
                          </div>
                       </div>

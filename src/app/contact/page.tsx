@@ -2,13 +2,20 @@
 
 import React, { useState } from 'react';
 import { 
-  PlusCircle, LogOut, ArrowLeft, Edit3, Trash2, List, 
-  Rocket, PlayCircle, Image, FileText, ChevronRight, 
-  Layout, Save, X, Plus, AlertCircle, CheckCircle2,
-  Lock, ArrowRight, Loader2, Mail, LayoutGrid, CheckCircle, Send
+  CheckCircle, 
+  ArrowRight, 
+  Plus, 
+  Send, 
+  Loader2, 
+  ChevronLeft,
+  Upload as UploadIcon,
+  File as FileIcon,
+  X,
+  Link as LinkIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePortfolio } from '@/context/PortfolioContext';
+import { saveAssetToDB } from '@/lib/idb';
 
 const fadeInUp: any = {
   initial: { opacity: 0, y: 30 },
@@ -23,7 +30,14 @@ const ProjectDiscoveryFlow = () => {
   const [direction, setDirection] = useState(0);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    email: '', 
+    phone: '', 
+    driveLink: '' 
+  });
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const steps = [
     // ... (steps 0-2)
@@ -72,6 +86,11 @@ const ProjectDiscoveryFlow = () => {
         "Research & Validation",
         "Long-term Technical Partnership"
       ]
+    },
+    {
+      id: 'assets',
+      question: "Do you have any existing assets or requirements?",
+      isAssetStep: true
     }
   ];
 
@@ -79,6 +98,34 @@ const ProjectDiscoveryFlow = () => {
   const activeSteps = steps.filter(s => !s.condition || s.condition(answers));
   const isFinalStep = step === activeSteps.length;
   const currentStepData = activeSteps[step];
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    let files: File[] = [];
+    if ('files' in e.target && e.target.files) {
+      files = Array.from(e.target.files);
+    } else if ('dataTransfer' in e && e.dataTransfer.files) {
+      files = Array.from(e.dataTransfer.files);
+    }
+
+    const MAX_SIZE = 20 * 1024 * 1024; // 20MB
+    const validFiles = files.filter(f => f.size <= MAX_SIZE);
+    
+    if (validFiles.length < files.length) {
+      alert("Some files were skipped because they exceed the 20MB limit.");
+    }
+
+    setAttachedFiles(prev => [
+      ...prev, 
+      ...validFiles
+    ]);
+  };
+
+  const removeFile = (name: string) => {
+    setAttachedFiles(prev => prev.filter(f => f.name !== name));
+  };
 
   const toggleSelection = (opt: string) => {
     if (currentStepData.multiSelect) {
@@ -113,21 +160,35 @@ const ProjectDiscoveryFlow = () => {
       ? answers.scope.join(', ') 
       : answers.scope;
 
+    const fileList = attachedFiles.length > 0 
+      ? `\n- Attached Assets: ${attachedFiles.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(2)}MB)`).join(', ')}`
+      : '';
+
+    const driveInfo = formData.driveLink ? `\n- Google Drive Link: ${formData.driveLink}` : '';
+
     const fullMessage = `
 Project Discovery Brief:
-- Phone: ${formData.phone || 'Not provided'}
+- Phone: ${formData.phone || 'Not provided'}${driveInfo}
 - Intent: ${answers.intent}
 ${answers.research ? `- Research Focus: ${answers.research}` : ''}
 - Project Stage: ${answers.stage}
-- Collaboration Scope: ${formattedScope}
+- Collaboration Scope: ${formattedScope}${fileList}
     `.trim();
 
     try {
+      const assetsData = [];
+      for (const file of attachedFiles) {
+        const id = Date.now().toString() + '-' + Math.random().toString(36).substring(2, 9);
+        await saveAssetToDB(id, file);
+        assetsData.push({ id, name: file.name, size: file.size });
+      }
+
       addSubmission({
         name: formData.name,
         email: formData.email,
         service: answers.intent,
-        message: fullMessage
+        message: fullMessage,
+        assets: assetsData
       });
 
       // Background Formspree backup
@@ -137,7 +198,12 @@ ${answers.research ? `- Research Focus: ${answers.research}` : ''}
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ ...formData, message: fullMessage, ...answers })
+        body: JSON.stringify({ 
+          ...formData, 
+          message: fullMessage, 
+          ...answers,
+          attachedFiles: attachedFiles.map(f => f.name).join(', ')
+        })
       }).catch(err => console.error("Backup failed:", err));
 
       setStatus('success');
@@ -222,57 +288,144 @@ ${answers.research ? `- Research Focus: ${answers.research}` : ''}
                 <h2 className="text-4xl md:text-6xl font-display font-bold tracking-tight text-white mb-6 max-w-4xl mx-auto leading-[1.1]">
                   {activeSteps[step].question}
                 </h2>
-                {activeSteps[step].multiSelect && (
-                  <p className="text-accent-blue font-bold uppercase tracking-[0.2em] text-[10px] mb-12">Select all that apply</p>
-                )}
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {activeSteps[step].options.map((opt) => {
-                    const isSelected = activeSteps[step].multiSelect 
-                      ? (answers[activeSteps[step].id] || []).includes(opt)
-                      : answers[activeSteps[step].id] === opt;
-                    
-                    return (
-                      <button
-                        key={opt}
-                        onClick={() => toggleSelection(opt)}
-                        className={`group relative p-8 rounded-[32px] border transition-all duration-300 text-left hover:-translate-y-1 ${
-                          isSelected 
-                            ? 'bg-accent-blue/10 border-accent-blue shadow-glow-blue' 
-                            : 'bg-white/5 border-white/5 hover:border-accent-blue/40 hover:bg-accent-blue/5'
-                        }`}
-                      >
-                        <div className="flex flex-col h-full justify-between items-start">
-                          <span className={`text-lg font-bold transition-colors leading-tight ${
-                            isSelected ? 'text-accent-blue' : 'text-white group-hover:text-accent-blue'
-                          }`}>{opt}</span>
-                          <div className={`mt-6 w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
-                            isSelected 
-                              ? 'bg-accent-blue border-accent-blue' 
-                              : 'border-white/10 group-hover:bg-accent-blue group-hover:border-accent-blue'
-                          }`}>
-                            {isSelected ? (
-                              <CheckCircle size={16} className="text-white" />
-                            ) : (
-                              <Plus size={16} className="text-text-muted group-hover:text-white" />
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                {currentStepData.isAssetStep ? (
+                  <div className="max-w-2xl mx-auto space-y-8">
+                    {/* Drive Link Input */}
+                    <div className="relative group">
+                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-accent-blue transition-colors">
+                        <LinkIcon size={20} />
+                      </div>
+                      <input 
+                        type="url" 
+                        placeholder="Paste Google Drive or Dropbox link" 
+                        value={formData.driveLink}
+                        onChange={(e) => setFormData(prev => ({ ...prev, driveLink: e.target.value }))}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl pl-16 pr-8 py-5 text-lg focus:border-accent-blue outline-none transition-all placeholder:text-white/20"
+                      />
+                    </div>
 
-                {activeSteps[step].multiSelect && (
-                  <motion.button
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    onClick={() => nextStep()}
-                    disabled={!(answers[activeSteps[step].id] || []).length}
-                    className="mt-16 bg-white text-black px-12 py-5 rounded-full font-black text-lg hover:bg-accent-blue hover:text-white transition-all shadow-2xl disabled:opacity-20"
-                  >
-                    Continue <ArrowRight size={20} className="inline-block ml-2" />
-                  </motion.button>
+                    <div className="relative py-4 flex items-center gap-4">
+                      <div className="h-px flex-1 bg-white/5" />
+                      <span className="text-[10px] font-black uppercase text-text-muted tracking-widest">or upload directly</span>
+                      <div className="h-px flex-1 bg-white/5" />
+                    </div>
+
+                    <div 
+                      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={handleFileUpload}
+                      className={`relative border-2 border-dashed rounded-[32px] p-12 transition-all duration-300 ${
+                        isDragging 
+                          ? 'border-accent-blue bg-accent-blue/5 scale-[1.02]' 
+                          : 'border-white/10 bg-white/5 hover:border-white/20'
+                      }`}
+                    >
+                      <input 
+                        type="file" 
+                        multiple 
+                        onChange={handleFileUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <div className="flex flex-col items-center gap-4 text-text-muted">
+                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
+                          <UploadIcon className={isDragging ? 'text-accent-blue' : ''} size={24} />
+                        </div>
+                        <p className="text-lg">
+                          <span className="text-white font-bold">Click to upload</span> or drag and drop
+                        </p>
+                        <p className="text-sm">Logos, Guidelines, Requirements (Max 20MB)</p>
+                      </div>
+                    </div>
+
+                    {attachedFiles.length > 0 && (
+                      <div className="grid grid-cols-1 gap-3">
+                        {attachedFiles.map(file => (
+                          <div key={file.name} className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-2xl animate-in fade-in slide-in-from-bottom-2">
+                            <div className="flex items-center gap-3">
+                              <FileIcon size={18} className="text-accent-blue" />
+                              <div className="text-left">
+                                <p className="text-sm font-bold text-white truncate max-w-[200px]">{file.name}</p>
+                                <p className="text-[10px] text-text-muted">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                              </div>
+                            </div>
+                            <button 
+                              type="button"
+                              onClick={() => removeFile(file.name)}
+                              className="p-2 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition-colors"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 mt-12">
+                      <button
+                        onClick={() => nextStep()}
+                        className="bg-white text-black px-12 py-5 rounded-full font-black text-lg hover:bg-accent-blue hover:text-white transition-all shadow-2xl"
+                      >
+                        {(attachedFiles.length > 0 || formData.driveLink) ? 'Continue' : 'Skip this step'} 
+                        <ArrowRight size={20} className="inline-block ml-2" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {activeSteps[step].multiSelect && (
+                      <p className="text-accent-blue font-bold uppercase tracking-[0.2em] text-[10px] mb-12">Select all that apply</p>
+                    )}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {(activeSteps[step].options || []).map((opt) => {
+                        const isSelected = activeSteps[step].multiSelect 
+                          ? (answers[activeSteps[step].id] || []).includes(opt)
+                          : answers[activeSteps[step].id] === opt;
+                        
+                        return (
+                          <button
+                            key={opt}
+                            onClick={() => toggleSelection(opt)}
+                            className={`group relative p-8 rounded-[32px] border transition-all duration-300 text-left hover:-translate-y-1 ${
+                              isSelected 
+                                ? 'bg-accent-blue/10 border-accent-blue shadow-glow-blue' 
+                                : 'bg-white/5 border-white/5 hover:border-accent-blue/40 hover:bg-accent-blue/5'
+                            }`}
+                          >
+                            <div className="flex flex-col h-full justify-between items-start">
+                              <span className={`text-lg font-bold transition-colors leading-tight ${
+                                isSelected ? 'text-accent-blue' : 'text-white group-hover:text-accent-blue'
+                              }`}>{opt}</span>
+                              <div className={`mt-6 w-8 h-8 rounded-full border flex items-center justify-center transition-all ${
+                                isSelected 
+                                  ? 'bg-accent-blue border-accent-blue' 
+                                  : 'border-white/10 group-hover:bg-accent-blue group-hover:border-accent-blue'
+                              }`}>
+                                {isSelected ? (
+                                  <CheckCircle size={16} className="text-white" />
+                                ) : (
+                                  <Plus size={16} className="text-text-muted group-hover:text-white" />
+                                )}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {activeSteps[step].multiSelect && (
+                      <motion.button
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        onClick={() => nextStep()}
+                        disabled={!(answers[activeSteps[step].id] || []).length}
+                        className="mt-16 bg-white text-black px-12 py-5 rounded-full font-black text-lg hover:bg-accent-blue hover:text-white transition-all shadow-2xl disabled:opacity-20"
+                      >
+                        Continue <ArrowRight size={20} className="inline-block ml-2" />
+                      </motion.button>
+                    )}
+                  </>
                 )}
               </div>
             </motion.div>
@@ -338,9 +491,9 @@ ${answers.research ? `- Research Focus: ${answers.research}` : ''}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             onClick={prevStep}
-            className="mt-12 mx-auto flex items-center gap-2 text-text-muted hover:text-white transition-colors font-bold uppercase tracking-widest text-[10px]"
+            className="flex items-center gap-2 text-text-muted hover:text-white transition-colors mt-12 mx-auto font-bold uppercase tracking-widest text-[10px]"
           >
-            <ArrowLeft size={14} /> Previous Step
+            <ChevronLeft size={14} /> Previous Step
           </motion.button>
         )}
       </div>
