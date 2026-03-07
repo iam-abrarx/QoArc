@@ -6,7 +6,7 @@ import {
   PlusCircle, LogOut, ArrowLeft, Edit3, Trash2, List, 
   Rocket, PlayCircle, Image, FileText, ChevronRight, 
   Layout, Save, X, Plus, AlertCircle, CheckCircle2,
-  Lock, ArrowRight, Loader2, Mail
+  Lock, ArrowRight, Loader2, Mail, LayoutGrid
 } from 'lucide-react';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { PortfolioItem } from '@/lib/portfolio';
@@ -54,6 +54,9 @@ function AdminContent() {
     mobileMockups: [],
     desktopMockups: [],
     videoUrl: '',
+    uiComponents: [],
+    systemDiagram: '',
+    systemDiagramCaption: '',
     url: '',
     metaTitle: '',
     metaDescription: '',
@@ -501,6 +504,32 @@ function AdminContent() {
                     <div className="space-y-3">
                       <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Video Showcase (Vimeo/YT)</label>
                       <input value={newItem.videoUrl} onChange={(e) => setNewItem({ ...newItem, videoUrl: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-2xl px-5 py-4 outline-none text-sm" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-8 pt-8 border-t border-white/5">
+                    <h3 className="text-xl font-display font-bold flex items-center gap-3">
+                      <LayoutGrid className="text-accent-purple" size={20} /> Design System & Architecture
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="space-y-3">
+                        <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">UI/UX Components Used</label>
+                        {(newItem.uiComponents || []).map((comp, idx) => (
+                          <div key={idx} className="flex gap-2">
+                            <input value={comp} onChange={(e) => updateArrayField('uiComponents', idx, e.target.value)} type="text" className="flex-1 bg-bg-dark border border-white/5 rounded-xl px-4 py-3 focus:border-accent-purple/30 outline-none text-sm" />
+                            <button type="button" onClick={() => removeArrayItem('uiComponents', idx)} className="px-3 rounded-xl bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20">×</button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => addArrayItem('uiComponents')} className="text-xs text-accent-purple underline">+ Add Component</button>
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">System Architecture Diagram URL</label>
+                        <input value={newItem.systemDiagram} onChange={(e) => setNewItem({ ...newItem, systemDiagram: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-xl px-5 py-4 outline-none text-sm" />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Diagram Caption</label>
+                        <input value={newItem.systemDiagramCaption} onChange={(e) => setNewItem({ ...newItem, systemDiagramCaption: e.target.value })} type="text" placeholder="Pipeline description..." className="w-full bg-bg-dark border border-white/5 rounded-xl px-5 py-4 outline-none text-sm" />
+                      </div>
                     </div>
                   </div>
 
