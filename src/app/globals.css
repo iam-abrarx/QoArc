@@ -88,3 +88,25 @@
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+
+/* react-phone-number-input Custom Theme overrides */
+.custom-phone-input .PhoneInputInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  width: 100%;
+}
+
+.custom-phone-input .PhoneInputCountry {
+  margin-right: 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding-right: 16px;
+}
+
+.custom-phone-input .PhoneInputCountrySelectArrow {
+  opacity: 0.5;
+  color: white;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+}

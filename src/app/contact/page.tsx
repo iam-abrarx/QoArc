@@ -16,6 +16,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { saveAssetToDB } from '@/lib/idb';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 const fadeInUp: any = {
   initial: { opacity: 0, y: 30 },
@@ -143,6 +145,16 @@ const ProjectDiscoveryFlow = () => {
   };
 
   const nextStep = () => {
+    // Validate drive link if on assets step before proceeding
+    if (activeSteps[step]?.id === 'assets' && formData.driveLink) {
+      try {
+        new URL(formData.driveLink);
+      } catch (err) {
+        alert("Please enter a valid URL (e.g., https://drive.google.com/...)");
+        return;
+      }
+    }
+
     setDirection(1);
     setStep(prev => prev + 1);
   };
@@ -154,6 +166,13 @@ const ProjectDiscoveryFlow = () => {
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    
+    // Validate phone number if provided
+    if (formData.phone && !isValidPhoneNumber(formData.phone)) {
+      alert("Please enter a valid phone number.");
+      return;
+    }
+
     setStatus('submitting');
 
     const formattedScope = Array.isArray(answers.scope) 
@@ -461,13 +480,17 @@ ${answers.research ? `- Research Focus: ${answers.research}` : ''}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-lg focus:border-accent-blue outline-none transition-all placeholder:text-white/20"
                     required
                   />
-                  <input 
-                    type="tel" 
-                    placeholder="Phone Number (Optional)" 
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full md:col-span-2 bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-lg focus:border-accent-blue outline-none transition-all placeholder:text-white/20"
-                  />
+                  <div className="w-full md:col-span-2 text-left">
+                    <PhoneInput
+                      international
+                      defaultCountry="US"
+                      limitMaxLength={true}
+                      placeholder="Phone Number (Optional)"
+                      value={formData.phone}
+                      onChange={(val) => setFormData(prev => ({ ...prev, phone: val as string }))}
+                      className="w-full custom-phone-input bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-lg focus-within:border-accent-blue transition-all"
+                    />
+                  </div>
                 </div>
                 <button 
                   type="submit"
