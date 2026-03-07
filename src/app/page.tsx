@@ -80,7 +80,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-5xl sm:text-7xl md:text-9xl font-display font-extrabold tracking-tighter leading-[0.85] mb-8"
           >
-            Building <span className="text-gradient-blue">Intelligent</span><br/>Digital Systems
+            Building <span className="text-gradient-blue">Intelligent</span><br/>Digital Society
           </motion.h1>
 
           <motion.p 
