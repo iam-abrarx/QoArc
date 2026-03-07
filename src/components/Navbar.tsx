@@ -20,6 +20,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Services', href: '/#services' },
+    { name: 'Portfolio', href: '/#portfolio' },
     { name: 'Studio', href: '/studio' },
     { name: 'QoArc Lab', href: '/lab' },
     { name: 'About', href: '/#about' },
