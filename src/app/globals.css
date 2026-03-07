@@ -7,8 +7,8 @@
   --font-display: "Outfit", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-bg-dark: #131618;
-  --color-bg-card: #1a1d21;
+  --color-bg-dark: #181c20;
+  --color-bg-card: #22272c;
   --color-accent-blue: #3b82f6;
   --color-accent-purple: #8b5cf6;
   --color-text-muted: #94a3b8;
@@ -54,7 +54,7 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #131618;
+  background: #181c20;
 }
 ::-webkit-scrollbar-thumb {
   background: #1e293b;

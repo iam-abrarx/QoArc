@@ -43,40 +43,53 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addItem = (item: Omit<PortfolioItem, 'id'>) => {
-    const newItem = { ...item, id: Date.now().toString() };
-    const updated = [...portfolioItems, newItem];
-    setPortfolioItems(updated);
-    localStorage.setItem('portfolioItems', JSON.stringify(updated));
+    const newItem = { ...item, id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}` };
+    setPortfolioItems(prev => {
+      const updated = [...prev, newItem];
+      localStorage.setItem('portfolioItems', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const deleteItem = (id: string) => {
-    const updated = portfolioItems.filter(i => i.id !== id);
-    setPortfolioItems(updated);
-    localStorage.setItem('portfolioItems', JSON.stringify(updated));
+    setPortfolioItems(prev => {
+      const updated = prev.filter(i => String(i.id) !== String(id));
+      localStorage.setItem('portfolioItems', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const updateItem = (item: PortfolioItem) => {
-    const updated = portfolioItems.map(i => i.id === item.id ? item : i);
-    setPortfolioItems(updated);
-    localStorage.setItem('portfolioItems', JSON.stringify(updated));
+    setPortfolioItems(prev => {
+      const updated = prev.map(i => String(i.id) === String(item.id) ? item : i);
+      localStorage.setItem('portfolioItems', JSON.stringify(updated));
+      return updated;
+    });
   };
+
 
   const addSubmission = (submission: Omit<ContactSubmission, 'id' | 'date'>) => {
     const newSubmission: ContactSubmission = {
       ...submission,
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       date: new Date().toLocaleString()
     };
-    const updated = [newSubmission, ...contactSubmissions];
-    setContactSubmissions(updated);
-    localStorage.setItem('contactSubmissions', JSON.stringify(updated));
+    setContactSubmissions(prev => {
+      const updated = [newSubmission, ...prev];
+      localStorage.setItem('contactSubmissions', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const deleteSubmission = (id: string) => {
-    const updated = contactSubmissions.filter(s => s.id !== id);
-    setContactSubmissions(updated);
-    localStorage.setItem('contactSubmissions', JSON.stringify(updated));
+    setContactSubmissions(prev => {
+      const updated = prev.filter(s => String(s.id) !== String(id));
+      localStorage.setItem('contactSubmissions', JSON.stringify(updated));
+      return updated;
+    });
   };
+
+
 
   return (
     <PortfolioContext.Provider value={{ 

@@ -29,25 +29,25 @@ export default function LabPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-24">
           {[
             { 
-              title: '"Dual Brain" GNN', 
-              desc: 'A hybrid architecture fusing Graph Convolutional Networks (Topology) with RDKit physics descriptors (Cheminformatics).',
-              stats: '192-dim Latent Space',
+              title: 'COW Project', 
+              desc: 'Computer-vision Based Observation of Livestock using SAM2 and Depth Anything v2 for precision agriculture.',
+              stats: '1,190 Fully Processed SKUs',
               accent: 'blue',
-              icon: <PsychologyIcon />,
+              icon: <Beaker size={16} />,
               bgClass: 'bg-dots'
             },
             { 
-              title: 'Rigidity Hypothesis', 
-              desc: 'Identifying why legacy PFAS are toxic: "Rigid Crowbars" that physically jam nuclear receptors and trigger toxicity.',
-              stats: 'Chemical Physics',
+              title: 'PFAS Rigidity', 
+              desc: 'Deep learning screening of toxic PFAS using Graph Neural Networks and the Rigidity Hypothesis.',
+              stats: '50K Safe Variants',
               accent: 'purple',
-              icon: <ScienceIcon />,
+              icon: <Beaker size={16} />,
               bgClass: 'bg-network'
             },
             { 
-              title: 'Discovery Funnel', 
-              desc: 'Scaling molecular screening to 5 Million unique candidates via LSTM-based generation and Reinforcement Learning (PPO).',
-              stats: '5M Candidates',
+              title: 'Neural Command Center', 
+              desc: 'Distributed deep learning training dashboard with gradient compression and node coordination.',
+              stats: '40+ Architectures',
               accent: 'blue',
               icon: <Filter size={16} />,
               bgClass: 'bg-dots'
@@ -75,22 +75,22 @@ export default function LabPage() {
         <motion.div {...fadeInUp} className="bg-bg-card rounded-[48px] border border-white/5 p-12 md:p-20 relative overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-4xl font-display font-bold mb-8">Breakthrough: The Unicorn Discovery</h2>
+              <h2 className="text-4xl font-display font-bold mb-8">Breakthrough: Distributed Training</h2>
               <p className="text-lg text-text-muted mb-10 leading-relaxed">
-                By incorporating flexible "ether hinges" (-O-), we identified molecules that achieve perfect safety scores (10/10) while maintaining vital industrial properties.
+                Our DDP (Distributed Deep Learning Platform) achieves significant bandwidth reduction through Top-1% gradient compression, enabling efficient training across decentralized worker nodes.
               </p>
               <button className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-accent-blue hover:text-white transition-all">
-                Read Research Paper
+                View DDP Documentation
               </button>
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="p-8 rounded-3xl bg-white/5 border border-white/10 text-center">
-                <div className="text-4xl font-black text-accent-blue mb-2">10/10</div>
-                <div className="text-xs text-text-muted uppercase tracking-widest font-bold">Safety Score</div>
+                <div className="text-4xl font-black text-accent-blue mb-2">99%</div>
+                <div className="text-xs text-text-muted uppercase tracking-widest font-bold">Compression</div>
               </div>
               <div className="p-8 rounded-3xl bg-white/5 border border-white/10 text-center">
-                <div className="text-4xl font-black text-accent-purple mb-2">50K</div>
-                <div className="text-xs text-text-muted uppercase tracking-widest font-bold">Safe Variants</div>
+                <div className="text-4xl font-black text-accent-purple mb-2">40+</div>
+                <div className="text-xs text-text-muted uppercase tracking-widest font-bold">Models Verified</div>
               </div>
             </div>
           </div>

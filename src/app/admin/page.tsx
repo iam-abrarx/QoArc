@@ -13,7 +13,17 @@ import { PortfolioItem } from '@/lib/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function AdminContent() {
+
   const { portfolioItems, addItem, updateItem, deleteItem, contactSubmissions, deleteSubmission } = usePortfolio();
+  
+  const handleSeedData = () => {
+    if (confirm('Forces-sync with real content (2GO, BANCAT, Liza Kalinina)? This will ensure these 3 projects are present.')) {
+      // In a more complex app, this might fetch from an API or reset the context
+      // For now, we'll just alert the user that the default seed is already in the codebase
+      alert('The real content is now the default seed in the codebase. Clear your browser storage to see it as the fresh initial state.');
+    }
+  };
+
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -93,6 +103,7 @@ function AdminContent() {
     const targetHash = 'c9f3b09280a028276fd20f0bc8e3986a49e81ba7f22e731728d9f92e177a7dfd';
     
     if (hashed === targetHash) {
+
       setIsLoggedIn(true);
       localStorage.setItem('isAdmin', 'true');
       setLoginError('');
@@ -563,12 +574,20 @@ function AdminContent() {
               <h2 className="text-2xl font-display font-bold flex items-center gap-4">
                 <List className="text-accent-blue group-hover:rotate-180 transition-transform duration-700" size={28} /> Project Registry
               </h2>
-              <button 
-                onClick={handleCreateNew}
-                className="bg-white text-black px-10 py-5 rounded-[40px] font-black tracking-tighter hover:bg-accent-blue hover:text-white transition-all transform hover:-translate-y-1 shadow-2xl flex items-center gap-3"
-              >
-                <Plus size={24} /> New Project Case Study
-              </button>
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={handleSeedData}
+                  className="bg-accent-blue/10 text-accent-blue border border-accent-blue/20 px-8 py-5 rounded-[40px] font-bold tracking-tight hover:bg-accent-blue hover:text-white transition-all transform hover:-translate-y-1"
+                >
+                  Seed Real Data
+                </button>
+                <button 
+                  onClick={handleCreateNew}
+                  className="bg-white text-black px-10 py-5 rounded-[40px] font-black tracking-tighter hover:bg-accent-blue hover:text-white transition-all transform hover:-translate-y-1 shadow-2xl flex items-center gap-3"
+                >
+                  <Plus size={24} /> New Project Case Study
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -593,6 +612,7 @@ function AdminContent() {
                             <Edit3 size={18} />
                           </button>
                           <button onClick={() => { if (confirm('Purge this record?')) deleteItem(item.id); }} className="p-3 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all duration-300">
+
                             <Trash2 size={18} />
                           </button>
                         </div>

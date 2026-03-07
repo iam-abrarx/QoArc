@@ -125,7 +125,7 @@ export default function StudioPage() {
               >
                 <div className="aspect-[16/10] relative overflow-hidden">
                   <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#131618] via-[#131618]/30 to-transparent opacity-80"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#181c20] via-[#181c20]/30 to-transparent opacity-80"></div>
                   
                   {item.isFeatured && (
                     <div className="absolute top-4 left-4 bg-accent-blue text-white px-3 py-1 rounded-md z-10">
@@ -193,7 +193,7 @@ export default function StudioPage() {
         {selectedItem && (
           <div className="fixed inset-0 z-[60]">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-[#131618]/98 backdrop-blur-2xl" 
+              className="absolute inset-0 bg-[#181c20]/98 backdrop-blur-2xl" 
               onClick={() => { setSelectedItem(null); document.body.style.overflow = 'auto'; }}
             />
             
@@ -203,7 +203,7 @@ export default function StudioPage() {
               className="relative w-full h-full flex"
             >
               {/* Left Chapter Navigation */}
-              <div className="hidden lg:flex flex-col w-52 border-r border-white/[0.04] bg-[#131618]/80 backdrop-blur-xl pt-28 px-4 flex-shrink-0">
+              <div className="hidden lg:flex flex-col w-52 border-r border-white/[0.04] bg-[#181c20]/80 backdrop-blur-xl pt-28 px-4 flex-shrink-0">
                 <button onClick={() => { setSelectedItem(null); document.body.style.overflow = 'auto'; }}
                   className="mb-8 w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] flex items-center justify-center hover:bg-white/10 transition-colors text-white/50 hover:text-white">
                   <X size={14} />
@@ -233,7 +233,7 @@ export default function StudioPage() {
               {/* Right Scrollable Content */}
               <div ref={contentRef} className="flex-1 overflow-y-auto custom-scrollbar">
                 {/* Mobile Close */}
-                <div className="lg:hidden sticky top-0 z-20 p-4 flex justify-between items-center bg-[#131618]/90 backdrop-blur-xl border-b border-white/[0.04]">
+                <div className="lg:hidden sticky top-0 z-20 p-4 flex justify-between items-center bg-[#181c20]/90 backdrop-blur-xl border-b border-white/[0.04]">
                   <span className="text-sm font-bold truncate">{selectedItem.name}</span>
                   <button onClick={() => { setSelectedItem(null); document.body.style.overflow = 'auto'; }}
                     className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center"><X size={14} /></button>
@@ -242,7 +242,7 @@ export default function StudioPage() {
                 {/* Hero */}
                 <div className="relative aspect-[21/9] overflow-hidden" id="chapter-overview">
                   <img src={selectedItem.heroImage || selectedItem.imageUrl} className="w-full h-full object-cover" alt={selectedItem.name} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#131618] via-[#131618]/50 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#181c20] via-[#181c20]/50 to-transparent"></div>
                   <div className="absolute bottom-8 left-8 right-8 md:left-12 md:right-12">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                       <span className="px-3 py-1 rounded-md bg-accent-blue text-white text-[9px] font-black uppercase tracking-widest">{selectedItem.category}</span>
