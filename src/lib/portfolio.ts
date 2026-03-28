@@ -35,6 +35,7 @@ export interface PortfolioItem {
   imageUrl: string; // Thumbnail/Cover
   galleryImages?: string[];
   mobileMockups?: string[];
+  tabletMockups?: string[];
   desktopMockups?: string[];
   videoUrl?: string;
 
@@ -61,122 +62,171 @@ export interface PortfolioItem {
   isVisibleOnHome?: boolean;
   status?: 'draft' | 'published';
   order?: number;
+
+  // New fields for Carousel/Showcase
+  deviceType?: 'mobile' | 'tablet' | 'desktop' | 'random';
+  primaryColor?: string;
+  challenges?: string; // Specific for carousel-style display
+  solutions?: string; // Specific for carousel-style display
+  stats?: { value: string; label: string }[];
 }
 
 export const initialProjects: PortfolioItem[] = [
   {
-    id: '2go-juice-system',
-    name: '2GO Bangladesh — Fresh Juice System',
-    client: '2GO Bangladesh',
-    slug: '2go-juice-system',
-    description: 'A revolutionary fresh juice brand and integrated retail system providing healthy, affordable, and high-quality beverages across Dhaka.',
-    category: 'Branding & Retail',
-    industry: 'Food & Beverage',
-    services: ['Brand Identity', 'Retail System Design', 'Digital Experience', 'Supply Chain Integration'],
-    year: '2024',
-    techStack: ['Freshness Optimization', 'Retail OS', 'Inventory Intelligence'],
-    heroImage: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=2670',
-    intro: 'The Mastermind of Freshness. 2GO is redefining the beverage industry in Bangladesh with a focus on hygiene, health, and a premium "grab-and-go" experience.',
-    duration: 'Ongoing',
-    scope: 'Developing a scalable retail model from brand identity to the proprietary fruit-sourcing and inventory management system.',
-    platform: 'Retail + Digital Ecosystem',
-    deliverables: ['Visual Identity System', 'Store Design Guidelines', 'Inventory Management App', 'Customer Loyalty Platform'],
-    teamRole: 'Strategic Partners',
-    challenge: 'The juice market in Dhaka is fragmented between unhygienic street vendors and over-priced imported brands. There was no "middle-ground" offering high-quality, fresh, and affordable juices for the daily commuter.',
-    goal: 'Create a brand that feels premium yet accessible, backed by a robust system that ensures 100% freshness and high throughput across multiple retail touchpoints.',
-    solution: 'We developed a clean, minimalist brand identity centered around "2GO" logic—speed and health. The system includes optimized fruit-to-juice workflows and a digital dashboard for tracking stock and freshness levels in real-time.',
-    keyFeatures: [
-      'Hygiene-first processing standards',
-      'Real-time inventory and freshness tracking',
-      'Minimalist kiosk design for high-traffic areas',
-      'Scalable franchise model with digital oversight'
+    id: "aether-node",
+    name: "Aether Node: Distributed AI Infrastructure",
+    client: "NeuroFlow Systems",
+    slug: "aether-ai-infra",
+    description: "Infrastructure // Case Study",
+    category: "Infrastructure",
+    industry: "AI / LLM",
+    challenge: "Developing a sovereign, high-concurrency inference engine for distributed LLM architectures without centralized latency bottlenecks.",
+    solution: "Architected a decentralized node cluster with sub-millisecond data synchronization and tactical load-balancing across edge regions.",
+    challenges: "Developing a sovereign, high-concurrency inference engine for distributed LLM architectures without centralized latency bottlenecks.",
+    solutions: "Architected a decentralized node cluster with sub-millisecond data synchronization and tactical load-balancing across edge regions.",
+    stats: [
+      { value: "0.4ms", label: "Node Latency" },
+      { value: "100%", label: "Sovereignty" }
     ],
-    designDirection: 'Vibrant, clean, and energetic. Using a "Mastermind" aesthetic with bold typography and high-fidelity product photography.',
-    outcome: 'Successfully launched multiple outlets with high customer retention. Proven model for rapid expansion in urban centers.',
-    imageUrl: 'https://images.unsplash.com/photo-1610970881699-44a5587cabec?auto=format&fit=crop&q=80&w=2670',
-    galleryImages: [
-      'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=2671',
-      'https://images.unsplash.com/photo-1525904097878-94fb15835963?auto=format&fit=crop&q=80&w=2670'
-    ],
-    url: 'https://2go.qoarc.com',
+    imageUrl: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2000&auto=format&fit=crop",
+    desktopMockups: ["https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2000&auto=format&fit=crop"],
+    deviceType: "desktop",
+    primaryColor: "#0024ff",
     status: 'published',
-    isFeatured: true
+    isFeatured: true,
+    year: "2024",
+    techStack: ["Rust", "gRPC", "Next.js 15", "PyTorch"],
+    url: "#"
   },
   {
-    id: 'bancat-cancer-aid',
-    name: 'BANCAT — Holistic Cancer Care',
-    client: 'BANCAT',
-    slug: 'bancat-cancer-aid',
-    description: 'Transforming the cancer journey in Bangladesh into a cohesive, dignified experience through holistic care, housing, and psychological support.',
-    category: 'NGO & Healthcare',
-    industry: 'Social Impact',
-    services: ['Digital Strategy', 'Service Design', 'Psychosocial Integration', 'Community Advocacy'],
-    year: '2024',
-    techStack: ['Care Economy Model', 'Holistic Wellness Ecosystem', 'Durbar Volunteer Network'],
-    heroImage: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=2670',
-    intro: 'Care is Cure. BANCAT goes beyond medical treatment to develop a comprehensive cancer wellness ecosystem that ensures no patient fights alone.',
-    duration: 'Since 2019',
-    scope: 'Scaling holistic support across Mosabbir Alok Nibash (Care Homes), Alokon (Mental Health), and Alok Katha (Empowerment).',
-    platform: 'Holistic Care Network',
-    deliverables: ['Care Home Infrastructure', 'Mental Health Sanctuary', 'Alok Katha Craft Initiative', 'Durbar Volunteer Movement'],
-    teamRole: 'Digital & Strategic Partners',
-    challenge: 'A cancer diagnosis in Bangladesh often triggers a battle against both the disease and a systemic healthcare gap that leaves rural patients logistically stranded.',
-    goal: 'Close the gap between diagnosis and recovery by providing medical, financial, emotional, and psychosocial support.',
-    solution: 'Established the "Care is Cure" philosophy, building physical infrastructure like Mosabbir Alok Nibash (85-bed facility) and digital support systems for 2,000+ patients.',
-    keyFeatures: [
-      'Mosabbir Alok Nibash: Holistic care homes',
-      'Alokon: Specialized oncology psychological therapy',
-      'Alok Katha: Empowerment through handcrafted goods',
-      'BANCAT Durbar: 2,000+ member strong youth volunteer network'
+    id: "quantus-fx",
+    name: "Quantus: High-Frequency Transaction Engine",
+    client: "Global Liquidity Hub",
+    slug: "quantus-fintech",
+    description: "Fintech // Case Study",
+    category: "Fintech",
+    industry: "Financial Services",
+    challenge: "Fragmented ledger synchronization and non-performant transaction routing resulted in significant slippage and data drift during high-volatility events.",
+    solution: "Engineered a reactive, event-driven transaction orchestration engine using WebSocket clusters and optimized linear algebra for real-time risk modeling.",
+    challenges: "Fragmented ledger synchronization and non-performant transaction routing resulted in significant slippage and data drift during high-volatility events.",
+    solutions: "Engineered a reactive, event-driven transaction orchestration engine using WebSocket clusters and optimized linear algebra for real-time risk modeling.",
+    stats: [
+      { value: "1.2M", label: "Events / Sec" },
+      { value: "< 2ms", label: "Settlement" }
     ],
-    designDirection: 'Compassionate and resilient. Soft, hopeful tones and powerful imagery of "Warriors" shifting the narrative to empowerment.',
-    outcome: '2,000+ patients served. 10 million+ awareness reach. Bangladesh\'s first holistic hospice and care home model.',
-    imageUrl: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=80&w=2670',
-    galleryImages: [
-      'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=2670',
-      'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80&w=2670'
-    ],
-    url: 'https://bancat.org.bd',
+    imageUrl: "https://images.unsplash.com/photo-1611974714851-eb605161882b?q=80&w=2000&auto=format&fit=crop",
+    mobileMockups: ["https://images.unsplash.com/photo-1611974714851-eb605161882b?q=80&w=2000&auto=format&fit=crop"],
+    deviceType: "mobile",
+    primaryColor: "#cc0000",
     status: 'published',
-    isFeatured: true
+    isFeatured: true,
+    year: "2024",
+    techStack: ["Node.js", "Redis", "Framer Motion", "Prisma"],
+    url: "#"
   },
   {
-    id: 'liza-dop-portfolio',
-    name: 'Liza Kalinina — Cinematography',
-    client: 'Liza Kalinina',
-    slug: 'liza-dop-portfolio',
-    description: 'A premium visual storytelling portfolio for an international Director of Photography specializing in high-end commercial and narrative cinema.',
-    category: 'Branding',
-    industry: 'Film & Media',
-    services: ['Portfolio Strategy', 'Visual Direction', 'Reel Curation', 'Digital Experience'],
-    year: '2024',
-    techStack: ['Cinematography', 'Digital Mastermind', 'Visual R&D'],
-    heroImage: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=2670',
-    intro: 'Capturing the unseen. Liza Kalinina is a DOP focused on the interplay of light, shadow, and human emotion.',
-    duration: '3 Months',
-    scope: 'Curating a decade of visual excellence into a high-performance digital showcase for global agency acquisition.',
-    platform: 'Web Portfolio',
-    deliverables: ['Premium Portfolio Hub', 'Showreel Strategy', 'Component-Based Case Studies'],
-    teamRole: 'Creative & Technical Direction',
-    challenge: 'Building a digital stage that breathes with the films, ensuring heavy video assets load instantly without compromising 4K visual quality.',
-    goal: 'Create a "Digital Mastermind" for the artist—a platform that presents relevant reels to different creative directors.',
-    solution: 'Video-first architecture with custom WebGL transitions and a sophisticated asset pipeline prioritizing visual fidelity.',
-    keyFeatures: [
-      'Interactive Cinematic Showreel Header',
-      'Dynamic Genre-Based Reel Switching',
-      'High-Performance Video Asset Pipeline',
-      'Bespoke Dark Aesthetic Typography'
+    id: "sovereign-cloud",
+    name: "Sovereign Cloud: Enterprise Control Plane",
+    client: "DynaScale Global",
+    slug: "sovereign-saas",
+    description: "SaaS // Case Study",
+    category: "SaaS",
+    industry: "Cloud Infrastructure",
+    challenge: "Enterprise partners required a unified, multi-tenant interface to manage massive edge-compute clusters without compromising on design precision or security overhead.",
+    solution: "Built a cinematic, precision-engineered control plane with CAD-grid overlays and real-time node telemetry visualization.",
+    challenges: "Enterprise partners required a unified, multi-tenant interface to manage massive edge-compute clusters without compromising on design precision or security overhead.",
+    solutions: "Built a cinematic, precision-engineered control plane with CAD-grid overlays and real-time node telemetry visualization.",
+    stats: [
+      { value: "42k+", label: "Managed Nodes" },
+      { value: "99.999%", label: "Uptime" }
     ],
-    designDirection: 'Cinematic Noir. Deep blacks and monochromatic typography allowing the imagery to take center stage.',
-    outcome: 'Featured in multiple design galleries. 40% increase in international inquiries from production houses.',
-    imageUrl: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=2670',
-    galleryImages: [
-      'https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&q=80&w=2670',
-      'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=2670'
-    ],
-    url: 'https://lizakalinina.com',
+    imageUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop",
+    desktopMockups: ["https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop"],
+    deviceType: "desktop",
+    primaryColor: "#00c2ff",
     status: 'published',
-    isFeatured: false
+    isFeatured: true,
+    year: "2023",
+    techStack: ["TypeScript", "Three.js", "Terraform", "Go"],
+    url: "#"
+  },
+  {
+    id: "nexus-industrial",
+    name: "Nexus Ops: Predictive Maintenance Node",
+    client: "Industrial Corp",
+    slug: "nexus-iot",
+    description: "IoT // Case Study",
+    category: "IoT",
+    industry: "Manufacturing",
+    challenge: "Industrial manufacturing lines suffered from unexpected downtime and invisible inefficiencies across legacy sensor networks.",
+    solution: "Deployed a real-time predictive maintenance node using edge-AI to analyze vibration and thermal telemetry before failures occurs.",
+    challenges: "Industrial manufacturing lines suffered from unexpected downtime and invisible inefficiencies across legacy sensor networks.",
+    solutions: "Deployed a real-time predictive maintenance node using edge-AI to analyze vibration and thermal telemetry before failures occurs.",
+    stats: [
+      { value: "30%", label: "Zero-Downtime" },
+      { value: "85%", label: "Accuracy" }
+    ],
+    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000&auto=format&fit=crop",
+    tabletMockups: ["https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2000&auto=format&fit=crop"],
+    deviceType: "tablet",
+    primaryColor: "#ff4d00",
+    status: 'published',
+    isFeatured: true,
+    year: "2023",
+    techStack: ["C++", "Python", "React", "Socket.io"],
+    url: "#"
+  },
+  {
+    id: "sentinel-vision",
+    name: "Sentinel: Precision Computer Vision",
+    client: "SecureGrid",
+    slug: "sentinel-ai-vision",
+    description: "Security // Case Study",
+    category: "AI",
+    industry: "Security",
+    challenge: "Legacy video monitoring systems lacked the sub-second classification depth required for high-risk industrial parameters.",
+    solution: "Architected a custom vision transformer model (ViT) optimized for the browser to maintain real-time tracking with zero server round-trips.",
+    challenges: "Legacy video monitoring systems lacked the sub-second classification depth required for high-risk industrial parameters.",
+    solutions: "Architected a custom vision transformer model (ViT) optimized for the browser to maintain real-time tracking with zero server round-trips.",
+    stats: [
+      { value: "99.8%", label: "Classification" },
+      { value: "0ms", label: "Server Trip" }
+    ],
+    imageUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000&auto=format&fit=crop",
+    mobileMockups: ["https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000&auto=format&fit=crop"],
+    deviceType: "mobile",
+    primaryColor: "#0de3ff",
+    status: 'published',
+    isFeatured: true,
+    year: "2024",
+    techStack: ["TensorFlow.js", "Webhooks", "Zustand"],
+    url: "#"
+  },
+  {
+    id: "velocity-pay",
+    name: "Velocity: Enterprise Settlement Engine",
+    client: "Standard FinTech",
+    slug: "velocity-saas",
+    description: "Fintech // Case Study",
+    category: "SaaS",
+    industry: "Financial Services",
+    challenge: "Cross-border gross settlements took up to 3 days, severely impacting liquidity and architectural flexibility for global merchants.",
+    solution: "Implemented a high-concurrency payment gateway optimized for real-time gross settlement (RTGS) using atomic ledger locks.",
+    challenges: "Cross-border gross settlements took up to 3 days, severely impacting liquidity and architectural flexibility for global merchants.",
+    solutions: "Implemented a high-concurrency payment gateway optimized for real-time gross settlement (RTGS) using atomic ledger locks.",
+    stats: [
+      { value: "Instant", label: "Liquidity" },
+      { value: "40%", label: "Cost Reduction" }
+    ],
+    imageUrl: "https://images.unsplash.com/photo-1551288560-192895f8564a?q=80&w=2000&auto=format&fit=crop",
+    desktopMockups: ["https://images.unsplash.com/photo-1551288560-192895f8564a?q=80&w=2000&auto=format&fit=crop"],
+    deviceType: "desktop",
+    primaryColor: "#0047ff",
+    status: 'published',
+    isFeatured: true,
+    year: "2024",
+    techStack: ["Next.js 15", "Go", "Kubernetes", "PostgreSQL"],
+    url: "#"
   }
 ];
 

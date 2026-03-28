@@ -1,263 +1,220 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Rocket, ArrowRight, Zap, Globe, Beaker, Brain, Bolt, ChevronRight, 
-  CheckCircle, Brush, Cloud, Layers, Users, Eye, Sparkles, ShieldCheck
-} from 'lucide-react';
+import Hero from '@/components/Hero';
 import { motion } from 'framer-motion';
+import { useLeadCapture } from '@/context/LeadCaptureContext';
 import { usePortfolio } from '@/context/PortfolioContext';
+import EngineeringModalities from '@/components/EngineeringModalities';
+import EngineeringLifecycle from '@/components/EngineeringLifecycle';
+import CaseStudyCarousel from '@/components/CaseStudyCarousel';
+import Testimonials from '@/components/Testimonials';
+import ContactSection from '@/components/ContactSection';
+import { 
+  ArrowRight, 
+  Sparkles, 
+  CheckCircle2, 
+  ShieldCheck, 
+  Clock, 
+  BarChart3, 
+  Cpu, 
+  Zap, 
+  Layout, 
+  Globe,
+  Quote,
+  Linkedin,
+  Rocket,
+  ArrowUpRight,
+  Layers,
+  Terminal,
+  Workflow
+} from 'lucide-react';
 
-const fadeInUp: any = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
+const fadeInUp = {
+  initial: { opacity: 0, y: 30, filter: 'blur(10px)' },
+  whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' },
   viewport: { once: true },
-  transition: { duration: 0.8, ease: [0.17, 0.55, 0.55, 1] }
+  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }
 };
 
-function PsychologyIcon(props: any) {
+export default function HomePage() {
+  const { openModal } = useLeadCapture();
+  const { labItems } = usePortfolio();
   return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .52 8.105 4 4 0 0 0 8 0 4 4 0 0 0 .52-8.105 4 4 0 0 0-2.526-5.77A3 3 0 1 0 12 5z" />
-      <path d="M9 13a4.5 4.5 0 0 0 3-4" />
-      <path d="M15 13a4.5 4.5 0 0 1-3-4" />
-      <path d="M12 9v10" />
-    </svg>
-  );
-}
+    <div className="bg-surface relative selection:bg-primary selection:text-white">
+      {/* 1. Hero Section - Redesigned to Blue Dark */}
+      <Hero />
 
-export default function Home() {
-  const [isAdmin] = useState(() => typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true');
-  const { partnerLogos } = usePortfolio();
-
-  const services = [
-    {
-      title: 'Web Design & Development',
-      description: 'Bespoke digital experiences engineered for maximum performance and conversion.',
-      icon: <Brush className="text-accent-blue" size={28} />,
-      accent: 'blue',
-      features: ['UI/UX Strategy', 'Responsive Systems', 'Brand Identity', 'Performance Audit']
-    },
-    {
-      title: 'AI Automation Solutions',
-      description: 'Leverage Generative AI to automate tasks, gain insights, and provide intelligent support.',
-      icon: <PsychologyIcon className="text-accent-purple" size={28} />,
-      accent: 'purple',
-      features: ['Custom AI Agents', 'Workflow Automation', 'Data Intelligence', 'Smart Chatbots']
-    },
-    {
-      title: 'SaaS Development',
-      description: 'End-to-end scalable Software-as-a-Service platforms, from architecture to deployment.',
-      icon: <Cloud className="text-accent-blue" size={28} />,
-      accent: 'blue',
-      features: ['Multi-tenant Arch', 'Cloud Infrastructure', 'API Ecosystems', 'Subscription Logic']
-    },
-    {
-      title: 'Custom Tech Solutions',
-      description: 'Unique business challenges require unique software tailored to your operational needs.',
-      icon: <Layers className="text-accent-purple" size={28} />,
-      accent: 'purple',
-      features: ['Legacy Migration', 'System Integration', 'Data Pipelines', 'Security Audits']
-    }
-  ];
-
-  return (
-    <div className="bg-grid min-h-screen">
-      {/* Hero */}
-      <section className="relative pt-40 pb-24 px-6 overflow-hidden">
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-accent-blue text-xs font-bold uppercase tracking-widest mb-8"
-          >
-            <span className="w-2 h-2 rounded-full bg-accent-blue animate-pulse"></span>
-            The Future of Digital Systems
-          </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl sm:text-7xl md:text-9xl font-display font-extrabold tracking-tighter leading-[0.85] mb-8"
-          >
-            Building <span className="text-gradient-blue">Intelligent</span><br/>Digital Society
-          </motion.h1>
-
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="max-w-2xl mx-auto text-lg md:text-xl text-text-muted mb-12 leading-relaxed"
-          >
-            Web. AI. Automation. Research. We craft high-performance solutions that scale with your vision.
-          </motion.p>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-6"
-          >
-            <Link href="/contact" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-2xl shadow-white/10 flex items-center justify-center gap-2">
-              Start Your Project <Rocket size={20} />
-            </Link>
-            <a href="#portfolio" className="w-full sm:w-auto glass px-10 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition-colors flex items-center justify-center">
-              Explore Portfolio
-            </a>
-          </motion.div>
-        </div>
-
-        {/* Background Blobs */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[600px] h-[600px] bg-accent-blue/10 rounded-full blur-[120px] -z-10 animate-pulse" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent-purple/10 rounded-full blur-[120px] -z-10 animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
-      </section>
-
-      {/* ─── Services Section ─── */}
-      <section id="services" className="py-24 px-6 scroll-mt-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-            <motion.div {...fadeInUp}>
-              <h2 className="text-sm font-bold uppercase tracking-widest text-accent-blue mb-4">Our Expertise</h2>
-              <h3 className="text-4xl md:text-6xl font-display font-bold tracking-tight">Premium <span className="text-gradient-blue">Services</span></h3>
-            </motion.div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {services.map((service, i) => (
+      {/* 2. Agency KPI Stats - Elite v2 (Compact & High-Contrast on Dark) */}
+      <section className="bg-bg-dark py-12 border-b border-white/5 relative overflow-hidden">
+        {/* Subtle CAD grid overlay */}
+        <div className="absolute inset-0 bg-grid opacity-[0.03] pointer-events-none"></div>
+        <div className="max-w-screen-2xl mx-auto px-8 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-0 md:divide-x divide-white/5">
+            {[
+              { value: '6', label: 'YEARS IN MARKET', node: '0x01 // HIST' },
+              { value: '15+', label: 'SYSTEMS BUILT', node: '0x02 // DEPL' },
+              { value: '5+', label: 'INDUSTRIES TRANSFORMED', node: '0x03 // SECT' },
+              { value: '15+', label: 'ELITE ARCHITECTS', node: '00 // TEAM' }
+            ].map((stat, i) => (
               <motion.div 
                 key={i}
-                {...fadeInUp}
-                className="group p-10 rounded-2xl bg-bg-card border border-white/5 hover:border-accent-blue/30 hover:-translate-y-1 transition-all duration-500"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.8 }}
+                className="group relative px-12 py-8"
               >
-                <div className="w-12 h-12 bg-white/[0.04] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  {service.icon}
+                {/* Node Identifier */}
+                <div className="absolute top-0 left-12 flex items-center gap-2">
+                  <span className="text-[8px] font-black tracking-[0.4em] text-white/20 uppercase">{stat.node}</span>
                 </div>
-                <h4 className="text-xl font-display font-bold mb-3">{service.title}</h4>
-                <p className="text-text-muted text-sm leading-relaxed mb-6">{service.description}</p>
-                <ul className="grid grid-cols-2 gap-3 text-xs font-medium text-white/60">
-                  {service.features.map((feature, j) => (
-                    <li key={j} className="flex items-center gap-1.5">
-                      <CheckCircle className="text-accent-blue" size={12} />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+
+                <div className="relative pt-6">
+                  {/* Two-Tone Typographic Depth */}
+                  <div className="relative">
+                    <div className="text-6xl md:text-7xl font-display font-medium text-white tracking-tighter italic leading-none relative z-10">
+                      {stat.value}
+                    </div>
+                    <div className="absolute -top-1 -left-1 text-6xl md:text-7xl font-display font-medium text-transparent tracking-tighter italic leading-none z-0 opacity-15" 
+                         style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)' }}>
+                      {stat.value}
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="h-[1px] w-6 bg-white/15 group-hover:w-12 transition-all duration-500"></div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/30 leading-relaxed whitespace-nowrap group-hover:text-white/70 transition-colors">
+                      {stat.label}
+                    </p>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Brands & Studio ─── */}
-      <section id="portfolio" className="py-32 px-6 border-t border-white/5 scroll-mt-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-            {/* Left: Dynamic Logo Grid (3x3) */}
-            <motion.div {...fadeInUp} className="order-2 lg:order-1">
-              <div className="grid grid-cols-3 gap-3 md:gap-4">
-                {partnerLogos.length > 0 ? (
-                  partnerLogos.map((logo) => (
-                    <div key={logo.id} className={`aspect-[4/3] bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-center p-4 hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors group cursor-pointer ${logo.isWide ? 'col-span-2' : ''}`}>
-                      <img src={logo.url} alt={logo.alt} className="w-full h-full object-contain filter grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
-                    </div>
-                  ))
-                ) : (
-                  Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} className="aspect-[4/3] bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-center hover:bg-white/[0.05] hover:border-white/[0.1] transition-colors group cursor-pointer">
-                      <Sparkles className="text-white/10 group-hover:text-accent-blue/50 transition-colors" size={24} />
-                    </div>
-                  ))
+      {/* 3. Engineering Modalities - Redesigned to Accordion */}
+      <EngineeringModalities />
+
+      {/* 4. Selected Work - Carousel Redesign */}
+      <CaseStudyCarousel />
+
+      {/* 4.5 Development Phases - Restored - Sharpened */}
+      <EngineeringLifecycle />
+
+      {/* 4.7 Testimonials - Our Clients Say */}
+      <Testimonials />
+
+
+      {/* 5a. Lab Spotlight - SOVEREIGN INTELLIGENCE (Light) */}
+      <section className="py-40 px-8 bg-gradient-to-br from-[#eff6ff] via-[#f8fbff] to-white text-primary relative overflow-hidden border-t border-primary/5">
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
+          <div className="w-full h-full" style={{ backgroundImage: 'radial-gradient(circle, #002046 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+        </div>
+
+        <div className="max-w-screen-2xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
+            {/* Left Side: Narrative */}
+            <div className="space-y-16">
+              <div className="space-y-4">
+                <h2 className="text-[120px] font-display font-black leading-none tracking-tighter uppercase block">
+                  SOVEREIGN
+                </h2>
+                <h2 className="text-[120px] font-display font-black leading-none tracking-tighter uppercase block text-transparent" 
+                    style={{ WebkitTextStroke: '2px rgba(0,32,70,0.8)' }}>
+                  INTELLIGENCE.
+                </h2>
+              </div>
+
+              <div className="space-y-10 max-w-xl">
+                <p className="text-xl text-primary/60 leading-relaxed font-sans font-light italic border-l-[0.5px] border-primary/20 pl-8">
+                  Incubating edge-case technologies that redefine the boundaries of automated systems. High-fidelity research for sovereign deployment.
+                </p>
+                <p className="text-xl text-primary/60 leading-relaxed font-sans font-light italic">
+                  By focusing on &quot;Intellectual Architecture&quot;, we develop secure, future-proof autonomous layers that deliver value.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Side: Technical Graphic */}
+            <div className="relative aspect-square flex items-center justify-center lg:justify-end">
+              <div className="relative w-full max-w-md aspect-square border-l border-t border-primary/10 p-12 overflow-hidden flex items-center justify-center group bg-surface-container-lowest shadow-sharp">
+                 <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent"></div>
+                 
+                 {/* Precision Core */}
+                 <div className="relative">
+                   <div className="w-4 h-4 bg-[#cc0000] rounded-none relative z-10 shadow-[0_0_30px_rgba(204,0,0,0.3)]"></div>
+                   <div className="absolute inset-0 w-4 h-4 bg-[#cc0000] rounded-none animate-ping opacity-30"></div>
+                   
+                   {/* Scanning Elements */}
+                   <div className="absolute -inset-24 border border-primary/5 animate-spin-slow rounded-none"></div>
+                   <div className="absolute -inset-16 border border-primary/10 rounded-none"></div>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5b. Lab Projects - Dark Node Row */}
+      <section className="py-20 px-8 bg-[#001026] text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+          <div className="w-full h-full" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+        </div>
+        <div className="max-w-screen-2xl mx-auto relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            {labItems.slice(0, 2).map((p, i) => (
+              <Link key={p.id} href="/lab" className="group relative px-12 py-10 first:pl-0 border-l border-white/5 first:border-l-0 hover:bg-white/[0.03] transition-all">
+                {/* Vertical Divider */}
+                {i > 0 && (
+                  <div className="absolute left-0 top-12 bottom-12 w-[1px] bg-[#4A90D9] opacity-10 group-hover:opacity-100 transition-opacity"></div>
                 )}
-              </div>
-            </motion.div>
-
-            {/* Right: Text & CTA */}
-            <motion.div {...fadeInUp} className="order-1 lg:order-2">
-              <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent-blue mb-4">Our Work</h2>
-              <h3 className="text-4xl md:text-5xl lg:text-6xl font-display font-black mb-6 tracking-tighter leading-[1.1]">
-                Trusted by <br className="hidden md:block" />
-                <span className="text-gradient-blue text-transparent bg-clip-text">Industry Leaders</span>
-              </h3>
-              <p className="text-lg text-text-muted leading-relaxed mb-10 opacity-80">
-                We've partnered with visionary companies across the globe to engineer high-performance digital systems, intelligent automation tools, and stunning web experiences. See how our bespoke solutions create measurable impact.
-              </p>
-              <Link href="/studio" className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 rounded-xl font-bold text-sm hover:scale-105 transition-all shadow-xl shadow-white/5 group">
-                Visit Our Studio <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                
+                <div className="space-y-6 flex flex-col items-center text-center">
+                  <div className="flex items-center justify-center relative w-full">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#4A90D9]">{p.node}</span>
+                    <ArrowUpRight size={16} className="absolute right-0 text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </div>
+                  <div className="space-y-2 flex flex-col items-center">
+                    <h4 className="text-4xl font-display font-medium text-white group-hover:text-[#4A90D9] transition-colors italic leading-none max-w-lg">{p.name}</h4>
+                    <p className="text-sm text-white/40 max-w-md group-hover:text-white/60 transition-colors leading-relaxed italic">
+                      {p.desc}
+                    </p>
+                  </div>
+                </div>
               </Link>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── About Section ─── */}
-      <section id="about" className="py-24 px-6 bg-white/[0.01] border-t border-white/5 scroll-mt-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
-            <motion.div {...fadeInUp}>
-              <h2 className="text-sm font-bold uppercase tracking-widest text-accent-blue mb-4">Our Story</h2>
-              <h3 className="text-4xl md:text-6xl font-display font-bold tracking-tight mb-6">Visionary <span className="text-gradient-blue">Team</span></h3>
-              <p className="text-lg text-text-muted leading-relaxed mb-8">
-                QoArc Studio was founded on the belief that technology should be as intuitive as it is powerful. We are a collective of designers, engineers, and researchers dedicated to building the future of digital systems.
-              </p>
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h4 className="text-3xl font-bold mb-1">3+</h4>
-                  <p className="text-xs text-text-muted uppercase tracking-widest font-bold">Projects Delivered</p>
-                </div>
-                <div>
-                  <h4 className="text-3xl font-bold mb-1">6</h4>
-                  <p className="text-xs text-text-muted uppercase tracking-widest font-bold">Core Researchers</p>
-                </div>
-              </div>
-            </motion.div>
-            <motion.div {...fadeInUp} className="relative">
-              <div className="aspect-square rounded-2xl bg-gradient-to-br from-accent-blue/20 to-accent-purple/20 border border-white/10 p-12 flex items-center justify-center">
-                <div className="text-center">
-                  <Users size={64} className="text-white mb-4 mx-auto" strokeWidth={1.5} />
-                  <div className="text-xl font-display font-bold">Driven by Innovation</div>
-                </div>
-              </div>
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent-blue/20 rounded-full blur-3xl animate-pulse"></div>
-            </motion.div>
-          </div>
-
-          {/* Values */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: 'Our Mission', desc: 'To empower businesses with intelligent digital systems that provide practical problem solutions and drive sustainable growth.', icon: <Eye className="text-accent-blue" /> },
-              { title: 'Our Vision', desc: 'To be the global leader in research-driven AI and automation solutions, shaping the future of technology.', icon: <Sparkles className="text-accent-purple" /> },
-              { title: 'Core Values', desc: 'Excellence, Integrity, Innovation, and a relentless focus on delivering measurable value to our partners.', icon: <ShieldCheck className="text-accent-blue" /> }
-            ].map((value, i) => (
-              <motion.div key={i} {...fadeInUp} className="p-6 rounded-2xl bg-bg-card border border-white/5">
-                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mb-4">
-                  {value.icon}
-                </div>
-                <h4 className="text-lg font-bold mb-2">{value.title}</h4>
-                <p className="text-text-muted text-sm leading-relaxed">{value.desc}</p>
-              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Contact CTA ─── */}
-      <section className="py-24 px-6">
-        <div className="max-w-5xl mx-auto bg-gradient-to-br from-accent-blue to-accent-purple rounded-2xl p-12 md:p-20 text-center relative overflow-hidden">
-          <motion.div {...fadeInUp} className="relative z-10">
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-display font-bold mb-6 leading-tight">Ready to Build Your <br/>Next Vision?</h2>
-            <p className="text-lg text-white/80 mb-10 max-w-2xl mx-auto">
-              Let's turn your idea into a high-performance digital product. From concept to launch, we've got you covered.
-            </p>
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-black px-10 py-4 rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-2xl">
-              Start a Conversation <Rocket size={20} />
-            </Link>
-          </motion.div>
-          <div className="absolute inset-0 opacity-10 pointer-events-none bg-grid"></div>
+
+      {/* 4.8 Contact Section - Minimalist Integration */}
+      <ContactSection />
+
+      {/* 6. Footer CTA */}
+      <section className="py-40 px-8 bg-white cad-line">
+        <div className="max-w-screen-xl mx-auto text-center space-y-16">
+           <h2 className="text-8xl md:text-[120px] font-display font-medium text-primary tracking-tighter leading-[0.8] italic grayscale opacity-20">
+              Innovate <br /> or Stagnate.
+           </h2>
+           <div className="space-y-8">
+              <p className="text-xl text-primary/60 max-w-xl mx-auto italic">
+                 Architect your vision with global precision. Initiation takes less than 24 hours.
+              </p>
+              <button 
+                onClick={openModal}
+                className="inline-block bg-primary text-white px-12 py-6 rounded-none font-bold uppercase tracking-widest text-xs shadow-premium hover:scale-[1.02] transition-all cursor-pointer"
+              >
+                Initiate Sequence →
+              </button>
+           </div>
         </div>
       </section>
-
     </div>
   );
 }
