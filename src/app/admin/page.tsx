@@ -137,7 +137,7 @@ function AdminContent() {
     e.preventDefault();
     setIsAuthenticating(true);
     const hashed = await sha256(password);
-    const targetHash = 'c9f3b09280a028276fd20f0bc8e3986a49e81ba7f22e731728d9f92e177a7dfd';
+    const targetHash = 'aeae67b513fc017766f20f6dbfca5621b575bc62bfcc880748cf091f58287f39';
     
     if (hashed === targetHash) {
 

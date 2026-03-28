@@ -40,7 +40,7 @@ const navItems = [
   },
   {
     name: 'AI & Data',
-    href: '/ai-data',
+    href: '#',
     isMega: true,
     description: 'Transforming industrial signal into sovereign predictive intelligence.',
     image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1000&auto=format&fit=crop',
