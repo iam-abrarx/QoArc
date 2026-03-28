@@ -22,6 +22,7 @@ import {
   Mail,
   Phone
 } from 'lucide-react';
+import { usePortfolio } from '@/context/PortfolioContext';
 
 type FormData = {
   projectTypes: string[];
@@ -42,7 +43,10 @@ const STEPS = [
 ];
 
 export default function LeadCaptureForm() {
+  const { addSubmission } = usePortfolio();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     projectTypes: [],
     journeyStages: [],
@@ -55,6 +59,39 @@ export default function LeadCaptureForm() {
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+
+  const handleSubmitSequence = async () => {
+    setIsSubmitting(true);
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const messageBody = `
+Project Types: ${formData.projectTypes.join(', ')}
+Journey Stages: ${formData.journeyStages.join(', ')}
+Support Types: ${formData.supportTypes.join(', ')}
+Assets/Links: ${formData.assets || 'None'}
+      `.trim();
+
+      addSubmission({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        service: formData.projectTypes.join(', ') || 'General Inquiry',
+        message: messageBody,
+      });
+
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    } catch (error) {
+       console.error(error);
+       setIsSubmitting(false);
+       alert('Transmission failure. Please try again.');
+    }
+  };
 
   const toggleSelection = (field: 'projectTypes' | 'journeyStages' | 'supportTypes', value: string) => {
     setFormData(prev => ({
@@ -228,11 +265,11 @@ export default function LeadCaptureForm() {
             </div>
             <div className="pt-8 flex justify-center">
                <button 
-                onClick={() => alert('Brief Submitted Successfully')}
-                disabled={!isStepValid()}
+                onClick={handleSubmitSequence}
+                disabled={!isStepValid() || isSubmitting}
                 className="bg-primary text-white px-20 py-8 rounded-none font-bold uppercase tracking-widest text-xs shadow-premium hover:scale-105 transition-all disabled:opacity-50 disabled:grayscale flex items-center gap-4"
               >
-                Submit Project Brief <Zap size={16} />
+                {isSubmitting ? 'Transmitting...' : <>Submit Project Brief <Zap size={16} /></>}
               </button>
             </div>
           </div>
@@ -260,25 +297,44 @@ export default function LeadCaptureForm() {
       {/* Main Form Area */}
       <div className="min-h-[600px] flex flex-col justify-center">
         <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 20, filter: 'blur(10px)' }}
-            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, x: -20, filter: 'blur(10px)' }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="space-y-16"
-          >
-            <h2 className="text-6xl md:text-8xl font-display font-medium text-primary text-center tracking-tighter italic">
-              {STEPS[currentStep - 1].title}
-            </h2>
+          {!isSubmitted ? (
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, x: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-16"
+            >
+              <h2 className="text-6xl md:text-8xl font-display font-medium text-primary text-center tracking-tighter italic">
+                {STEPS[currentStep - 1].title}
+              </h2>
 
-            {renderStep()}
-          </motion.div>
+              {renderStep()}
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="success"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-primary p-20 rounded-none shadow-premium text-center space-y-12"
+            >
+              <div className="w-24 h-24 rounded-none bg-white/10 mx-auto flex items-center justify-center text-white mb-8 border border-white/20">
+                <Check size={48} />
+              </div>
+              <div className="space-y-6">
+                <h2 className="text-6xl md:text-7xl font-display font-medium text-white italic leading-none">Brief <br/> <span className="opacity-40">Received.</span></h2>
+                <p className="text-xl text-white/60 font-sans italic leading-relaxed max-w-2xl mx-auto border-t border-white/10 pt-12">
+                   Your architectural brief has been logged in our system. An engineering lead will be in contact within 24 hours.
+                </p>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
       {/* Footer Navigation */}
-      {currentStep > 1 && (
+      {currentStep > 1 && !isSubmitted && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
           <button 
             onClick={prevStep}

@@ -28,10 +28,18 @@ const fadeInUp = {
 // Roles are now managed via PortfolioContext
 
 export default function CareersPage() {
-  const { jobOpenings } = usePortfolio();
+  const { jobOpenings, addSubmission } = usePortfolio();
   const [selectedRole, setSelectedRole] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  // Form state
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [cvFile, setCvFile] = useState<string | null>(null);
+  const [cvFileName, setCvFileName] = useState('');
+  
   const formRef = useRef<HTMLDivElement>(null);
 
   const handleApply = (roleTitle: string) => {
@@ -39,14 +47,67 @@ export default function CareersPage() {
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 20 * 1024 * 1024) {
+        alert('File size exceeds 20MB limit.');
+        return;
+      }
+      setCvFileName(file.name);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCvFile(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate high-fidelity processing
-    setTimeout(() => {
+
+    const payload = {
+      name,
+      email,
+      role: selectedRole,
+      videoUrl,
+      cvFile
+    };
+
+    try {
+      // Server-side logging via API route
+      await fetch('/api/careers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      // Save to local context for visibility in Admin Dashboard
+      addSubmission({
+        name,
+        email,
+        company: 'N/A',
+        phone: 'N/A',
+        service: `[CAREERS]: ${selectedRole}`,
+        message: `Application for ${selectedRole}\nVideo Introduction: ${videoUrl}`,
+        assets: cvFile ? [{ id: Date.now().toString(), name: cvFileName, size: Math.round(cvFile.length * (3/4)) }] : []
+      });
+
       setIsSubmitting(false);
       setIsSubmitted(true);
-    }, 2000);
+      // Reset form on success
+      setName('');
+      setEmail('');
+      setSelectedRole('');
+      setVideoUrl('');
+      setCvFile(null);
+      setCvFileName('');
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      setIsSubmitting(false);
+      alert('Transmission failure. Please try again.');
+    }
   };
 
   return (
@@ -132,6 +193,8 @@ export default function CareersPage() {
                       <input 
                         required
                         type="text" 
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         placeholder="Elizabeth Archer"
                         className="w-full bg-surface py-5 px-8 border-[0.5px] border-primary/10 rounded-none outline-none focus:border-primary/40 transition-all font-sans italic"
                       />
@@ -141,6 +204,8 @@ export default function CareersPage() {
                       <input 
                         required
                         type="email" 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         placeholder="architect@qoarc.ai"
                         className="w-full bg-surface py-5 px-8 border-[0.5px] border-primary/10 rounded-none outline-none focus:border-primary/40 transition-all font-sans italic"
                       />
@@ -168,6 +233,8 @@ export default function CareersPage() {
                       <input 
                         required
                         type="url" 
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
                         placeholder="Loom, Drive, or YouTube Link"
                         className="w-full bg-surface py-5 px-8 border-[0.5px] border-primary/10 rounded-none outline-none focus:border-primary/40 transition-all font-sans italic"
                       />
@@ -183,11 +250,14 @@ export default function CareersPage() {
                         required
                         type="file" 
                         accept=".pdf,.doc,.docx"
+                        onChange={handleFileChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                       />
                       <div className="w-full bg-surface py-10 border-[0.5px] border-dashed border-primary/20 rounded-none flex flex-col items-center justify-center gap-4 group-hover:bg-primary/5 transition-all">
                         <Upload className="text-primary/20 group-hover:text-primary transition-colors" size={32} />
-                        <span className="text-precision opacity-40 group-hover:opacity-100 transition-opacity italic">Click to upload CV nodes or drag files here</span>
+                        <span className="text-precision opacity-40 group-hover:opacity-100 transition-opacity italic">
+                          {cvFileName ? `Loaded: ${cvFileName}` : 'Click to upload CV nodes or drag files here'}
+                        </span>
                       </div>
                     </div>
                   </div>
