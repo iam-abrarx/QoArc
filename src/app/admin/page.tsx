@@ -52,7 +52,7 @@ function AdminContent() {
     logoColor: 'text-[#0047AB]',
     authorName: '',
     authorTitle: '',
-    authorImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop',
+    authorImage: 'https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20female.jpg',
     authorLinkedin: '#',
     rating: 5,
     content: ''
