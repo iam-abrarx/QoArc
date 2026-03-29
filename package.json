@@ -10,6 +10,9 @@
   "private": true,
   "dependencies": {
     "@google/genai": "^1.27.0",
+    "@neondatabase/serverless": "^1.0.2",
+    "@prisma/client": "^7.6.0",
+    "@vercel/blob": "^2.3.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.0",
     "libphonenumber-js": "^1.12.38",
@@ -26,6 +29,7 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "^19.0.0",
     "postcss": "^8.5.3",
+    "prisma": "^7.6.0",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2"
   }

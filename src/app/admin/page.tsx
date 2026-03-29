@@ -1186,28 +1186,37 @@ function AdminContent() {
                    <div className="space-y-3 md:col-span-2">
                      <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black flex items-center">
                        Author Profile Image 
-                       {newTestimonial.authorImage?.length > 500 && <span className="text-green-500 lowercase tracking-normal ml-2 bg-green-500/10 px-2 py-0.5">(Local node loaded)</span>}
+                       {newTestimonial.authorImage?.startsWith('https://z50m8u0xhlij7sue') && <span className="text-green-500 lowercase tracking-normal ml-2 bg-green-500/10 px-2 py-0.5">(Cloud hosted)</span>}
                      </label>
                      <div className="flex gap-4">
-                       <input type="text" value={newTestimonial.authorImage} onChange={e => setNewTestimonial({...newTestimonial, authorImage: e.target.value})} placeholder="https://images.unsplash.com/... or upload" className="flex-1 bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none text-white" required />
+                       <input type="text" value={newTestimonial.authorImage} onChange={e => setNewTestimonial({...newTestimonial, authorImage: e.target.value})} placeholder="https://... or upload" className="flex-1 bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none text-white" required />
                        <label className="cursor-pointer bg-accent-blue/10 hover:bg-accent-blue hover:text-white text-accent-blue px-8 py-4 rounded-none font-black transition-all flex items-center justify-center shrink-0 border border-accent-blue/20 tracking-widest text-[10px] uppercase">
                           Upload Node
                           <input 
                             type="file" 
                             accept="image/*" 
                             className="hidden" 
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                if (file.size > 2 * 1024 * 1024) {
-                                  alert('Image size must be less than 2MB to ensure structural integrity.');
+                                if (file.size > 5 * 1024 * 1024) {
+                                  alert('Image size must be less than 5MB.');
                                   return;
                                 }
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  setNewTestimonial({ ...newTestimonial, authorImage: reader.result as string });
-                                };
-                                reader.readAsDataURL(file);
+                                try {
+                                  const formData = new FormData();
+                                  formData.append('file', file);
+                                  const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                                  const data = await res.json();
+                                  if (data.url) {
+                                    setNewTestimonial({ ...newTestimonial, authorImage: data.url });
+                                  } else {
+                                    alert('Upload failed: ' + (data.error || 'Unknown error'));
+                                  }
+                                } catch (err) {
+                                  alert('Upload failed. Please try again.');
+                                  console.error(err);
+                                }
                               }
                             }} 
                           />

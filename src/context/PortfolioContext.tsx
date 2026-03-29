@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { PortfolioItem, initialProjects } from '@/lib/portfolio';
 
 export interface ContactSubmission {
@@ -82,6 +82,38 @@ interface PortfolioContextType {
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
 
+// Helper: fetch with fallback (if DB not configured, fall back to hardcoded defaults)
+async function fetchApi<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`API ${url} returned ${res.status}`);
+    return await res.json();
+  } catch {
+    console.warn(`Failed to fetch ${url}, using fallback data`);
+    return fallback;
+  }
+}
+
+// Default data used as fallback when DB is not configured
+const defaultTestimonials: Testimonial[] = [
+  { id: '1', company: "BANcat", logoColor: "text-[#cc0000]", authorName: "Dr. Rafiq Ahmed", authorTitle: "Director of Operations, BANCAT Bangladesh", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg", authorLinkedin: "#", rating: 5, content: "QOARC built a powerful platform for our cancer charity. It makes it simple for donors to find and support patients in real-time. The site is easy to use in both English and Bangla, helping us reach more people." },
+  { id: '2', company: "AsiaLinkage", logoColor: "text-[#002046]", authorName: "Tanvir Hossain", authorTitle: "CEO, AsiaLinkage International", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg", authorLinkedin: "#", rating: 5, content: "QOARC built a comprehensive digital catalogue for our business. They created a structured website where all our products are beautifully categorized and easily accessible to our clients. It completely transformed how we showcase our inventory." },
+  { id: '3', company: "2GO Bangladesh", logoColor: "text-[#ff6600]", authorName: "Nusrat Jahan", authorTitle: "Head of Digital, 2GO", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20female.jpg", authorLinkedin: "#", rating: 5, content: "Our new website is fast, modern, and looks great. QOARC made the shopping experience so much smoother for our customers. We've seen a huge improvement in how people interact with our brand." },
+  { id: '4', company: "Elizabeth Archer", logoColor: "text-[#b8860b]", authorName: "Elizabeth Archer", authorTitle: "Director of Photography", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20female.jpg", authorLinkedin: "#", rating: 5, content: "QOARC turned my photography portfolio into a high-end digital magazine. The cinematic feel and private client areas have completely changed how I present my work to filmmakers. It's truly elite." },
+  { id: '5', company: "Nazmus Sakib Pharmacy", logoColor: "text-[#008080]", authorName: "Nazmus Sakib", authorTitle: "Owner", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg", authorLinkedin: "#", rating: 5, content: "QOARC developed a fast, reliable inventory management system for our local pharmacy. It helps us keep track of medicines, sales, and stock levels effortlessly. The system is easy to use and has completely modernized our daily operations." },
+];
+
+const defaultJobs: JobOpening[] = [
+  { id: '1', title: 'Senior AI Engineer', team: 'Intelligence Node', type: 'Full-time // Remote/Hybrid', desc: 'Engineering RAG pipelines and GNN architectures for proprietary research nodes.' },
+  { id: '2', title: 'Full-Stack Product Lead', team: 'SaaS Engineering', type: 'Full-time // Dhaka HQ', desc: 'Leading the end-to-end build of sovereign software systems for US/EU startups.' },
+  { id: '3', title: 'UX / Systems Designer', team: 'Strategic Design', type: 'Full-time // Remote/Hybrid', desc: 'Designing high-fidelity "Intellectual Architect" interfaces for complex AI logic.' },
+];
+
+const defaultLabItems: LabItem[] = [
+  { id: '1', name: 'Animal weight estimation from images', desc: 'A deep learning ML project for precision agriculture and livestock observation.', node: '0x01 // ARCHITECTURAL_RE' },
+  { id: '2', name: 'Large scale PFAS generation for safety and toxicity analysis', desc: 'GNN-based toxicity modeling for accelerated materials science.', node: '0x02 // NEURAL_KINETICS' },
+];
+
 export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
@@ -91,312 +123,170 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const [labItems, setLabItems] = useState<LabItem[]>([]);
   const [footerInfo, setFooterInfo] = useState<FooterInfo>({ email: 'info@qoarc.com', linkedin: 'https://linkedin.com' });
 
+  // Fetch all data from API on mount
   useEffect(() => {
-    const saved = localStorage.getItem('portfolioItems');
-    if (saved) {
-      setPortfolioItems(JSON.parse(saved));
-    } else {
-      setPortfolioItems(initialProjects);
-    }
+    fetchApi<PortfolioItem[]>('/api/projects', initialProjects).then(setPortfolioItems);
+    fetchApi<ContactSubmission[]>('/api/submissions', []).then(setContactSubmissions);
+    fetchApi<PartnerLogo[]>('/api/partner-logos', []).then(setPartnerLogos);
+    fetchApi<JobOpening[]>('/api/job-openings', defaultJobs).then(setJobOpenings);
+    fetchApi<Testimonial[]>('/api/testimonials', defaultTestimonials).then(setTestimonials);
+    fetchApi<LabItem[]>('/api/lab-items', defaultLabItems).then(setLabItems);
 
-    const savedMsgs = localStorage.getItem('contactSubmissions');
-    if (savedMsgs) {
-      setContactSubmissions(JSON.parse(savedMsgs));
-    }
-
-    const savedLogos = localStorage.getItem('partnerLogos');
-    if (savedLogos) {
-      setPartnerLogos(JSON.parse(savedLogos));
-    }
-
-    const savedJobs = localStorage.getItem('jobOpenings');
-    if (savedJobs) {
-      setJobOpenings(JSON.parse(savedJobs));
-    } else {
-      setJobOpenings([
-        { id: '1', title: 'Senior AI Engineer', team: 'Intelligence Node', type: 'Full-time // Remote/Hybrid', desc: 'Engineering RAG pipelines and GNN architectures for proprietary research nodes.' },
-        { id: '2', title: 'Full-Stack Product Lead', team: 'SaaS Engineering', type: 'Full-time // Dhaka HQ', desc: 'Leading the end-to-end build of sovereign software systems for US/EU startups.' },
-        { id: '3', title: 'UX / Systems Designer', team: 'Strategic Design', type: 'Full-time // Remote/Hybrid', desc: 'Designing high-fidelity "Intellectual Architect" interfaces for complex AI logic.' }
-      ]);
-    }
-
-    // Force re-seed of testimonials as requested
-    localStorage.removeItem('testimonials');
-    const savedTestimonials = localStorage.getItem('testimonials');
-    if (savedTestimonials) {
-      setTestimonials(JSON.parse(savedTestimonials));
-    } else {
-      setTestimonials([
-        {
-          id: '1',
-          company: "BANcat",
-          logoColor: "text-[#cc0000]",
-          authorName: "Dr. Rafiq Ahmed",
-          authorTitle: "Director of Operations, BANCAT Bangladesh",
-          authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "QOARC built a powerful platform for our cancer charity. It makes it simple for donors to find and support patients in real-time. The site is easy to use in both English and Bangla, helping us reach more people.",
-        },
-        {
-          id: '2',
-          company: "AsiaLinkage",
-          logoColor: "text-[#002046]",
-          authorName: "Tanvir Hossain",
-          authorTitle: "CEO, AsiaLinkage International",
-          authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "QOARC built a comprehensive digital catalogue for our business. They created a structured website where all our products are beautifully categorized and easily accessible to our clients. It completely transformed how we showcase our inventory.",
-        },
-        {
-          id: '3',
-          company: "2GO Bangladesh",
-          logoColor: "text-[#ff6600]",
-          authorName: "Nusrat Jahan",
-          authorTitle: "Head of Digital, 2GO",
-          authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20female.jpg",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "Our new website is fast, modern, and looks great. QOARC made the shopping experience so much smoother for our customers. We've seen a huge improvement in how people interact with our brand.",
-        },
-        {
-          id: '4',
-          company: "Elizabeth Archer",
-          logoColor: "text-[#b8860b]",
-          authorName: "Elizabeth Archer",
-          authorTitle: "Director of Photography",
-          authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20female.jpg",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "QOARC turned my photography portfolio into a high-end digital magazine. The cinematic feel and private client areas have completely changed how I present my work to filmmakers. It's truly elite.",
-        },
-        {
-          id: '5',
-          company: "Nazmus Sakib Pharmacy",
-          logoColor: "text-[#008080]",
-          authorName: "Nazmus Sakib",
-          authorTitle: "Owner",
-          authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "QOARC developed a fast, reliable inventory management system for our local pharmacy. It helps us keep track of medicines, sales, and stock levels effortlessly. The system is easy to use and has completely modernized our daily operations.",
-        }
-      ]);
-      // Save the new defaults
-      localStorage.setItem('testimonials', JSON.stringify([
-        {
-          id: '1',
-          company: "BANcat",
-          logoColor: "text-[#cc0000]",
-          authorName: "Dr. Rafiq Ahmed",
-          authorTitle: "Director of Operations, BANCAT Bangladesh",
-          authorImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "QOARC built a powerful platform for our cancer charity. It makes it simple for donors to find and support patients in real-time. The site is easy to use in both English and Bangla, helping us reach more people.",
-        },
-        {
-          id: '2',
-          company: "AsiaLinkage",
-          logoColor: "text-[#002046]",
-          authorName: "Tanvir Hossain",
-          authorTitle: "CEO, AsiaLinkage International",
-          authorImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "QOARC built a comprehensive digital catalogue for our business. They created a structured website where all our products are beautifully categorized and easily accessible to our clients. It completely transformed how we showcase our inventory.",
-        },
-        {
-          id: '3',
-          company: "2GO Bangladesh",
-          logoColor: "text-[#ff6600]",
-          authorName: "Nusrat Jahan",
-          authorTitle: "Head of Digital, 2GO",
-          authorImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "Our new website is fast, modern, and looks great. QOARC made the shopping experience so much smoother for our customers. We've seen a huge improvement in how people interact with our brand.",
-        },
-        {
-          id: '4',
-          company: "Elizabeth Archer",
-          logoColor: "text-[#b8860b]",
-          authorName: "Elizabeth Archer",
-          authorTitle: "Director of Photography",
-          authorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "QOARC turned my photography portfolio into a high-end digital magazine. The cinematic feel and private client areas have completely changed how I present my work to filmmakers. It's truly elite.",
-        },
-        {
-          id: '5',
-          company: "Nazmus Sakib Pharmacy",
-          logoColor: "text-[#008080]",
-          authorName: "Nazmus Sakib",
-          authorTitle: "Owner",
-          authorImage: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=200&auto=format&fit=crop",
-          authorLinkedin: "#",
-          rating: 5,
-          content: "QOARC developed a fast, reliable inventory management system for our local pharmacy. It helps us keep track of medicines, sales, and stock levels effortlessly. The system is easy to use and has completely modernized our daily operations.",
-        }
-      ]));
-    }
-
-    // Force re-seed of lab items
-    localStorage.removeItem('labItems');
-    const savedLab = localStorage.getItem('labItems');
-    if (savedLab) {
-      setLabItems(JSON.parse(savedLab));
-    } else {
-      const defaultLabItems = [
-        { id: '1', name: 'Animal weight estimation from images', desc: 'A deep learning ML project for precision agriculture and livestock observation.', node: '0x01 // ARCHITECTURAL_RE' },
-        { id: '2', name: 'Large scale PFAS generation for safety and toxicity analysis', desc: 'GNN-based toxicity modeling for accelerated materials science.', node: '0x02 // NEURAL_KINETICS' }
-      ];
-      setLabItems(defaultLabItems);
-      localStorage.setItem('labItems', JSON.stringify(defaultLabItems));
-    }
-
+    // Footer info still uses localStorage (simple key-value, not worth a table)
     const savedFooter = localStorage.getItem('footerInfo');
     if (savedFooter) {
       setFooterInfo(JSON.parse(savedFooter));
     }
   }, []);
 
-  const addItem = (item: Omit<PortfolioItem, 'id'>) => {
-    const newItem = { ...item, id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}` };
-    setPortfolioItems(prev => {
-      const updated = [...prev, newItem];
-      localStorage.setItem('portfolioItems', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  // --- Projects ---
+  const addItem = useCallback((item: Omit<PortfolioItem, 'id'>) => {
+    const tempId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const newItem = { ...item, id: tempId } as PortfolioItem;
+    setPortfolioItems(prev => [...prev, newItem]);
 
-  const deleteItem = (id: string) => {
-    setPortfolioItems(prev => {
-      const updated = prev.filter(i => String(i.id) !== String(id));
-      localStorage.setItem('portfolioItems', JSON.stringify(updated));
-      return updated;
-    });
-  };
+    fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newItem),
+    }).then(res => res.json()).then(data => {
+      if (data.id && data.id !== tempId) {
+        setPortfolioItems(prev => prev.map(p => p.id === tempId ? { ...p, id: data.id } : p));
+      }
+    }).catch(console.error);
+  }, []);
 
-  const updateItem = (item: PortfolioItem) => {
-    setPortfolioItems(prev => {
-      const updated = prev.map(i => String(i.id) === String(item.id) ? item : i);
-      localStorage.setItem('portfolioItems', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  const deleteItem = useCallback((id: string) => {
+    setPortfolioItems(prev => prev.filter(i => String(i.id) !== String(id)));
+    fetch(`/api/projects/${id}`, { method: 'DELETE' }).catch(console.error);
+  }, []);
 
-  const addSubmission = (submission: Omit<ContactSubmission, 'id' | 'date'>) => {
+  const updateItem = useCallback((item: PortfolioItem) => {
+    setPortfolioItems(prev => prev.map(i => String(i.id) === String(item.id) ? item : i));
+    fetch(`/api/projects/${item.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
+    }).catch(console.error);
+  }, []);
+
+  // --- Contact Submissions ---
+  const addSubmission = useCallback((submission: Omit<ContactSubmission, 'id' | 'date'>) => {
+    const tempId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newSubmission: ContactSubmission = {
       ...submission,
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      date: new Date().toLocaleString()
+      id: tempId,
+      date: new Date().toLocaleString(),
     };
-    setContactSubmissions(prev => {
-      const updated = [newSubmission, ...prev];
-      localStorage.setItem('contactSubmissions', JSON.stringify(updated));
-      return updated;
-    });
-  };
+    setContactSubmissions(prev => [newSubmission, ...prev]);
 
-  const deleteSubmission = (id: string) => {
-    setContactSubmissions(prev => {
-      const updated = prev.filter(s => String(s.id) !== String(id));
-      localStorage.setItem('contactSubmissions', JSON.stringify(updated));
-      return updated;
-    });
-  };
+    fetch('/api/submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submission),
+    }).catch(console.error);
+  }, []);
 
-  const addPartnerLogo = (logo: Omit<PartnerLogo, 'id'>) => {
-    const newLogo = { ...logo, id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}` };
-    setPartnerLogos(prev => {
-      const updated = [...prev, newLogo];
-      localStorage.setItem('partnerLogos', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  const deleteSubmission = useCallback((id: string) => {
+    setContactSubmissions(prev => prev.filter(s => String(s.id) !== String(id)));
+    fetch(`/api/submissions/${id}`, { method: 'DELETE' }).catch(console.error);
+  }, []);
 
-  const deletePartnerLogo = (id: string) => {
-    setPartnerLogos(prev => {
-      const updated = prev.filter(l => String(l.id) !== String(id));
-      localStorage.setItem('partnerLogos', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  // --- Partner Logos ---
+  const addPartnerLogo = useCallback((logo: Omit<PartnerLogo, 'id'>) => {
+    const tempId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const newLogo = { ...logo, id: tempId };
+    setPartnerLogos(prev => [...prev, newLogo]);
 
-  const addJobOpening = (job: Omit<JobOpening, 'id'>) => {
-    const newJob = { ...job, id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}` };
-    setJobOpenings(prev => {
-      const updated = [...prev, newJob];
-      localStorage.setItem('jobOpenings', JSON.stringify(updated));
-      return updated;
-    });
-  };
+    fetch('/api/partner-logos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(logo),
+    }).catch(console.error);
+  }, []);
 
-  const deleteJobOpening = (id: string) => {
-    setJobOpenings(prev => {
-      const updated = prev.filter(j => String(j.id) !== String(id));
-      localStorage.setItem('jobOpenings', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  const deletePartnerLogo = useCallback((id: string) => {
+    setPartnerLogos(prev => prev.filter(l => String(l.id) !== String(id)));
+    fetch(`/api/partner-logos/${id}`, { method: 'DELETE' }).catch(console.error);
+  }, []);
 
-  const addTestimonial = (testimonial: Omit<Testimonial, 'id'>) => {
-    const newTestimonial = { ...testimonial, id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}` };
-    setTestimonials(prev => {
-      const updated = [...prev, newTestimonial];
-      localStorage.setItem('testimonials', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  // --- Job Openings ---
+  const addJobOpening = useCallback((job: Omit<JobOpening, 'id'>) => {
+    const tempId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const newJob = { ...job, id: tempId };
+    setJobOpenings(prev => [...prev, newJob]);
 
-  const deleteTestimonial = (id: string) => {
-    setTestimonials(prev => {
-      const updated = prev.filter(t => String(t.id) !== String(id));
-      localStorage.setItem('testimonials', JSON.stringify(updated));
-      return updated;
-    });
-  };
+    fetch('/api/job-openings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(job),
+    }).catch(console.error);
+  }, []);
 
-  const updateTestimonial = (testimonial: Testimonial) => {
-    setTestimonials(prev => {
-      const updated = prev.map(t => String(t.id) === String(testimonial.id) ? testimonial : t);
-      localStorage.setItem('testimonials', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  const deleteJobOpening = useCallback((id: string) => {
+    setJobOpenings(prev => prev.filter(j => String(j.id) !== String(id)));
+    fetch(`/api/job-openings/${id}`, { method: 'DELETE' }).catch(console.error);
+  }, []);
 
-  const addLabItem = (item: Omit<LabItem, 'id'>) => {
-    const newItem = { ...item, id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}` };
-    setLabItems(prev => {
-      const updated = [...prev, newItem];
-      localStorage.setItem('labItems', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  // --- Testimonials ---
+  const addTestimonial = useCallback((testimonial: Omit<Testimonial, 'id'>) => {
+    const tempId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const newTestimonial = { ...testimonial, id: tempId };
+    setTestimonials(prev => [...prev, newTestimonial]);
 
-  const deleteLabItem = (id: string) => {
-    setLabItems(prev => {
-      const updated = prev.filter(l => String(l.id) !== String(id));
-      localStorage.setItem('labItems', JSON.stringify(updated));
-      return updated;
-    });
-  };
+    fetch('/api/testimonials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(testimonial),
+    }).catch(console.error);
+  }, []);
 
-  const updateLabItem = (item: LabItem) => {
-    setLabItems(prev => {
-      const updated = prev.map(l => String(l.id) === String(item.id) ? item : l);
-      localStorage.setItem('labItems', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  const deleteTestimonial = useCallback((id: string) => {
+    setTestimonials(prev => prev.filter(t => String(t.id) !== String(id)));
+    fetch(`/api/testimonials/${id}`, { method: 'DELETE' }).catch(console.error);
+  }, []);
 
-  const updateFooterInfo = (info: FooterInfo) => {
+  const updateTestimonial = useCallback((testimonial: Testimonial) => {
+    setTestimonials(prev => prev.map(t => String(t.id) === String(testimonial.id) ? testimonial : t));
+    fetch(`/api/testimonials/${testimonial.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(testimonial),
+    }).catch(console.error);
+  }, []);
+
+  // --- Lab Items ---
+  const addLabItem = useCallback((item: Omit<LabItem, 'id'>) => {
+    const tempId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const newItem = { ...item, id: tempId };
+    setLabItems(prev => [...prev, newItem]);
+
+    fetch('/api/lab-items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
+    }).catch(console.error);
+  }, []);
+
+  const deleteLabItem = useCallback((id: string) => {
+    setLabItems(prev => prev.filter(l => String(l.id) !== String(id)));
+    fetch(`/api/lab-items/${id}`, { method: 'DELETE' }).catch(console.error);
+  }, []);
+
+  const updateLabItem = useCallback((item: LabItem) => {
+    setLabItems(prev => prev.map(l => String(l.id) === String(item.id) ? item : l));
+    fetch(`/api/lab-items/${item.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
+    }).catch(console.error);
+  }, []);
+
+  // --- Footer (stays localStorage for simplicity) ---
+  const updateFooterInfo = useCallback((info: FooterInfo) => {
     setFooterInfo(info);
     localStorage.setItem('footerInfo', JSON.stringify(info));
-  };
+  }, []);
 
   return (
     <PortfolioContext.Provider value={{ 
