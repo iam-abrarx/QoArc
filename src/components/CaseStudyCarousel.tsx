@@ -155,64 +155,89 @@ export default function CaseStudyCarousel() {
                 </div>
 
                 {/* Right Side: Mockups */}
-                <div className="lg:w-[45%] bg-[#f8f9ff] relative overflow-hidden flex items-center justify-center p-12 lg:p-20">
+                <div className="lg:w-[50%] bg-[#f8f9ff] relative overflow-hidden flex items-center justify-center p-12 lg:p-24 perspective-[2000px]">
                     <div className="absolute inset-0 bg-grid opacity-[0.03] pointer-events-none"></div>
                     
-                    {/* Mockup Rendering Logic */}
-                    <div className="relative w-full h-full flex items-center justify-center">
+                    {/* Mockup Rendering Logic with 3D Transforms */}
+                    <div className="relative w-full h-full flex items-center justify-center z-10 transition-transform duration-700 ease-out-quart">
                         {resolvedDeviceTypes[current] === 'mobile' && (
-                          <div className="relative flex items-center justify-center gap-8">
-                            <motion.div 
-                              initial={{ y: 50, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              transition={{ delay: 0.2, duration: 0.6 }}
-                              className="w-56 aspect-[9/19] bg-[#002046] rounded-[40px] border-[8px] border-[#002046] shadow-premium overflow-hidden relative z-10"
-                            >
-                                <img src={cs.mobileMockups?.[0] || cs.imageUrl} alt="Mockup 1" className="w-full h-full object-cover" />
-                            </motion.div>
-                            <motion.div 
-                              initial={{ y: 100, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              transition={{ delay: 0.4, duration: 0.6 }}
-                              className="w-56 aspect-[9/19] bg-[#002046] rounded-[40px] border-[8px] border-[#002046] shadow-premium overflow-hidden relative hidden xl:block translate-y-20 -rotate-6"
-                            >
-                                <img src={cs.mobileMockups?.[1] || cs.imageUrl} alt="Mockup 2" className="w-full h-full object-cover" />
-                            </motion.div>
-                          </div>
-                        )}
-
-                        {resolvedDeviceTypes[current] === 'tablet' && (
                           <motion.div 
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.8 }}
-                            className="w-full max-w-lg aspect-[3/4] bg-[#002046] rounded-[24px] border-[12px] border-[#002046] shadow-premium overflow-hidden relative"
+                            initial={{ rotateY: -20, rotateX: 5, x: 20, opacity: 0 }}
+                            animate={{ rotateY: -10, rotateX: 2, x: 0, opacity: 1 }}
+                            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                            className="relative flex items-center justify-center gap-10"
+                            style={{ transformStyle: 'preserve-3d' }}
                           >
-                             <img src={cs.desktopMockups?.[0] || cs.imageUrl} alt="Tablet Mockup" className="w-full h-full object-cover" />
+                             {/* Primary Mobile - iPhone 16 Style (No Notch) */}
+                             <div className="relative group">
+                                {/* Hardware Buttons */}
+                                <div className="absolute -left-[11px] top-24 w-[2px] h-10 bg-[#1a1f2e] rounded-l-md border-y border-white/5"></div>
+                                <div className="absolute -left-[11px] top-40 w-[2px] h-16 bg-[#1a1f2e] rounded-l-md border-y border-white/5"></div>
+                                <div className="absolute -left-[11px] top-60 w-[2px] h-16 bg-[#1a1f2e] rounded-l-md border-y border-white/5"></div>
+                                <div className="absolute -right-[11px] top-44 w-[2px] h-20 bg-[#1a1f2e] rounded-r-md border-y border-white/5"></div>
+
+                                <div className="w-64 aspect-[9/19.5] bg-[#001026] rounded-[48px] border-[10px] border-[#080c14] shadow-[0_40px_100px_-15px_rgba(0,0,0,0.6)] overflow-hidden relative">
+                                    <motion.div 
+                                       animate={{ x: ['100%', '-100%'] }}
+                                       transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                                       className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none z-20"
+                                    ></motion.div>
+                                    <img src={cs.mobileMockups?.[0] || cs.imageUrl} alt="Mobile Mockup" className="w-full h-full object-cover" />
+                                </div>
+                             </div>
                           </motion.div>
                         )}
 
                         {resolvedDeviceTypes[current] === 'desktop' && (
                           <motion.div 
-                            initial={{ y: 30, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 0.8 }}
-                            className="w-full max-w-2xl aspect-video bg-[#001026] rounded-none border-[10px] border-[#002046] shadow-premium overflow-hidden relative"
+                            initial={{ y: 60, opacity: 0, rotateX: 10 }}
+                            animate={{ y: 0, opacity: 1, rotateX: 5 }}
+                            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                            className="w-full max-w-3xl flex flex-col items-center"
                           >
-                             {/* Mac Bar */}
-                             <div className="absolute top-0 left-0 w-full h-6 bg-[#002046] flex items-center px-4 gap-1.5 border-b border-white/5">
-                                <div className="w-2 h-2 rounded-full bg-red-500/40"></div>
-                                <div className="w-2 h-2 rounded-full bg-yellow-500/40"></div>
-                                <div className="w-2 h-2 rounded-full bg-green-500/40"></div>
+                             <div className="w-full aspect-[16/10] bg-[#000814] rounded-t-[14px] border-[12px] border-[#080c14] shadow-2xl overflow-hidden relative">
+                                <img src={cs.desktopMockups?.[0] || cs.imageUrl} alt="Desktop Mockup" className="w-full h-full object-cover" />
                              </div>
-                             <img src={cs.desktopMockups?.[0] || cs.imageUrl} alt="Desktop Mockup" className="w-full h-full object-cover pt-6" />
+                             <div className="w-[102%] h-4 bg-[#0d1117] rounded-b-[40%] shadow-[0_25px_50px_-12px_rgba(0,0,0,1)] border-t border-white/5 relative z-20 flex justify-center">
+                                <div className="w-24 h-[1px] bg-white/10 absolute top-0"></div>
+                             </div>
+                          </motion.div>
+                        )}
+
+                        {resolvedDeviceTypes[current] === 'mixed' && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="relative w-full h-full flex items-center justify-center p-8"
+                          >
+                             {/* Desktop Component (Static Background) */}
+                             <motion.div 
+                               initial={{ scale: 0.9, y: 20, rotateX: 5 }}
+                               animate={{ scale: 1, y: 0, rotateX: 3 }}
+                               className="w-full max-w-2xl flex flex-col items-center"
+                             >
+                                <div className="w-full aspect-[16/10] bg-[#000814] rounded-t-[12px] border-[10px] border-[#080c14] shadow-xl overflow-hidden relative">
+                                   <img src={cs.desktopMockups?.[0] || cs.imageUrl} alt="Desktop Backdrop" className="w-full h-full object-cover" />
+                                </div>
+                                <div className="w-[101%] h-3 bg-[#0d1117] rounded-b-[30%] border-t border-white/5 shadow-2xl"></div>
+                             </motion.div>
+                             
+                             {/* Mobile Component (Floating Front) */}
+                             <motion.div 
+                               initial={{ x: 100, y: 100, rotateY: -15, opacity: 0 }}
+                               animate={{ x: 60, y: 60, rotateY: -10, opacity: 1 }}
+                               transition={{ delay: 0.5, duration: 1 }}
+                               className="absolute bottom-1/2 translate-y-1/2 right-[10%] w-48 aspect-[9/19.5] bg-[#001026] rounded-[36px] border-[8px] border-[#080c14] shadow-[0_30px_60px_-10px_rgba(0,0,0,0.7)] overflow-hidden z-30"
+                             >
+                                <img src={cs.mobileMockups?.[0] || cs.imageUrl} alt="Mobile Overlay" className="w-full h-full object-cover" />
+                             </motion.div>
                           </motion.div>
                         )}
                     </div>
 
                     {/* Branding Watermark */}
-                    <div className="absolute bottom-12 right-12 text-6xl font-display italic opacity-5 text-[#002046]">
-                       {cs.id.toUpperCase()}
+                    <div className="absolute bottom-12 right-12 text-8xl font-display italic opacity-[0.02] text-[#002046] select-none uppercase tracking-tighter mix-blend-multiply">
+                       {cs.id.replace(/-/g, '')}
                     </div>
                 </div>
               </motion.div>

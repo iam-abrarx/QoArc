@@ -57,10 +57,15 @@
 }
 
 @layer base {
-  body {
+  html, body {
     @apply bg-surface text-on-surface font-sans antialiased selection:bg-surface-container-high selection:text-primary;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar, body::-webkit-scrollbar {
+    display: none;
   }
   .text-text-muted {
     @apply text-on-surface/60 font-medium;
@@ -135,12 +140,17 @@
   .cad-crosshair::before { @apply w-[0.5px] h-3 left-0 top-0; }
   .cad-crosshair::after { @apply h-[0.5px] w-3 left-0 top-0; }
 
-  .geometric-accent {
-    @apply relative overflow-hidden;
-  }
   .geometric-accent::before {
     content: '';
     @apply absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
 }
 

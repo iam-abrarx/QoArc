@@ -125,12 +125,20 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch all data from API on mount
   useEffect(() => {
-    fetchApi<PortfolioItem[]>('/api/projects', initialProjects).then(setPortfolioItems);
+    fetchApi<PortfolioItem[]>('/api/projects', initialProjects).then(items => {
+      setPortfolioItems(items && items.length > 0 ? items : initialProjects);
+    });
     fetchApi<ContactSubmission[]>('/api/submissions', []).then(setContactSubmissions);
     fetchApi<PartnerLogo[]>('/api/partner-logos', []).then(setPartnerLogos);
-    fetchApi<JobOpening[]>('/api/job-openings', defaultJobs).then(setJobOpenings);
-    fetchApi<Testimonial[]>('/api/testimonials', defaultTestimonials).then(setTestimonials);
-    fetchApi<LabItem[]>('/api/lab-items', defaultLabItems).then(setLabItems);
+    fetchApi<JobOpening[]>('/api/job-openings', defaultJobs).then(items => {
+      setJobOpenings(items && items.length > 0 ? items : defaultJobs);
+    });
+    fetchApi<Testimonial[]>('/api/testimonials', defaultTestimonials).then(items => {
+      setTestimonials(items && items.length > 0 ? items : defaultTestimonials);
+    });
+    fetchApi<LabItem[]>('/api/lab-items', defaultLabItems).then(items => {
+      setLabItems(items && items.length > 0 ? items : defaultLabItems);
+    });
 
     // Footer info still uses localStorage (simple key-value, not worth a table)
     const savedFooter = localStorage.getItem('footerInfo');

@@ -18,12 +18,15 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+import PharmaAIAnimation from './PharmaAIAnimation';
+import PharmaBIDashboard from './PharmaBIDashboard';
+
 const categories = [
   {
     id: 'software',
     title: 'Custom Software Engineering',
     desc: 'Delivering high-concurrency, multi-tenant engineering solutions at global scale. We bridge complex architectural requirements with premium user experiences through sub-second latency and hardened security.',
-    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2000&auto=format&fit=crop',
+    image: '/images/mockups/software-engineering.png',
     links: [
       { name: 'Web App Development', href: '/services/custom-software/web-app-development' },
       { name: 'Mobile App Development', href: '/services/custom-software/mobile-app-development' },
@@ -162,21 +165,57 @@ export default function EngineeringModalities() {
                           </div>
                         </div>
 
-                        {/* Right Content - Image */}
+                        {/* Right Content - Mockup Scene */}
                         <motion.div 
                           initial={{ opacity: 0, scale: 0.98 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ duration: 0.8, delay: 0.2 }}
-                          className="hidden lg:block h-96 relative rounded-none overflow-hidden shadow-sharp group/img"
+                          className="hidden lg:block h-[500px] relative rounded-none overflow-hidden shadow-sharp group/img bg-[#f0f2f5]"
                         >
-                           <img 
-                              src={item.image} 
-                              alt={item.title} 
-                              className="w-full h-full object-cover transition-transform duration-1000 group-hover/img:scale-110" 
-                           />
-                           <div className="absolute inset-0 bg-primary/20 mix-blend-multiply opacity-20"></div>
-                           <div className="absolute top-8 right-8 px-6 py-3 bg-white/10 backdrop-blur-md rounded-none border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest">
-                               Engineering // Verified
+                           {item.id === 'software' ? (
+                             <div className="w-full h-full relative flex items-center justify-center p-12 overflow-hidden bg-[#e5e7eb]">
+                                {/* Desk Texture/Background */}
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/20 to-transparent"></div>
+                                <div className="absolute bottom-0 w-full h-24 bg-gradient-to-t from-black/5 to-transparent"></div>
+                                
+                                {/* Laptop on Table Mockup */}
+                                <motion.div 
+                                  whileHover={{ y: -5, rotateX: 2 }}
+                                  className="relative w-full aspect-[16/10] max-w-xl z-10 transition-transform duration-700"
+                                  style={{ perspective: '1000px' }}
+                                >
+                                   {/* Laptop Screen (Top) */}
+                                   <div className="w-full h-full bg-[#080c14] rounded-t-xl border-[8px] border-[#1a1f2e] shadow-2xl relative overflow-hidden">
+                                      {/* No notch as per previous UX standard */}
+                                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none z-20"></div>
+                                      <PharmaBIDashboard />
+                                   </div>
+                                   
+                                   {/* Laptop Base (Bottom/Table Surface) */}
+                                   <div className="w-[104%] h-2 bg-[#0d1117] rounded-b-[4px] -ml-[2%] relative z-0 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.5)] border-t border-white/10"></div>
+                                   <div className="w-[108%] h-2 bg-[#1a1f2e]/60 rounded-b-lg -ml-[4%] blur-[2px]"></div>
+                                </motion.div>
+
+                                {/* Perspective/Scene Details */}
+                                <div className="absolute bottom-20 left-10 text-[80px] font-display italic opacity-[0.03] text-primary/40 select-none uppercase tracking-tighter">
+                                   ENG // 2026
+                                </div>
+                             </div>
+                           ) : item.id === 'ai-data' ? (
+                             <PharmaAIAnimation />
+                           ) : (
+                             <>
+                               <img 
+                                  src={item.image} 
+                                  alt={item.title} 
+                                  className="w-full h-full object-cover transition-transform duration-1000 group-hover/img:scale-110" 
+                               />
+                               <div className="absolute inset-0 bg-primary/20 mix-blend-multiply opacity-20"></div>
+                             </>
+                           )}
+                           
+                           <div className="absolute top-8 right-8 px-6 py-3 bg-white/10 backdrop-blur-md rounded-none border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest z-20">
+                                Engineering // Verified
                            </div>
                         </motion.div>
                       </div>
