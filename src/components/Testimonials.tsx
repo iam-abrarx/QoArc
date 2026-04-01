@@ -69,12 +69,12 @@ export default function Testimonials() {
 
                   {/* Footer Links */}
                   <div className="flex justify-end items-center gap-8 pt-4 border-t border-primary/5">
-                    <a href="#" className="flex items-center gap-2 text-primary/60 hover:text-[#0047AB] font-bold text-sm tracking-tight transition-colors">
+                    <a href={t.companyUrl || "#"} target={t.companyUrl && t.companyUrl !== "#" ? "_blank" : undefined} rel="noopener noreferrer" className="flex items-center gap-2 text-primary/60 hover:text-[#0047AB] font-bold text-sm tracking-tight transition-colors">
                       <FileText size={16} />
                       Check the original
                     </a>
                     <div className="w-[1px] h-4 bg-primary/10"></div>
-                    <a href="#" className="flex items-center gap-2 text-primary/60 hover:text-[#0047AB] font-bold text-sm tracking-tight transition-colors">
+                    <a href={t.projectUrl || "#"} className="flex items-center gap-2 text-primary/60 hover:text-[#0047AB] font-bold text-sm tracking-tight transition-colors">
                       <ExternalLink size={16} />
                       Check the project
                     </a>
