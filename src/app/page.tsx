@@ -143,7 +143,6 @@ export default function HomePage() {
             </div>
             </div>
           </div>
-        </div>
       </section>
 
       {/* 5b. Lab Projects - Dark Node Row */}
