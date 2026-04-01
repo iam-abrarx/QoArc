@@ -19,7 +19,7 @@ import {
 import Link from 'next/link';
 
 import PharmaAIAnimation from './PharmaAIAnimation';
-import PharmaBIDashboard from './PharmaBIDashboard';
+import PharmaBIDashboard from '@/components/PharmaBIDashboard';
 
 const categories = [
   {
