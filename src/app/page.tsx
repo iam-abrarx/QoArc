@@ -10,6 +10,7 @@ import { usePortfolio } from '@/context/PortfolioContext';
 import EngineeringModalities from '@/components/EngineeringModalities';
 import EngineeringLifecycle from '@/components/EngineeringLifecycle';
 import CaseStudyCarousel from '@/components/CaseStudyCarousel';
+import PharmaAIAnimation from '@/components/PharmaAIAnimation';
 import Testimonials from '@/components/Testimonials';
 import ContactSection from '@/components/ContactSection';
 import { 
@@ -103,11 +104,6 @@ export default function HomePage() {
       {/* 4. Selected Work - Carousel Redesign */}
       <CaseStudyCarousel />
 
-      {/* 4.5 Development Phases - Restored - Sharpened */}
-      <EngineeringLifecycle />
-
-      {/* 4.7 Testimonials - Our Clients Say */}
-      <Testimonials />
 
 
       {/* 5a. Lab Spotlight - SOVEREIGN INTELLIGENCE (Light) */}
@@ -139,22 +135,12 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-
-            {/* Right Side: Technical Graphic */}
-            <div className="relative aspect-square flex items-center justify-center lg:justify-end">
-              <div className="relative w-full max-w-md aspect-square border-l border-t border-primary/10 p-12 overflow-hidden flex items-center justify-center group bg-surface-container-lowest shadow-sharp">
-                 <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent"></div>
-                 
-                 {/* Precision Core */}
-                 <div className="relative">
-                   <div className="w-4 h-4 bg-[#cc0000] rounded-none relative z-10 shadow-[0_0_30px_rgba(204,0,0,0.3)]"></div>
-                   <div className="absolute inset-0 w-4 h-4 bg-[#cc0000] rounded-none animate-ping opacity-30"></div>
-                   
-                   {/* Scanning Elements */}
-                   <div className="absolute -inset-24 border border-primary/5 animate-spin-slow rounded-none"></div>
-                   <div className="absolute -inset-16 border border-primary/10 rounded-none"></div>
-                 </div>
+            {/* Right Side: Pharma AI Animation */}
+            <div className="relative flex items-center justify-center lg:justify-end">
+              <div className="w-full max-w-md lg:max-w-xl">
+                 <PharmaAIAnimation />
               </div>
+            </div>
             </div>
           </div>
         </div>
@@ -193,6 +179,13 @@ export default function HomePage() {
       </section>
 
 
+
+
+      {/* 4.5 Development Phases - Restored - Sharpened */}
+      <EngineeringLifecycle />
+
+      {/* 4.7 Testimonials - Our Clients Say */}
+      <Testimonials />
       {/* 4.8 Contact Section - Minimalist Integration */}
       <ContactSection />
 
