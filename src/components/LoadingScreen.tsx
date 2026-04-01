@@ -73,15 +73,7 @@ export default function LoadingScreen() {
           {/* Main Content */}
           <div className="relative z-10 w-full max-w-md space-y-12">
             <div className="space-y-4">
-               <div className="flex justify-between items-end">
-                  <motion.div 
-                    key={statusSequence[statusIndex]}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-[10px] font-bold text-white/40 uppercase tracking-[0.4em] italic"
-                  >
-                     {statusSequence[statusIndex]}
-                  </motion.div>
+               <div className="flex justify-end items-end">
                   <div className="text-xl font-display font-medium italic text-white tracking-tighter">
                      {Math.round(percent)}%
                   </div>
