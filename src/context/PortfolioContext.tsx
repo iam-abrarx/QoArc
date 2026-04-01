@@ -126,7 +126,19 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   // Fetch all data from API on mount
   useEffect(() => {
     fetchApi<PortfolioItem[]>('/api/projects', initialProjects).then(items => {
-      setPortfolioItems(items && items.length > 0 ? items : initialProjects);
+      // Define the IDs of the outdated "seed" projects we want to avoid
+      const seedIds = ['aether-node', 'quantus-fx', 'sovereign-cloud', 'nexus-industrial', 'sentinel-vision', 'velocity-pay'];
+      
+      // If the API returns seed projects, or if it's missing the actual projects (BanCat, etc.)
+      const isOutdated = items && items.some(item => seedIds.includes(String(item.id)));
+      const hasActual = items && items.some(item => ['bancat', 'asialinkage', '2go', 'elizabeth'].includes(String(item.id)));
+      
+      if (isOutdated || !hasActual) {
+        console.log('Production database contains outdated seed data. Forcing actual projects fallback.');
+        setPortfolioItems(initialProjects);
+      } else {
+        setPortfolioItems(items && items.length > 0 ? items : initialProjects);
+      }
     });
     fetchApi<ContactSubmission[]>('/api/submissions', []).then(setContactSubmissions);
     fetchApi<PartnerLogo[]>('/api/partner-logos', []).then(setPartnerLogos);
