@@ -140,7 +140,7 @@ const PharmaBIDashboard = () => {
             <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div> Live
           </div>
           <div className="bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded text-blue-400 font-bold text-[7px] uppercase">
-             Powered by Qoarc
+             Powered by QOARC
           </div>
         </div>
       </div>

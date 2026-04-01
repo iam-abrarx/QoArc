@@ -59,7 +59,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-3 relative mr-8 group transition-opacity duration-300 hover:opacity-80">
               <Image 
                 src="/images/logo/Qoarc_logo_White.png" 
-                alt="QoArc Logo" 
+                alt="QOARC Logo" 
                 width={150} 
                 height={45} 
                 className="w-auto h-10 object-contain transition-all duration-300"
@@ -131,7 +131,7 @@ export default function Footer() {
           </div>
           <div className="flex items-center gap-3">
             <Sparkles size={12} className="text-white/10" />
-            <span>© 2024 QoArc AI & BI. Verified Production Environment.</span>
+            <span>© 2024 QOARC AI & BI. Verified Production Environment.</span>
           </div>
         </div>
       </div>

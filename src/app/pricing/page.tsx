@@ -18,7 +18,7 @@ const plans = [
     name: "Discovery Node",
     price: "4.5k",
     period: "Per Sprint",
-    desc: "1-week architecture & ROI audit. The foundational entry point for any QoArc system.",
+    desc: "1-week architecture & ROI audit. The foundational entry point for any QOARC system.",
     features: [
       "Technical Roadmapping",
       "Sovereign Security Audit",
@@ -46,7 +46,7 @@ const plans = [
     name: "Lab Partnership",
     price: "Custom",
     period: "Quarterly",
-    desc: "Direct access to QoArc Lab R&D. High-frequency iteration on bleeding edge architectures.",
+    desc: "Direct access to QOARC Lab R&D. High-frequency iteration on bleeding edge architectures.",
     features: [
       "Bespoke GNN Research",
       "Custom Model Training",

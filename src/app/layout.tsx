@@ -21,7 +21,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "QoArc | Architecting Autonomous Intelligence",
+  title: "QOARC | Architecting Autonomous Intelligence",
   description: "A full-service AI product studio. We build intelligent SaaS, automate business operations, and ship end-to-end software products.",
 };
 
