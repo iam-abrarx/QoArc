@@ -186,7 +186,7 @@ export default function PharmaAIAnimation() {
   }, []);
 
   return (
-    <div className="app-container relative w-full h-full bg-[#030509] border border-white/10 overflow-hidden font-sans text-sm">
+    <div className="app-container relative w-full h-[500px] lg:h-[600px] rounded-2xl bg-[#030509] border border-white/10 overflow-hidden font-sans text-sm shadow-2xl">
       {/* Background Floats */}
       <div className="absolute top-0 left-0 w-64 h-64 bg-[#4c7cff] opacity-[0.05] blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#10b981] opacity-[0.03] blur-[100px] translate-x-1/2 translate-y-1/2"></div>
