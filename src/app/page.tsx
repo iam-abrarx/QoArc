@@ -13,6 +13,7 @@ import CaseStudyCarousel from '@/components/CaseStudyCarousel';
 import PharmaAIAnimation from '@/components/PharmaAIAnimation';
 import Testimonials from '@/components/Testimonials';
 import ContactSection from '@/components/ContactSection';
+import ChatHighlight from '@/components/ChatHighlight';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -103,6 +104,9 @@ export default function HomePage() {
 
       {/* 4. Selected Work - Carousel Redesign */}
       <CaseStudyCarousel />
+
+      {/* 4.5 Strategic Intelligence Node - Chatbot Highlight */}
+      <ChatHighlight />
 
 
 

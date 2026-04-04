@@ -49,11 +49,14 @@ export interface LabItem {
   name: string;
   desc: string;
   node: string;
+  imageUrl?: string;
 }
 
 export interface FooterInfo {
   email: string;
   linkedin: string;
+  phone: string;
+  address: string;
 }
 
 interface PortfolioContextType {
@@ -97,11 +100,11 @@ async function fetchApi<T>(url: string, fallback: T): Promise<T> {
 }
 
 const defaultTestimonials: Testimonial[] = [
-  { id: '1', company: "BANcat", logoColor: "text-[#cc0000]", authorName: "Dr. Rafiq Ahmed", authorTitle: "Director of Operations, BANCAT Bangladesh", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg", authorLinkedin: "#", rating: 5, content: "QOARC built a powerful platform for our cancer charity. It makes it simple for donors to find and support patients in real-time. The site is easy to use in both English and Bangla, helping us reach more people.", companyUrl: "https://bancat.org.bd", projectUrl: "/work/bancat" },
-  { id: '2', company: "AsiaLinkage", logoColor: "text-[#002046]", authorName: "Shafiqul Islam", authorTitle: "Managing director", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg", authorLinkedin: "#", rating: 5, content: "QOARC built a comprehensive digital catalogue for our business. They created a structured website where all our products are beautifully categorized and easily accessible to our clients. It completely transformed how we showcase our inventory.", companyUrl: "https://asialinkage.com", projectUrl: "/work/asialinkage" },
-  { id: '3', company: "2GO Bangladesh", logoColor: "text-[#ff6600]", authorName: "Noel Miazi", authorTitle: "Head of Digital, 2GO", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20female.jpg", authorLinkedin: "#", rating: 5, content: "Our new website is fast, modern, and looks great. QOARC made the shopping experience so much smoother for our customers. We've seen a huge improvement in how people interact with our brand.", companyUrl: "https://bout2go.com", projectUrl: "/work/2go" },
-  { id: '5', company: "Epharma", logoColor: "text-[#008080]", authorName: "Nazmus Sakib", authorTitle: "Owner", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20male.jpg", authorLinkedin: "#", rating: 5, content: "QOARC developed a fast, reliable inventory management system for our local pharmacy. It helps us keep track of medicines, sales, and stock levels effortlessly. The system is easy to use and has completely modernized our daily operations.", companyUrl: "#", projectUrl: "#" },
-  { id: '4', company: "Elizabeth Archer", logoColor: "text-[#b8860b]", authorName: "Elizabeth Kalinina", authorTitle: "Director of Photography", authorImage: "https://69c86795a9fb0ef7c012e385.imgix.net/testimonial%20female.jpg", authorLinkedin: "#", rating: 5, content: "QOARC turned my photography portfolio into a high-end digital magazine. The cinematic feel and private client areas have completely changed how I present my work to filmmakers. It's truly elite.", companyUrl: "#", projectUrl: "/work/elizabeth" },
+  { id: '1', company: "BANcat", logoColor: "text-[#cc0000]", authorName: "Dr. Rafiq Ahmed", authorTitle: "Director of Operations, BANCAT Bangladesh", authorImage: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=80&w=200&h=200", authorLinkedin: "#", rating: 5, content: "QOARC built a powerful platform for our cancer charity. It makes it simple for donors to find and support patients in real-time. The site is easy to use in both English and Bangla, helping us reach more people.", companyUrl: "https://bancat.org.bd", projectUrl: "/work/bancat" },
+  { id: '2', company: "AsiaLinkage", logoColor: "text-[#002046]", authorName: "Shafiqul Islam", authorTitle: "Managing director", authorImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200&h=200", authorLinkedin: "#", rating: 5, content: "QOARC built a comprehensive digital catalog for our business. They created a structured website where all our products are beautifully categorized and easily accessible to our clients. It completely transformed how we showcase our inventory.", companyUrl: "https://asialinkage.com", projectUrl: "/work/asialinkage" },
+  { id: '3', company: "2GO Bangladesh", logoColor: "text-[#ff6600]", authorName: "Noel Miazi", authorTitle: "Head of Digital, 2GO", authorImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200&h=200", authorLinkedin: "#", rating: 5, content: "Our new website is fast, modern, and looks great. QOARC made the shopping experience so much smoother for our customers. We've seen a huge improvement in how people interact with our brand.", companyUrl: "https://bout2go.com", projectUrl: "/work/2go" },
+  { id: '5', company: "Epharma", logoColor: "text-[#008080]", authorName: "Nazmus Sakib", authorTitle: "Owner", authorImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200", authorLinkedin: "#", rating: 5, content: "QOARC developed a fast, reliable inventory management system for our local pharmacy. It helps us keep track of medicines, sales, and stock levels effortlessly. The system is easy to use and has completely modernized our daily operations.", companyUrl: "#", projectUrl: "#" },
+  { id: '4', company: "Elizabeth Archer", logoColor: "text-[#b8860b]", authorName: "Elizabeth Kalinina", authorTitle: "Director of Photography", authorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200&h=200", authorLinkedin: "#", rating: 5, content: "QOARC turned my photography portfolio into a high-end digital magazine. The cinematic feel and private client areas have completely changed how I present my work to filmmakers. It's truly elite.", companyUrl: "#", projectUrl: "/work/elizabeth" },
 ];
 
 const defaultJobs: JobOpening[] = [
@@ -122,23 +125,23 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
   const [jobOpenings, setJobOpenings] = useState<JobOpening[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [labItems, setLabItems] = useState<LabItem[]>([]);
-  const [footerInfo, setFooterInfo] = useState<FooterInfo>({ email: 'info@qoarc.com', linkedin: 'https://linkedin.com' });
+  const [footerInfo, setFooterInfo] = useState<FooterInfo>({ 
+    email: 'info@qoarc.com', 
+    linkedin: 'https://linkedin.com',
+    phone: '+880 1234 567890',
+    address: 'Dhaka, Bangladesh'
+  });
 
   // Fetch all data from API on mount
   useEffect(() => {
-    fetchApi<PortfolioItem[]>('/api/projects', initialProjects).then(items => {
-      // Define the IDs of the outdated "seed" projects we want to avoid
-      const seedIds = ['aether-node', 'quantus-fx', 'sovereign-cloud', 'nexus-industrial', 'sentinel-vision', 'velocity-pay'];
-      
-      // If the API returns seed projects, or if it's missing the actual projects (BanCat, etc.)
-      const isOutdated = items && items.some(item => seedIds.includes(String(item.id)));
-      const hasActual = items && items.some(item => ['bancat', 'asialinkage', '2go', 'elizabeth'].includes(String(item.id)));
-      
-      if (isOutdated || !hasActual) {
-        console.log('Production database contains outdated seed data. Forcing actual projects fallback.');
-        setPortfolioItems(initialProjects);
+    fetchApi<PortfolioItem[]>('/api/projects', []).then(items => {
+      // If the API returns any projects, we use them. 
+      // If the API is empty, we fall back to initialProjects for the first-time setup.
+      if (items && items.length > 0) {
+        setPortfolioItems(items);
       } else {
-        setPortfolioItems(items && items.length > 0 ? items : initialProjects);
+        console.log('Database empty, initializing with default projects.');
+        setPortfolioItems(initialProjects);
       }
     });
     fetchApi<ContactSubmission[]>('/api/submissions', []).then(setContactSubmissions);
@@ -170,6 +173,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newItem),
+      credentials: 'include',
     }).then(res => res.json()).then(data => {
       if (data.id && data.id !== tempId) {
         setPortfolioItems(prev => prev.map(p => p.id === tempId ? { ...p, id: data.id } : p));
@@ -179,7 +183,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
 
   const deleteItem = useCallback((id: string) => {
     setPortfolioItems(prev => prev.filter(i => String(i.id) !== String(id)));
-    fetch(`/api/projects/${id}`, { method: 'DELETE' }).catch(console.error);
+    fetch(`/api/projects/${id}`, { method: 'DELETE', credentials: 'include' }).catch(console.error);
   }, []);
 
   const updateItem = useCallback((item: PortfolioItem) => {
@@ -188,6 +192,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
+      credentials: 'include',
     }).catch(console.error);
   }, []);
 
@@ -210,7 +215,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
 
   const deleteSubmission = useCallback((id: string) => {
     setContactSubmissions(prev => prev.filter(s => String(s.id) !== String(id)));
-    fetch(`/api/submissions/${id}`, { method: 'DELETE' }).catch(console.error);
+    fetch(`/api/submissions/${id}`, { method: 'DELETE', credentials: 'include' }).catch(console.error);
   }, []);
 
   // --- Partner Logos ---
@@ -223,12 +228,13 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(logo),
+      credentials: 'include',
     }).catch(console.error);
   }, []);
 
   const deletePartnerLogo = useCallback((id: string) => {
     setPartnerLogos(prev => prev.filter(l => String(l.id) !== String(id)));
-    fetch(`/api/partner-logos/${id}`, { method: 'DELETE' }).catch(console.error);
+    fetch(`/api/partner-logos/${id}`, { method: 'DELETE', credentials: 'include' }).catch(console.error);
   }, []);
 
   // --- Job Openings ---
@@ -241,12 +247,13 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(job),
+      credentials: 'include',
     }).catch(console.error);
   }, []);
 
   const deleteJobOpening = useCallback((id: string) => {
     setJobOpenings(prev => prev.filter(j => String(j.id) !== String(id)));
-    fetch(`/api/job-openings/${id}`, { method: 'DELETE' }).catch(console.error);
+    fetch(`/api/job-openings/${id}`, { method: 'DELETE', credentials: 'include' }).catch(console.error);
   }, []);
 
   // --- Testimonials ---
@@ -259,12 +266,13 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(testimonial),
+      credentials: 'include',
     }).catch(console.error);
   }, []);
 
   const deleteTestimonial = useCallback((id: string) => {
     setTestimonials(prev => prev.filter(t => String(t.id) !== String(id)));
-    fetch(`/api/testimonials/${id}`, { method: 'DELETE' }).catch(console.error);
+    fetch(`/api/testimonials/${id}`, { method: 'DELETE', credentials: 'include' }).catch(console.error);
   }, []);
 
   const updateTestimonial = useCallback((testimonial: Testimonial) => {
@@ -273,6 +281,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(testimonial),
+      credentials: 'include',
     }).catch(console.error);
   }, []);
 
@@ -286,12 +295,13 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
+      credentials: 'include',
     }).catch(console.error);
   }, []);
 
   const deleteLabItem = useCallback((id: string) => {
     setLabItems(prev => prev.filter(l => String(l.id) !== String(id)));
-    fetch(`/api/lab-items/${id}`, { method: 'DELETE' }).catch(console.error);
+    fetch(`/api/lab-items/${id}`, { method: 'DELETE', credentials: 'include' }).catch(console.error);
   }, []);
 
   const updateLabItem = useCallback((item: LabItem) => {
@@ -300,6 +310,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
+      credentials: 'include',
     }).catch(console.error);
   }, []);
 

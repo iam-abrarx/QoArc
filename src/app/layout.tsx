@@ -7,6 +7,8 @@ import { PortfolioProvider } from "@/context/PortfolioContext";
 import { LeadCaptureProvider } from "@/context/LeadCaptureContext";
 import LeadCaptureModal from "@/components/LeadCaptureModal";
 import LoadingScreen from "@/components/LoadingScreen";
+import ChatWidget from "@/components/ChatWidget";
+import { ChatProvider } from "@/context/ChatContext";
 
 const notoSerif = Noto_Serif({
   subsets: ["latin"],
@@ -21,8 +23,57 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "QOARC | Architecting Autonomous Intelligence",
+  metadataBase: new URL('https://www.qoarc.com'),
+  title: {
+    default: "QOARC | Architecting Autonomous Intelligence",
+    template: "%s | QOARC"
+  },
   description: "A full-service AI product studio. We build intelligent SaaS, automate business operations, and ship end-to-end software products.",
+  keywords: ["AI Studio", "Autonomous Intelligence", "SaaS Development", "Business Automation", "End-to-End Software"],
+  authors: [{ name: "QOARC Team" }],
+  creator: "QOARC",
+  publisher: "QOARC",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://www.qoarc.com",
+    title: "QOARC | Architecting Autonomous Intelligence",
+    description: "A full-service AI product studio. We build intelligent SaaS and automate business operations.",
+    siteName: "QOARC",
+    images: [{
+      url: "/og-image.png",
+      width: 1200,
+      height: 630,
+      alt: "QOARC AI Studio",
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "QOARC | Architecting Autonomous Intelligence",
+    description: "A full-service AI product studio. We build intelligent SaaS and automate business operations.",
+    images: ["/og-image.png"],
+    creator: "@qoarc",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: "/",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -36,12 +87,15 @@ export default function RootLayout({
         <LoadingScreen />
         <PortfolioProvider>
           <LeadCaptureProvider>
-            <Navbar />
-            <main className="min-h-screen">
-              {children}
-            </main>
-            <LeadCaptureModal />
-            <Footer />
+            <ChatProvider>
+              <Navbar />
+              <main className="min-h-screen">
+                {children}
+              </main>
+              <LeadCaptureModal />
+              <ChatWidget />
+              <Footer />
+            </ChatProvider>
           </LeadCaptureProvider>
         </PortfolioProvider>
       </body>
