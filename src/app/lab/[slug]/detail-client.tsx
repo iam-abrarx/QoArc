@@ -19,7 +19,9 @@ import {
   ShieldAlert,
   Server,
   Zap,
-  ShoppingBag
+  ShoppingBag,
+  Eye,
+  Minimize2
 } from 'lucide-react';
 import { useLeadCapture } from '@/context/LeadCaptureContext';
 
@@ -112,6 +114,7 @@ export default function LabDetailPage() {
   const data = labData[slug as string] || labData['pfas-rigidity'];
 
   const [activeSection, setActiveSection] = useState('abstract');
+  const [isFocusMode, setIsFocusMode] = useState(false);
   
   const sectionRefs = {
     abstract: useRef<HTMLElement>(null),
@@ -120,6 +123,17 @@ export default function LabDetailPage() {
     tech: useRef<HTMLElement>(null),
     results: useRef<HTMLElement>(null)
   };
+
+  useEffect(() => {
+    if (isFocusMode) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isFocusMode]);
 
   useEffect(() => {
     const observerOptions = {
@@ -152,29 +166,65 @@ export default function LabDetailPage() {
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      const navbarOffset = 110;
+      const navbarOffset = isFocusMode ? 60 : 110;
       const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - navbarOffset;
+      const offsetPosition = elementPosition + (isFocusMode ? el.offsetTop : window.scrollY) - navbarOffset;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+      const scrollContainer = isFocusMode ? document.getElementById('focus-container') : window;
+      
+      if (isFocusMode && scrollContainer) {
+        scrollContainer.scrollTo({
+          top: el.offsetTop - 60,
+          behavior: 'smooth'
+        });
+      } else {
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
     }
   };
 
   return (
-    <div className="bg-[#f0f2f5] pt-32 pb-24 px-4 md:px-8 selection:bg-primary selection:text-white">
+    <div 
+      id={isFocusMode ? "focus-container" : undefined}
+      className={`selection:bg-primary selection:text-white transition-all duration-300
+        ${isFocusMode 
+          ? 'fixed inset-0 z-[100] bg-[#f0f2f5] overflow-y-auto pt-10 pb-24 px-4 md:px-8' 
+          : 'bg-[#f0f2f5] pt-32 pb-24 px-4 md:px-8'
+        }`}
+    >
       <div className="max-w-screen-2xl mx-auto space-y-8">
         
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center gap-4 text-xs font-sans text-primary/50">
-          <Link href="/lab" className="flex items-center gap-2 hover:text-primary transition-colors">
-            <ArrowLeft size={14} /> Back to Lab
-          </Link>
-          <ChevronRight size={12} className="opacity-30" />
-          <span className="font-bold text-primary">{data.name}</span>
-        </div>
+        {/* Navigation Breadcrumb / Focus Header */}
+        {isFocusMode ? (
+          <div className="flex justify-between items-center border-b border-primary/10 pb-4 mb-4 text-xs font-sans">
+            <button 
+              onClick={() => setIsFocusMode(false)}
+              className="flex items-center gap-2 hover:text-[#cc0000] transition-colors font-bold text-primary"
+            >
+              <ArrowLeft size={14} /> Exit Focus Mode
+            </button>
+            <span className="text-primary/40 font-mono tracking-widest uppercase text-[10px] font-bold">Focus Mode Active // {data.docId}</span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between text-xs font-sans text-primary/50">
+            <div className="flex items-center gap-4">
+              <Link href="/lab" className="flex items-center gap-2 hover:text-primary transition-colors">
+                <ArrowLeft size={14} /> Back to Lab
+              </Link>
+              <ChevronRight size={12} className="opacity-30" />
+              <span className="font-bold text-primary">{data.name}</span>
+            </div>
+            <button 
+              onClick={() => setIsFocusMode(true)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-primary/10 hover:border-[#cc0000] hover:text-[#cc0000] transition-all font-bold shadow-sm"
+            >
+              <BookOpen size={12} /> Focus Mode
+            </button>
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-12 gap-8 items-start">
           
@@ -254,7 +304,7 @@ export default function LabDetailPage() {
                   </div>
                 </section>
 
-                {/* Research Parameters Table (Scientific addition) */}
+                {/* Research Parameters Table */}
                 <section className="space-y-6 pt-4 border-t border-primary/5">
                   <h3 className="text-xs font-bold uppercase tracking-widest text-primary/40">Key Performance Metrics</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
