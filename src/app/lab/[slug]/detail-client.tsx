@@ -16,7 +16,10 @@ import {
   BookOpen,
   ArrowLeft,
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  Server,
+  Zap,
+  ShoppingBag
 } from 'lucide-react';
 import { useLeadCapture } from '@/context/LeadCaptureContext';
 
@@ -37,26 +40,10 @@ const labData: Record<string, any> = {
     arxiv: 'https://arxiv.org/abs/example',
     license: 'Available for commercial licensing or custom development'
   },
-  'cow-project': {
-    docId: 'QOARC-2026-COW',
-    name: 'Project COW',
-    abstract: 'Cognitive Over-Write: Developing self-correcting neural nodes to eliminate hallucination in domain-specific Large Language Models.',
-    metrics: [
-      { val: '0.02%', label: 'Hallucination Rate' },
-      { val: 'Multi-Agent', label: 'Logic Layer' },
-      { val: 'Open-Weights', label: 'Incubation' }
-    ],
-    motivation: 'LLMs in mission-critical environments (Legislation, Medicine) require deterministic logic. COW introduces a sovereign verification layer that checks outputs against a symbolic knowledge graph before token emission.',
-    methodology: 'Integrating symbolic AI with neural transformers. The system uses a "Referee" agent that performs real-time fact-checking against curated vector databases.',
-    tech: ['Rust', 'Tantivy', 'Go', 'Llama-3', 'vLLM', 'Docker'],
-    results: 'Successfully reduced hallucination in legal transcript analysis by 94% compared to base GPT-4o implementations.',
-    arxiv: 'https://arxiv.org/abs/cow-example',
-    license: 'Custom integration for enterprise environments only'
-  },
   'animal-weight': {
     docId: 'QOARC-2026-ANIM',
     name: 'Animal Weight Estimation',
-    abstract: 'Applying advanced computer vision with Segment Anything 2 (SAM2) and Depth Anything v2 for non-invasive, precision agricultural livestock weight estimation.',
+    abstract: 'Applying advanced computer vision with Segment Anything 2 (SAM2) and Depth Anything v2 for non-invasive, precision agricultural livestock observation and mass estimation.',
     metrics: [
       { val: 'SAM2 + Depth', label: 'Neural Architecture' },
       { val: '92.4%', label: 'Estimation Accuracy' },
@@ -68,6 +55,54 @@ const labData: Record<string, any> = {
     results: 'Evaluations on sheep and cattle cohorts demonstrated an estimation error rate of less than 7.6% under varied outdoor lighting conditions, paving the way for fully automated livestock monitoring.',
     arxiv: 'https://arxiv.org/abs/example-sam2',
     license: 'Open source research under Apache 2.0 license'
+  },
+  'bancat-tech': {
+    docId: 'QOARC-2026-BANCAT',
+    name: 'Real-Time Sync on BANcat',
+    abstract: 'Designing zero-latency distributed data pipelines and dual-language state management systems to power real-time cancer support and direct donor connections.',
+    metrics: [
+      { val: '99.9%', label: 'Sync Accuracy' },
+      { val: '<150ms', label: 'Sync Latency' },
+      { val: 'PostgreSQL', label: 'Transaction Engine' }
+    ],
+    motivation: 'Oncology charity organizations face massive friction in allocating emergency funds to patients in real-time, often plagued by disconnected payment logs and delayed balance sheets.',
+    methodology: 'We engineered a bi-directional synchronization loop combining PostgreSQL transaction isolation levels (Serializable) with custom WebSocket channels to broadcast donor updates to client portals concurrently.',
+    tech: ['Next.js', 'Prisma', 'PostgreSQL', 'WebSockets', 'Tailwind CSS'],
+    results: 'Successfully processed donations supporting over 500 cancer patients in Bangladesh, maintaining absolute sync precision and a 0% double-ledger rate.',
+    arxiv: 'https://bancat.org.bd',
+    license: 'Proprietary platform architecture for non-profit operations'
+  },
+  'asialinkage-tech': {
+    docId: 'QOARC-2026-ASIA',
+    name: 'B2B Catalog Indexing Engines',
+    abstract: 'Developing structured database schemas, multi-tier caching architectures, and search indexes to organize and serve extensive commercial catalogs for regional trade networks.',
+    metrics: [
+      { val: '75%', label: 'Query Speedup' },
+      { val: '10K+', label: 'Catalog SKUs' },
+      { val: 'Redis', label: 'Caching Tier' }
+    ],
+    motivation: 'B2B wholesale trading environments experience heavy database performance degradation when searching and filtering large, nested product hierarchies.',
+    methodology: 'The engine implements PostgreSQL compound indexes alongside a write-through caching layer on Redis. Complex product variants are structured in JSONB fields, utilizing GIN indexes for fast fuzzy search queries.',
+    tech: ['Next.js', 'PostgreSQL', 'Redis', 'Tailwind CSS', 'Framer Motion'],
+    results: 'Achieved a 75% reduction in product listing query times, handling 10,000+ business items with instant autocomplete responses.',
+    arxiv: 'https://asialinkage.com',
+    license: 'Custom B2B licensing option available'
+  },
+  '2go-tech': {
+    docId: 'QOARC-2026-2GO',
+    name: 'checkout funnel optimization',
+    abstract: 'Refactoring checkout state sync and client-side memory storage to streamline retail transactions and minimize cart abandonment in local delivery platforms.',
+    metrics: [
+      { val: '35%', label: 'Conversion Lift' },
+      { val: 'Optimistic UI', label: 'State Sync' },
+      { val: 'React Context', label: 'Cart Management' }
+    ],
+    motivation: 'Traditional e-commerce checkouts often suffer from slow server-side cart state resolution, causing shopping cart abandonments and bad user retention.',
+    methodology: 'We redesigned the checkout funnel by moving the primary cart state to local storage with optimistic UI updates. API requests are batched and executed asynchronously in the background, keeping the path-to-purchase completely fluid.',
+    tech: ['Next.js', 'Framer Motion', 'React Context', 'Tailwind CSS'],
+    results: 'Cut down checkout steps from 6 to 3, achieving a 35% improvement in retail order completions for 2GO Bangladesh.',
+    arxiv: 'https://bout2go.com',
+    license: 'Commercial deployment architecture for retail platforms'
   }
 };
 
@@ -184,10 +219,6 @@ export default function LabDetailPage() {
                   <span className="font-mono text-primary font-bold">{data.docId}</span>
                 </div>
                 <div className="flex justify-between border-b border-primary/5 pb-2">
-                  <span className="text-primary/40 font-bold">Date</span>
-                  <span className="text-primary font-bold">July 2026</span>
-                </div>
-                <div className="flex justify-between border-b border-primary/5 pb-2">
                   <span className="text-primary/40 font-bold">Classification</span>
                   <span className="text-[#cc0000] font-bold font-mono">PUBLIC / RESEARCH</span>
                 </div>
@@ -261,7 +292,7 @@ export default function LabDetailPage() {
 
                 {/* Research Parameters Table (Scientific addition) */}
                 <section className="space-y-6 pt-4 border-t border-primary/5">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-primary/40">Key Document Metrics</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-primary/40">Key Performance Metrics</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {data.metrics.map((m: any) => (
                       <div key={m.label} className="bg-[#f8fafc] border border-primary/5 p-6 text-center shadow-sm">
@@ -346,7 +377,7 @@ export default function LabDetailPage() {
               </div>
             </div>
 
-            {/* Mobile Actions block (Only visible on small viewports instead of left sticky panel) */}
+            {/* Mobile Actions block */}
             <div className="lg:hidden bg-white border border-primary/5 p-8 shadow-sm space-y-6">
               <h3 className="text-precision text-primary/40">Metadata & Actions</h3>
               <div className="space-y-4 text-xs font-sans">
