@@ -115,6 +115,7 @@ export default function LabDetailPage() {
 
   const [activeSection, setActiveSection] = useState('abstract');
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const [showExitButton, setShowExitButton] = useState(false);
   
   const sectionRefs = {
     abstract: useRef<HTMLElement>(null),
@@ -126,12 +127,13 @@ export default function LabDetailPage() {
 
   const hasAutoTriggered = useRef(false);
 
+  // Auto trigger distraction-free view on scroll down
   useEffect(() => {
     if (isFocusMode) return;
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > 200 && !hasAutoTriggered.current) {
+      if (currentScrollY > 250 && !hasAutoTriggered.current) {
         setIsFocusMode(true);
         hasAutoTriggered.current = true;
       } else if (currentScrollY <= 50) {
@@ -143,6 +145,7 @@ export default function LabDetailPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isFocusMode]);
 
+  // Synchronize layout when native fullscreen toggles
   useEffect(() => {
     const handleFullscreenChange = () => {
       const isCurrentlyFullscreen = !!document.fullscreenElement || 
@@ -162,16 +165,84 @@ export default function LabDetailPage() {
     };
   }, []);
 
+  // Toggle global class on HTML to slide/fade navbar and footer seamlessly
   useEffect(() => {
-    if (isFocusMode) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.documentElement.classList.toggle('focus-mode-active', isFocusMode);
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('focus-mode-active');
     };
   }, [isFocusMode]);
+
+  // Peek-and-Hide Exit Header logic
+  useEffect(() => {
+    if (!isFocusMode) {
+      setShowExitButton(false);
+      return;
+    }
+
+    // "Peek" the exit button on enter (slide down for 2.5s)
+    setShowExitButton(true);
+    const timer = setTimeout(() => {
+      setShowExitButton(false);
+    }, 2500);
+
+    // Show top exit bar when cursor hovers near top viewport edge (clientY < 80px)
+    const handleMouseMove = (e: MouseEvent) => {
+      if (e.clientY < 80) {
+        setShowExitButton(true);
+      } else if (e.clientY > 130) {
+        setShowExitButton(false);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isFocusMode]);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-10% 0px -70% 0px',
+      threshold: 0
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    
+    Object.values(sectionRefs).forEach(ref => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const navbarOffset = isFocusMode ? 50 : 110;
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - navbarOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const toggleFocusMode = async (enable: boolean) => {
     if (enable) {
@@ -212,101 +283,83 @@ export default function LabDetailPage() {
     }
   };
 
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-10% 0px -70% 0px',
-      threshold: 0
-    };
-
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-    
-    Object.values(sectionRefs).forEach(ref => {
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const navbarOffset = isFocusMode ? 60 : 110;
-      const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + (isFocusMode ? el.offsetTop : window.scrollY) - navbarOffset;
-
-      const scrollContainer = isFocusMode ? document.getElementById('focus-container') : window;
-      
-      if (isFocusMode && scrollContainer) {
-        scrollContainer.scrollTo({
-          top: el.offsetTop - 60,
-          behavior: 'smooth'
-        });
-      } else {
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
-      }
-    }
-  };
-
   return (
-    <div 
-      id={isFocusMode ? "focus-container" : undefined}
-      className={`selection:bg-primary selection:text-white transition-all duration-300
-        ${isFocusMode 
-          ? 'fixed inset-0 z-[100] bg-[#f0f2f5] overflow-y-auto pt-10 pb-24 px-4 md:px-8' 
-          : 'bg-[#f0f2f5] pt-32 pb-24 px-4 md:px-8'
-        }`}
-    >
+    <div className="selection:bg-primary selection:text-white bg-[#f0f2f5] pt-32 pb-24 px-4 md:px-8 transition-all duration-700">
+      
+      {/* Self-contained CSS styles for seamless global transitions */}
+      <style>{`
+        nav {
+          transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease !important;
+        }
+        footer {
+          transition: opacity 0.8s ease, transform 0.8s ease !important;
+        }
+        .focus-mode-active nav {
+          transform: translateY(-100%);
+          opacity: 0;
+          pointer-events: none;
+        }
+        .focus-mode-active footer {
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(30px);
+        }
+        /* Hide Crisp/Chat Widget during focus mode */
+        .focus-mode-active #crisp-chat-box,
+        .focus-mode-active [class*="chat-widget"],
+        .focus-mode-active [id*="chat-widget"] {
+          opacity: 0 !important;
+          pointer-events: none !important;
+          transition: opacity 0.5s ease !important;
+        }
+      `}</style>
+
+      {/* Peek-and-Hide Exit Header Banner */}
+      <div 
+        className={`fixed top-0 inset-x-0 z-[120] bg-white/95 backdrop-blur-md border-b border-primary/10 py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-700 shadow-sm
+          ${isFocusMode && showExitButton 
+            ? 'translate-y-0 opacity-100' 
+            : '-translate-y-full opacity-0 pointer-events-none'
+          }`}
+      >
+        <button 
+          onClick={() => toggleFocusMode(false)}
+          className="flex items-center gap-2 hover:text-[#cc0000] transition-colors font-bold text-xs uppercase tracking-wider text-primary"
+        >
+          <ArrowLeft size={14} /> Exit Focus Mode
+        </button>
+        <span className="text-primary/40 font-mono tracking-widest uppercase text-[10px] font-bold">Focus Mode Active // {data.docId}</span>
+      </div>
+
       <div className="max-w-screen-2xl mx-auto space-y-8">
         
-        {/* Navigation Breadcrumb / Focus Header */}
-        {isFocusMode ? (
-          <div className="flex justify-between items-center border-b border-primary/10 pb-4 mb-4 text-xs font-sans">
-            <button 
-              onClick={() => toggleFocusMode(false)}
-              className="flex items-center gap-2 hover:text-[#cc0000] transition-colors font-bold text-primary"
-            >
-              <ArrowLeft size={14} /> Exit Focus Mode
-            </button>
-            <span className="text-primary/40 font-mono tracking-widest uppercase text-[10px] font-bold">Focus Mode Active // {data.docId}</span>
+        {/* Normal Mode Top Breadcrumb / Focus Entry Bar */}
+        <div 
+          className={`flex items-center justify-between text-xs font-sans text-primary/50 transition-all duration-700
+            ${isFocusMode ? 'opacity-0 h-0 overflow-hidden pointer-events-none -translate-y-2' : 'opacity-100'}`}
+        >
+          <div className="flex items-center gap-4">
+            <Link href="/lab" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <ArrowLeft size={14} /> Back to Lab
+            </Link>
+            <ChevronRight size={12} className="opacity-30" />
+            <span className="font-bold text-primary">{data.name}</span>
           </div>
-        ) : (
-          <div className="flex items-center justify-between text-xs font-sans text-primary/50">
-            <div className="flex items-center gap-4">
-              <Link href="/lab" className="flex items-center gap-2 hover:text-primary transition-colors">
-                <ArrowLeft size={14} /> Back to Lab
-              </Link>
-              <ChevronRight size={12} className="opacity-30" />
-              <span className="font-bold text-primary">{data.name}</span>
-            </div>
-            <button 
-              onClick={() => toggleFocusMode(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-white border border-primary/10 hover:border-[#cc0000] hover:text-[#cc0000] transition-all font-bold shadow-sm"
-            >
-              <BookOpen size={12} /> Focus Mode
-            </button>
-          </div>
-        )}
+          <button 
+            onClick={() => toggleFocusMode(true)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-white border border-primary/10 hover:border-[#cc0000] hover:text-[#cc0000] transition-all font-bold shadow-sm"
+          >
+            <BookOpen size={12} /> Focus Mode
+          </button>
+        </div>
 
         <div className="grid lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT PANEL: Sticky Table of Contents */}
-          <div className="lg:col-span-3 space-y-6 sticky top-28 hidden lg:block">
+          <div 
+            className={`lg:col-span-3 space-y-6 sticky hidden lg:block transition-all duration-700
+              ${isFocusMode ? 'top-10' : 'top-28'}`}
+          >
             
             {/* Table of Contents */}
             <div className="space-y-6 p-4">
@@ -341,7 +394,7 @@ export default function LabDetailPage() {
 
           {/* RIGHT PANEL: Simulated Paper Sheet (Academic PDF style) */}
           <div className="lg:col-span-9 space-y-8">
-            <div className="bg-white border border-primary/10 shadow-premium p-8 md:p-20 relative overflow-hidden">
+            <div className="bg-white border border-primary/10 shadow-premium p-8 md:p-20 relative overflow-hidden transition-all duration-700">
               
               {/* Paper Layout Top Border CAD element */}
               <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary via-[#cc0000] to-primary"></div>
