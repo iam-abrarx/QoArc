@@ -182,7 +182,7 @@ export default function LabDetailPage() {
           <div className="lg:col-span-4 space-y-6 sticky top-28 hidden lg:block">
             
             {/* Table of Contents */}
-            <div className="bg-white border border-primary/5 p-8 shadow-sm space-y-6">
+            <div className="space-y-6 p-4">
               <h3 className="text-precision text-primary/40">Outline // Contents</h3>
               <nav className="space-y-4">
                 {[
@@ -211,14 +211,14 @@ export default function LabDetailPage() {
             </div>
 
             {/* Document Metadata Card */}
-            <div className="bg-white border border-primary/5 p-8 shadow-sm space-y-6">
+            <div className="space-y-6 p-4 pt-0">
               <h3 className="text-precision text-primary/40">Metadata // Info</h3>
               <div className="space-y-4 font-sans text-xs">
-                <div className="flex justify-between border-b border-primary/5 pb-2">
+                <div className="flex justify-between border-b border-primary/10 pb-2">
                   <span className="text-primary/40 font-bold">Document ID</span>
                   <span className="font-mono text-primary font-bold">{data.docId}</span>
                 </div>
-                <div className="flex justify-between border-b border-primary/5 pb-2">
+                <div className="flex justify-between border-b border-primary/10 pb-2">
                   <span className="text-primary/40 font-bold">Classification</span>
                   <span className="text-[#cc0000] font-bold font-mono">PUBLIC / RESEARCH</span>
                 </div>
