@@ -132,7 +132,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 relative mr-8 group transition-opacity duration-300 hover:opacity-80">
           <Image 
-            src={isScrolled || !(['/', '/about'].includes(pathname)) ? "/images/logo/Qoarc_logo_blue.png" : "/images/logo/Qoarc_logo_White.png"} 
+            src={isScrolled || !(['/', '/about'].includes(pathname)) ? "/images/logo/Qoarc_logo_blue.svg" : "/images/logo/Qoarc_logo_White.svg"} 
             alt="QOARC Logo" 
             width={120} 
             height={36} 

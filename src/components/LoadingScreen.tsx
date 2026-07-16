@@ -99,7 +99,7 @@ export default function LoadingScreen() {
           {/* Logo Brand */}
           <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center justify-center transition-opacity duration-700">
              <Image 
-               src="/images/logo/Qoarc_logo_White.png" 
+               src="/images/logo/Qoarc_logo_White.svg" 
                alt="QOARC Engineering" 
                width={120} 
                height={36} 

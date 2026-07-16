@@ -58,7 +58,7 @@ export default function Footer() {
           <div className="lg:col-span-2 space-y-8">
             <Link href="/" className="flex items-center gap-3 relative mr-8 group transition-opacity duration-300 hover:opacity-80">
               <Image 
-                src="/images/logo/Qoarc_logo_White.png" 
+                src="/images/logo/Qoarc_logo_White.svg" 
                 alt="QOARC Logo" 
                 width={150} 
                 height={45} 
