@@ -129,6 +129,12 @@ export default function LabDetailPage() {
   // Trigger focus mode on scroll down, and restore on scroll up
   useEffect(() => {
     const handleScroll = () => {
+      // If native fullscreen is currently active, bypass scroll toggling completely
+      const isNativeFullscreen = !!document.fullscreenElement || 
+                                 !!(document as any).webkitFullscreenElement || 
+                                 !!(document as any).msFullscreenElement;
+      if (isNativeFullscreen) return;
+
       const currentScrollY = window.scrollY;
       if (currentScrollY > 200) {
         if (!isFocusMode && !hasExitedManually.current) {
@@ -138,17 +144,6 @@ export default function LabDetailPage() {
         hasExitedManually.current = false; // Reset when scrolling back to top
         if (isFocusMode) {
           setIsFocusMode(false);
-          try {
-            if (document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement) {
-              if (document.exitFullscreen) {
-                document.exitFullscreen().catch(() => {});
-              } else if ((document as any).webkitExitFullscreen) {
-                (document as any).webkitExitFullscreen();
-              } else if ((document as any).msExitFullscreen) {
-                (document as any).msExitFullscreen();
-              }
-            }
-          } catch (e) {}
         }
       }
     };
