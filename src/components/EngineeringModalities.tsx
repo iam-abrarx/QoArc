@@ -157,12 +157,6 @@ export default function EngineeringModalities() {
                               </motion.div>
                             ))}
                           </div>
-
-                          <div className="pl-8 pt-6">
-                             <button className="bg-primary text-white px-8 py-4 rounded-none font-bold uppercase tracking-widest text-[10px] shadow-sharp hover:scale-[1.03] transition-all">
-                               Initiate Scope Sequence →
-                             </button>
-                          </div>
                         </div>
 
                         {/* Right Content - Mockup Scene */}

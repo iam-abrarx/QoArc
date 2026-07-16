@@ -38,6 +38,7 @@
   /* Typography */
   --font-display: "Noto Serif", serif;
   --font-sans: "Manrope", sans-serif;
+  --font-fraunces: var(--font-fraunces), serif;
 
   /* Spacing & Effects - Sharpened */
   --radius-xl: 0px;

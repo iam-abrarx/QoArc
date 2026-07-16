@@ -118,40 +118,22 @@ export default function CaseStudyCarousel() {
                       </h3>
                    </div>
 
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                      <div className="space-y-4">
-                         <h5 className="text-[12px] font-bold uppercase tracking-widest text-[#0024ff] italic">Challenges</h5>
-                         <p className="text-lg text-[#002046]/70 leading-relaxed font-sans">
-                            {cs.challenges || cs.challenge}
-                         </p>
-                      </div>
-                      <div className="space-y-4">
-                         <h5 className="text-[12px] font-bold uppercase tracking-widest text-[#0024ff] italic">Solutions</h5>
-                         <p className="text-lg text-[#002046]/70 leading-relaxed font-sans">
-                            {cs.solutions || cs.solution}
-                         </p>
-                      </div>
-                   </div>
+                    <div className="space-y-4">
+                       <p className="text-lg text-[#002046]/70 leading-relaxed font-sans max-w-xl">
+                          {cs.solutions || cs.solution || cs.description}
+                       </p>
+                    </div>
 
-                   <div className="flex flex-wrap items-center gap-12 pt-8 border-t border-primary/5">
-                      {cs.stats?.map((stat, i) => (
-                         <div key={i} className="space-y-1">
-                            <div className="text-4xl font-display font-bold text-[#0024ff]">{stat.value}</div>
-                            <div className="text-[10px] font-bold uppercase tracking-widest text-[#002046]/40">{stat.label}</div>
-                         </div>
-                      ))}
-                   </div>
-
-                   <div className="pt-8">
-                      <a 
-                        href={cs.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-4 bg-[#0024ff] text-white px-10 py-5 rounded-none font-bold uppercase tracking-widest text-[11px] hover:shadow-premium transition-all hover:scale-105"
-                      >
-                         View Case Study <ArrowRight size={14} />
-                      </a>
-                   </div>
+                    <div className="pt-8">
+                       <a 
+                         href={cs.url}
+                         target="_blank"
+                         rel="noopener noreferrer"
+                         className="inline-flex items-center gap-4 bg-[#0024ff] text-white px-10 py-5 rounded-none font-bold uppercase tracking-widest text-[11px] hover:shadow-premium transition-all hover:scale-105"
+                       >
+                          View Live <ArrowRight size={14} />
+                       </a>
+                    </div>
                 </div>
 
                 {/* Right Side: Mockups */}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Serif, Manrope } from "next/font/google";
+import { Noto_Serif, Manrope, Fraunces } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -20,6 +20,13 @@ const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
   weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"]
 });
 
 export const metadata: Metadata = {
@@ -82,7 +89,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${notoSerif.variable} ${manrope.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${notoSerif.variable} ${manrope.variable} ${fraunces.variable}`}>
       <body className="bg-surface text-on-surface font-sans antialiased overflow-x-hidden">
         <LoadingScreen />
         <PortfolioProvider>
