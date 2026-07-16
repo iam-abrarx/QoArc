@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -12,21 +12,19 @@ import {
   Code2, 
   Dna,
   Share2,
-  Download
+  Download,
+  BookOpen,
+  ArrowLeft,
+  ChevronRight,
+  ShieldAlert
 } from 'lucide-react';
 import { useLeadCapture } from '@/context/LeadCaptureContext';
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.8 }
-};
-
 const labData: Record<string, any> = {
   'pfas-rigidity': {
+    docId: 'QOARC-2026-PFAS',
     name: 'PFAS Rigidity Modeling',
-    abstract: 'Applying Hybrid GNN architectures to predict the structural rigidity and environmental persistence of Per- and Polyfluoroalkyl Substances (PFAS) in industrial water cycles.',
+    abstract: 'Applying Hybrid GNN architectures and molecular rigidity hypotheses to predict the structural resilience and environmental persistence of Per- and Polyfluoroalkyl Substances (PFAS) in industrial water cycles.',
     metrics: [
       { val: '5.2M', label: 'Candidates Modeled' },
       { val: '98.5%', label: 'Prediction Precision' },
@@ -40,6 +38,7 @@ const labData: Record<string, any> = {
     license: 'Available for commercial licensing or custom development'
   },
   'cow-project': {
+    docId: 'QOARC-2026-COW',
     name: 'Project COW',
     abstract: 'Cognitive Over-Write: Developing self-correcting neural nodes to eliminate hallucination in domain-specific Large Language Models.',
     metrics: [
@@ -55,6 +54,7 @@ const labData: Record<string, any> = {
     license: 'Custom integration for enterprise environments only'
   },
   'animal-weight': {
+    docId: 'QOARC-2026-ANIM',
     name: 'Animal Weight Estimation',
     abstract: 'Applying advanced computer vision with Segment Anything 2 (SAM2) and Depth Anything v2 for non-invasive, precision agricultural livestock weight estimation.',
     metrics: [
@@ -76,137 +76,307 @@ export default function LabDetailPage() {
   const { slug } = useParams();
   const data = labData[slug as string] || labData['pfas-rigidity'];
 
+  const [activeSection, setActiveSection] = useState('abstract');
+  
+  const sectionRefs = {
+    abstract: useRef<HTMLElement>(null),
+    motivation: useRef<HTMLElement>(null),
+    methodology: useRef<HTMLElement>(null),
+    tech: useRef<HTMLElement>(null),
+    results: useRef<HTMLElement>(null)
+  };
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-10% 0px -70% 0px',
+      threshold: 0
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    
+    Object.values(sectionRefs).forEach(ref => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const navbarOffset = 110;
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - navbarOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <div className="bg-surface pt-40">
-      {/* Abstract Header */}
-      <section className="px-8 pb-32">
-        <div className="max-w-screen-2xl mx-auto grid lg:grid-cols-2 gap-20 items-end">
-          <motion.div {...fadeInUp} className="space-y-12">
-            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.5em] text-primary/30">
-               <FlaskConical size={14} className="text-primary" /> Active Research Node
+    <div className="bg-[#f0f2f5] pt-32 pb-24 px-4 md:px-8 selection:bg-primary selection:text-white">
+      <div className="max-w-screen-2xl mx-auto space-y-8">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center gap-4 text-xs font-sans text-primary/50">
+          <Link href="/lab" className="flex items-center gap-2 hover:text-primary transition-colors">
+            <ArrowLeft size={14} /> Back to Lab
+          </Link>
+          <ChevronRight size={12} className="opacity-30" />
+          <span className="font-bold text-primary">{data.name}</span>
+        </div>
+
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
+          
+          {/* LEFT PANEL: Sticky Table of Contents & PDF Meta */}
+          <div className="lg:col-span-4 space-y-6 sticky top-28 hidden lg:block">
+            
+            {/* Table of Contents */}
+            <div className="bg-white border border-primary/5 p-8 shadow-sm space-y-6">
+              <h3 className="text-precision text-primary/40">Outline // Contents</h3>
+              <nav className="space-y-4">
+                {[
+                  { id: 'abstract', label: '01. Abstract & Overview' },
+                  { id: 'motivation', label: '02. Commercial Incentive' },
+                  { id: 'methodology', label: '03. Research Methodology' },
+                  { id: 'tech', label: '04. Technical Infrastructure' },
+                  { id: 'results', label: '05. Derived Value & Results' }
+                ].map(section => {
+                  const isActive = activeSection === section.id;
+                  return (
+                    <button
+                      key={section.id}
+                      onClick={() => scrollToSection(section.id)}
+                      className={`w-full text-left font-fraunces text-base italic transition-all duration-300 flex items-center gap-4 py-1.5 border-l-2 pl-4
+                        ${isActive 
+                          ? 'border-[#cc0000] text-[#cc0000] font-bold translate-x-2' 
+                          : 'border-transparent text-primary/50 hover:text-primary'
+                        }`}
+                    >
+                      {section.label}
+                    </button>
+                  );
+                })}
+              </nav>
             </div>
-            <h1 className="text-7xl md:text-8xl font-fraunces font-bold text-primary tracking-tighter italic">
-              {data.name}
-            </h1>
-            <p className="text-2xl text-primary/60 max-w-xl font-fraunces font-light leading-relaxed italic border-l-2 border-primary/20 pl-8">
-              {data.abstract}
-            </p>
-          </motion.div>
-          <motion.div {...fadeInUp} className="flex gap-4">
-            <button className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/10 text-primary hover:bg-primary hover:text-white transition-all">
-              <Share2 size={20} />
-            </button>
-            <Link href={data.arxiv} target="_blank" className="flex-1 bg-surface-container-high text-primary px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-surface-container-highest transition-all">
-              <FileText size={18} /> Download Abstract (PDF)
-            </Link>
-          </motion.div>
-        </div>
-      </section>
 
-      {/* Metrics Stat Cards */}
-      <section className="px-8 pb-40">
-        <div className="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-           {data.metrics.map((m: any, i: number) => (
-             <motion.div 
-               key={m.label} 
-               {...fadeInUp} 
-               transition={{ delay: i * 0.1 }}
-               className="p-12 rounded-[40px] bg-white border border-outline-variant/10 space-y-4 shadow-premium relative overflow-hidden group hover:-translate-y-2 transition-transform h-full flex flex-col justify-center"
-             >
-                <div className="text-xs font-bold uppercase tracking-[0.4em] text-primary/30">{m.label}</div>
-                <div className="text-5xl font-fraunces font-bold text-primary italic tracking-tighter">{m.val}</div>
-                <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.1] transition-opacity">
-                   <Dna size={120} />
+            {/* Document Metadata Card */}
+            <div className="bg-white border border-primary/5 p-8 shadow-sm space-y-6">
+              <h3 className="text-precision text-primary/40">Metadata // Info</h3>
+              <div className="space-y-4 font-sans text-xs">
+                <div className="flex justify-between border-b border-primary/5 pb-2">
+                  <span className="text-primary/40 font-bold">Document ID</span>
+                  <span className="font-mono text-primary font-bold">{data.docId}</span>
                 </div>
-             </motion.div>
-           ))}
-        </div>
-      </section>
-
-      {/* Motivation & Methodology */}
-      <section className="py-40 px-8 bg-surface-container-low rounded-[80px] lg:mx-8">
-        <div className="max-w-screen-2xl mx-auto grid lg:grid-cols-2 gap-32">
-           <motion.div {...fadeInUp} className="space-y-12">
-              <h2 className="text-5xl font-fraunces font-bold text-primary tracking-tight">Commercial <br/> <span className="italic">Incentive.</span></h2>
-              <p className="text-xl text-primary/60 font-fraunces font-light italic leading-relaxed">
-                 {data.motivation}
-              </p>
-              <div className="h-px bg-primary/10 w-24"></div>
-              <div className="flex items-center gap-6">
-                 <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white"><Terminal size={20} /></div>
-                 <div className="text-xs font-bold uppercase tracking-[0.3em] text-primary/40">Sovereign Data Extraction Node</div>
-              </div>
-           </motion.div>
-           <motion.div {...fadeInUp} className="space-y-12">
-              <h2 className="text-5xl font-fraunces font-bold text-primary tracking-tight">Strategic <br/> <span className="italic">Execution.</span></h2>
-              <div className="p-12 rounded-[40px] bg-surface relative overflow-hidden border border-outline-variant/10 shadow-premium">
-                 <div className="absolute inset-0 bg-grid opacity-20"></div>
-                 <p className="relative z-10 text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
-                    {data.methodology}
-                 </p>
-              </div>
-           </motion.div>
-        </div>
-      </section>
-
-      {/* Tech Stack */}
-      <section className="py-32 px-8">
-        <div className="max-w-screen-2xl mx-auto flex flex-col items-center gap-12 text-center">
-           <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] text-primary/30">Research Stack</h3>
-           <div className="flex flex-wrap justify-center gap-6">
-              {data.tech.map((t: string) => (
-                <div key={t} className="px-10 py-4 rounded-2xl bg-surface-container-low border border-outline-variant/10 text-xs font-bold text-primary italic shadow-premium hover:bg-primary hover:text-white transition-all cursor-crosshair">
-                  {t}
+                <div className="flex justify-between border-b border-primary/5 pb-2">
+                  <span className="text-primary/40 font-bold">Date</span>
+                  <span className="text-primary font-bold">July 2026</span>
                 </div>
-              ))}
-           </div>
-        </div>
-      </section>
+                <div className="flex justify-between border-b border-primary/5 pb-2">
+                  <span className="text-primary/40 font-bold">Classification</span>
+                  <span className="text-[#cc0000] font-bold font-mono">PUBLIC / RESEARCH</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-primary/40 font-bold block">License</span>
+                  <span className="text-primary/70 italic font-medium leading-relaxed block">{data.license}</span>
+                </div>
+              </div>
 
-      {/* Results */}
-      <section className="py-40 px-8 bg-white border-t border-outline-variant/10">
-         <div className="max-w-screen-2xl mx-auto grid lg:grid-cols-2 gap-32 items-center">
-            <motion.div {...fadeInUp} className="space-y-12">
-               <h2 className="text-6xl font-fraunces font-bold text-primary tracking-tight">Derived Value.</h2>
-               <div className="p-12 border-l-4 border-primary bg-surface-container-low rounded-r-[40px] space-y-6">
-                  <p className="text-2xl font-fraunces font-bold text-primary/80 leading-relaxed italic">
-                    {data.results}
-                  </p>
-               </div>
-            </motion.div>
-            <motion.div {...fadeInUp} className="space-y-12">
-               <h2 className="text-xs font-bold uppercase tracking-[0.5em] text-primary/30 italic">Scientific Provenance</h2>
-               <div className="space-y-8">
-                  <Link href={data.arxiv} className="flex items-center justify-between p-8 rounded-2xl border border-outline-variant/10 hover:border-primary transition-all group">
-                     <span className="text-lg font-bold text-primary">Full Whitepaper</span>
-                     <Download size={20} className="text-primary/40 group-hover:text-primary group-hover:translate-y-1 transition-all" />
-                  </Link>
-                  <div className="flex items-center justify-between p-8 rounded-2xl border border-outline-variant/10">
-                     <span className="text-lg font-bold text-primary">Raw Logic Mapping</span>
-                     <Code2 size={20} className="text-primary/40" />
+              {/* Action Buttons */}
+              <div className="pt-4 space-y-3">
+                <Link 
+                  href={data.arxiv} 
+                  target="_blank" 
+                  className="w-full bg-[#cc0000] text-white py-4 font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 shadow-sm hover:bg-[#b30000] transition-colors"
+                >
+                  <Download size={14} /> Download Abstract (PDF)
+                </Link>
+                <button 
+                  onClick={openModal}
+                  className="w-full bg-primary text-white py-4 font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 shadow-sm hover:bg-primary/95 transition-colors"
+                >
+                  Request Technical Collab
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          {/* RIGHT PANEL: Simulated Paper Sheet (Academic PDF style) */}
+          <div className="lg:col-span-8 space-y-8">
+            <div className="bg-white border border-primary/10 shadow-premium p-8 md:p-20 relative overflow-hidden">
+              
+              {/* Paper Layout Top Border CAD element */}
+              <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary via-[#cc0000] to-primary"></div>
+              
+              <div className="space-y-12">
+                
+                {/* Paper Header */}
+                <div className="border-b border-primary/10 pb-8 space-y-4">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 text-[9px] font-bold tracking-widest text-primary/40 uppercase">
+                    <span>QOARC Research Publications</span>
+                    <span>No. {data.docId}</span>
                   </div>
-               </div>
-            </motion.div>
-         </div>
-      </section>
+                  
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-fraunces font-black text-primary leading-tight italic">
+                    {data.name}
+                  </h1>
+                  
+                  <div className="pt-4 flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-bold text-primary/60 font-mono">
+                    <span className="flex items-center gap-1.5"><Terminal size={12} className="text-[#cc0000]" /> AUTHOR: QOARC LABS</span>
+                    <span className="flex items-center gap-1.5"><FlaskConical size={12} className="text-[#cc0000]" /> CLASSIFICATION: OPEN RESEARCH</span>
+                  </div>
+                </div>
 
-      {/* Bottom CTA */}
-      <section className="py-40 px-8 text-center bg-surface-container-low rounded-t-[80px]">
-         <div className="max-w-screen-md mx-auto space-y-12">
-            <h2 className="text-xs font-bold uppercase tracking-[0.5em] text-primary/30 mb-8 italic">Commercialization</h2>
-            <h2 className="text-7xl font-fraunces font-bold text-primary tracking-tighter leading-none italic">
-               {data.license}.
-            </h2>
-            <div className="pt-8">
-               <button 
-                 onClick={openModal}
-                 className="inline-flex bg-primary text-white px-12 py-6 rounded-2xl font-bold uppercase tracking-[0.3em] text-sm hover:shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer"
-               >
-                 Initiate Scoping Sequence
-               </button>
-             </div>
-         </div>
-      </section>
+                {/* Section 1: Abstract */}
+                <section 
+                  id="abstract" 
+                  ref={sectionRefs.abstract} 
+                  className="space-y-6 scroll-mt-28"
+                >
+                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
+                    <span className="text-[#cc0000] font-sans text-xs not-italic">01 //</span> Abstract
+                  </h2>
+                  <div className="bg-primary/5 p-6 md:p-8 border-l-2 border-primary/20">
+                    <p className="text-lg text-primary/80 font-fraunces font-light italic leading-relaxed">
+                      {data.abstract}
+                    </p>
+                  </div>
+                </section>
+
+                {/* Research Parameters Table (Scientific addition) */}
+                <section className="space-y-6 pt-4 border-t border-primary/5">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-primary/40">Key Document Metrics</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {data.metrics.map((m: any) => (
+                      <div key={m.label} className="bg-[#f8fafc] border border-primary/5 p-6 text-center shadow-sm">
+                        <div className="text-[9px] font-bold uppercase tracking-widest text-primary/40 mb-2">{m.label}</div>
+                        <div className="text-3xl font-fraunces font-bold text-primary italic leading-none">{m.val}</div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Section 2: Motivation */}
+                <section 
+                  id="motivation" 
+                  ref={sectionRefs.motivation} 
+                  className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
+                >
+                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
+                    <span className="text-[#cc0000] font-sans text-xs not-italic">02 //</span> Commercial Incentive & Objective
+                  </h2>
+                  <p className="text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
+                    {data.motivation}
+                  </p>
+                </section>
+
+                {/* Section 3: Methodology */}
+                <section 
+                  id="methodology" 
+                  ref={sectionRefs.methodology} 
+                  className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
+                >
+                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
+                    <span className="text-[#cc0000] font-sans text-xs not-italic">03 //</span> Research Methodology & Design
+                  </h2>
+                  <p className="text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
+                    {data.methodology}
+                  </p>
+                </section>
+
+                {/* Section 4: Tech Stack */}
+                <section 
+                  id="tech" 
+                  ref={sectionRefs.tech} 
+                  className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
+                >
+                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
+                    <span className="text-[#cc0000] font-sans text-xs not-italic">04 //</span> Technical Infrastructure Stack
+                  </h2>
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    {data.tech.map((t: string) => (
+                      <span 
+                        key={t} 
+                        className="px-6 py-2.5 bg-[#f8fafc] border border-primary/5 text-xs font-bold text-primary font-mono shadow-sm"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Section 5: Results */}
+                <section 
+                  id="results" 
+                  ref={sectionRefs.results} 
+                  className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
+                >
+                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
+                    <span className="text-[#cc0000] font-sans text-xs not-italic">05 //</span> Derived Value & Findings
+                  </h2>
+                  <div className="bg-[#cc0000]/5 border-l-2 border-[#cc0000] p-6 md:p-8">
+                    <p className="text-lg text-primary/80 font-fraunces font-light italic leading-relaxed">
+                      {data.results}
+                    </p>
+                  </div>
+                </section>
+
+                {/* Footer Disclaimer */}
+                <div className="pt-12 border-t border-primary/10 text-center text-[10px] text-primary/30 space-y-2">
+                  <p>© 2026 QOARC LABS. ALL RIGHTS RESERVED. FOR COMMERCIAL INTEGRATIONS, CONTACT OFFICE@QOARC.COM</p>
+                  <p>DOCUMENT ID: {data.docId} // VERIFIED CRYPTOGRAPHIC SIGNATURE: SECURE</p>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Mobile Actions block (Only visible on small viewports instead of left sticky panel) */}
+            <div className="lg:hidden bg-white border border-primary/5 p-8 shadow-sm space-y-6">
+              <h3 className="text-precision text-primary/40">Metadata & Actions</h3>
+              <div className="space-y-4 text-xs font-sans">
+                <div className="flex justify-between border-b border-primary/5 pb-2">
+                  <span className="text-primary/40 font-bold">License</span>
+                  <span className="text-primary font-bold text-right">{data.license}</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Link 
+                  href={data.arxiv} 
+                  target="_blank" 
+                  className="bg-[#cc0000] text-white py-4 font-bold uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 shadow-sm hover:bg-[#b30000] transition-colors text-center"
+                >
+                  <Download size={12} /> Abstract PDF
+                </Link>
+                <button 
+                  onClick={openModal}
+                  className="bg-primary text-white py-4 font-bold uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 shadow-sm hover:bg-primary/95 transition-colors text-center"
+                >
+                  Request Collab
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
     </div>
   );
 }
