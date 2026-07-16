@@ -178,8 +178,8 @@ export default function LabDetailPage() {
 
         <div className="grid lg:grid-cols-12 gap-8 items-start">
           
-          {/* LEFT PANEL: Sticky Table of Contents & PDF Meta */}
-          <div className="lg:col-span-4 space-y-6 sticky top-28 hidden lg:block">
+          {/* LEFT PANEL: Sticky Table of Contents */}
+          <div className="lg:col-span-3 space-y-6 sticky top-28 hidden lg:block">
             
             {/* Table of Contents */}
             <div className="space-y-6 p-4">
@@ -210,46 +210,10 @@ export default function LabDetailPage() {
               </nav>
             </div>
 
-            {/* Document Metadata Card */}
-            <div className="space-y-6 p-4 pt-0">
-              <h3 className="text-precision text-primary/40">Metadata // Info</h3>
-              <div className="space-y-4 font-sans text-xs">
-                <div className="flex justify-between border-b border-primary/10 pb-2">
-                  <span className="text-primary/40 font-bold">Document ID</span>
-                  <span className="font-mono text-primary font-bold">{data.docId}</span>
-                </div>
-                <div className="flex justify-between border-b border-primary/10 pb-2">
-                  <span className="text-primary/40 font-bold">Classification</span>
-                  <span className="text-[#cc0000] font-bold font-mono">PUBLIC / RESEARCH</span>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-primary/40 font-bold block">License</span>
-                  <span className="text-primary/70 italic font-medium leading-relaxed block">{data.license}</span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-4 space-y-3">
-                <Link 
-                  href={data.arxiv} 
-                  target="_blank" 
-                  className="w-full bg-[#cc0000] text-white py-4 font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 shadow-sm hover:bg-[#b30000] transition-colors"
-                >
-                  <Download size={14} /> Download Abstract (PDF)
-                </Link>
-                <button 
-                  onClick={openModal}
-                  className="w-full bg-primary text-white py-4 font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 shadow-sm hover:bg-primary/95 transition-colors"
-                >
-                  Request Technical Collab
-                </button>
-              </div>
-            </div>
-
           </div>
 
           {/* RIGHT PANEL: Simulated Paper Sheet (Academic PDF style) */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-9 space-y-8">
             <div className="bg-white border border-primary/10 shadow-premium p-8 md:p-20 relative overflow-hidden">
               
               {/* Paper Layout Top Border CAD element */}
@@ -374,32 +338,6 @@ export default function LabDetailPage() {
                   <p>DOCUMENT ID: {data.docId} // VERIFIED CRYPTOGRAPHIC SIGNATURE: SECURE</p>
                 </div>
 
-              </div>
-            </div>
-
-            {/* Mobile Actions block */}
-            <div className="lg:hidden bg-white border border-primary/5 p-8 shadow-sm space-y-6">
-              <h3 className="text-precision text-primary/40">Metadata & Actions</h3>
-              <div className="space-y-4 text-xs font-sans">
-                <div className="flex justify-between border-b border-primary/5 pb-2">
-                  <span className="text-primary/40 font-bold">License</span>
-                  <span className="text-primary font-bold text-right">{data.license}</span>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Link 
-                  href={data.arxiv} 
-                  target="_blank" 
-                  className="bg-[#cc0000] text-white py-4 font-bold uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 shadow-sm hover:bg-[#b30000] transition-colors text-center"
-                >
-                  <Download size={12} /> Abstract PDF
-                </Link>
-                <button 
-                  onClick={openModal}
-                  className="bg-primary text-white py-4 font-bold uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 shadow-sm hover:bg-primary/95 transition-colors text-center"
-                >
-                  Request Collab
-                </button>
               </div>
             </div>
 
