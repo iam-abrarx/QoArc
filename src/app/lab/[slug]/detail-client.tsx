@@ -115,7 +115,6 @@ export default function LabDetailPage() {
 
   const [activeSection, setActiveSection] = useState('abstract');
   const [isFocusMode, setIsFocusMode] = useState(false);
-  const [showExitButton, setShowExitButton] = useState(false);
   
   const sectionRefs = {
     abstract: useRef<HTMLElement>(null),
@@ -190,34 +189,7 @@ export default function LabDetailPage() {
     };
   }, [isFocusMode]);
 
-  // Peek-and-Hide Exit Header logic
-  useEffect(() => {
-    if (!isFocusMode) {
-      setShowExitButton(false);
-      return;
-    }
 
-    // "Peek" the exit button on enter (slide down for 2.5s)
-    setShowExitButton(true);
-    const timer = setTimeout(() => {
-      setShowExitButton(false);
-    }, 2500);
-
-    // Show top exit bar when cursor hovers near top viewport edge (clientY < 80px)
-    const handleMouseMove = (e: MouseEvent) => {
-      if (e.clientY < 80) {
-        setShowExitButton(true);
-      } else if (e.clientY > 130) {
-        setShowExitButton(false);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [isFocusMode]);
 
   useEffect(() => {
     const observerOptions = {
@@ -334,17 +306,7 @@ export default function LabDetailPage() {
         }
       `}</style>
 
-      {/* Floating Exit Button in top left corner (no full-width tab bar) */}
-      <button 
-        onClick={() => toggleFocusMode(false)}
-        className={`fixed top-6 left-6 z-[120] bg-white border border-primary/15 px-4 py-2.5 flex items-center gap-2 shadow-premium transition-all duration-500 hover:border-[#cc0000] hover:text-[#cc0000] text-primary font-bold text-[10px] uppercase tracking-widest rounded-none
-          ${isFocusMode && showExitButton 
-            ? 'translate-y-0 opacity-100' 
-            : '-translate-y-16 opacity-0 pointer-events-none'
-          }`}
-      >
-        <ArrowLeft size={12} className="text-[#cc0000]" /> Exit Focus Mode
-      </button>
+
 
       <div className="max-w-screen-2xl mx-auto space-y-8">
         
