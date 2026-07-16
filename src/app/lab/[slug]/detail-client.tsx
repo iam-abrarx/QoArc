@@ -124,6 +124,25 @@ export default function LabDetailPage() {
     results: useRef<HTMLElement>(null)
   };
 
+  const hasAutoTriggered = useRef(false);
+
+  useEffect(() => {
+    if (isFocusMode) return;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 200 && !hasAutoTriggered.current) {
+        setIsFocusMode(true);
+        hasAutoTriggered.current = true;
+      } else if (currentScrollY <= 50) {
+        hasAutoTriggered.current = false;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isFocusMode]);
+
   useEffect(() => {
     const handleFullscreenChange = () => {
       const isCurrentlyFullscreen = !!document.fullscreenElement || 
