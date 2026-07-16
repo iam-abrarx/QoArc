@@ -134,16 +134,6 @@ export default function LabDetailPage() {
       if (currentScrollY > 200) {
         if (!isFocusMode && !hasExitedManually.current) {
           setIsFocusMode(true);
-          try {
-            const element = document.documentElement;
-            if (element.requestFullscreen) {
-              element.requestFullscreen().catch(() => {});
-            } else if ((element as any).webkitRequestFullscreen) {
-              (element as any).webkitRequestFullscreen();
-            } else if ((element as any).msRequestFullscreen) {
-              (element as any).msRequestFullscreen();
-            }
-          } catch (e) {}
         }
       } else {
         hasExitedManually.current = false; // Reset when scrolling back to top
