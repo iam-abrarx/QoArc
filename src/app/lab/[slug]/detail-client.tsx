@@ -125,6 +125,25 @@ export default function LabDetailPage() {
   };
 
   useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!document.fullscreenElement || 
+                                    !!(document as any).webkitFullscreenElement || 
+                                    !!(document as any).msFullscreenElement;
+      setIsFocusMode(isCurrentlyFullscreen);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+    
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
     if (isFocusMode) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -134,6 +153,45 @@ export default function LabDetailPage() {
       document.body.style.overflow = '';
     };
   }, [isFocusMode]);
+
+  const toggleFocusMode = async (enable: boolean) => {
+    if (enable) {
+      try {
+        const element = document.documentElement;
+        if (element.requestFullscreen) {
+          await element.requestFullscreen();
+        } else if ((element as any).webkitRequestFullscreen) {
+          await (element as any).webkitRequestFullscreen();
+        } else if ((element as any).msRequestFullscreen) {
+          await (element as any).msRequestFullscreen();
+        } else {
+          setIsFocusMode(true);
+        }
+      } catch (err) {
+        console.error("Fullscreen request failed:", err);
+        setIsFocusMode(true);
+      }
+    } else {
+      try {
+        if (document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement) {
+          if (document.exitFullscreen) {
+            await document.exitFullscreen();
+          } else if ((document as any).webkitExitFullscreen) {
+            await (document as any).webkitExitFullscreen();
+          } else if ((document as any).msExitFullscreen) {
+            await (document as any).msExitFullscreen();
+          } else {
+            setIsFocusMode(false);
+          }
+        } else {
+          setIsFocusMode(false);
+        }
+      } catch (err) {
+        console.error("Exit fullscreen failed:", err);
+        setIsFocusMode(false);
+      }
+    }
+  };
 
   useEffect(() => {
     const observerOptions = {
@@ -201,7 +259,7 @@ export default function LabDetailPage() {
         {isFocusMode ? (
           <div className="flex justify-between items-center border-b border-primary/10 pb-4 mb-4 text-xs font-sans">
             <button 
-              onClick={() => setIsFocusMode(false)}
+              onClick={() => toggleFocusMode(false)}
               className="flex items-center gap-2 hover:text-[#cc0000] transition-colors font-bold text-primary"
             >
               <ArrowLeft size={14} /> Exit Focus Mode
@@ -218,7 +276,7 @@ export default function LabDetailPage() {
               <span className="font-bold text-primary">{data.name}</span>
             </div>
             <button 
-              onClick={() => setIsFocusMode(true)}
+              onClick={() => toggleFocusMode(true)}
               className="flex items-center gap-2 px-3 py-1.5 bg-white border border-primary/10 hover:border-[#cc0000] hover:text-[#cc0000] transition-all font-bold shadow-sm"
             >
               <BookOpen size={12} /> Focus Mode
