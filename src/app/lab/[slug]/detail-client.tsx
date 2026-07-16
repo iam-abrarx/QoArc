@@ -317,13 +317,14 @@ export default function LabDetailPage() {
       
       {/* Self-contained CSS styles for seamless global transitions */}
       <style>{`
-        nav {
+        /* Target ONLY the global fixed navbar, not the local TOC nav */
+        nav.fixed {
           transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease !important;
         }
         footer {
           transition: opacity 0.8s ease, transform 0.8s ease !important;
         }
-        .focus-mode-active nav {
+        .focus-mode-active nav.fixed {
           transform: translateY(-100%);
           opacity: 0;
           pointer-events: none;
@@ -343,22 +344,17 @@ export default function LabDetailPage() {
         }
       `}</style>
 
-      {/* Peek-and-Hide Exit Header Banner */}
-      <div 
-        className={`fixed top-0 inset-x-0 z-[120] bg-white/95 backdrop-blur-md border-b border-primary/10 py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-700 shadow-sm
+      {/* Floating Exit Button in top left corner (no full-width tab bar) */}
+      <button 
+        onClick={() => toggleFocusMode(false)}
+        className={`fixed top-6 left-6 z-[120] bg-white border border-primary/15 px-4 py-2.5 flex items-center gap-2 shadow-premium transition-all duration-500 hover:border-[#cc0000] hover:text-[#cc0000] text-primary font-bold text-[10px] uppercase tracking-widest rounded-none
           ${isFocusMode && showExitButton 
             ? 'translate-y-0 opacity-100' 
-            : '-translate-y-full opacity-0 pointer-events-none'
+            : '-translate-y-16 opacity-0 pointer-events-none'
           }`}
       >
-        <button 
-          onClick={() => toggleFocusMode(false)}
-          className="flex items-center gap-2 hover:text-[#cc0000] transition-colors font-bold text-xs uppercase tracking-wider text-primary"
-        >
-          <ArrowLeft size={14} /> Exit Focus Mode
-        </button>
-        <span className="text-primary/40 font-mono tracking-widest uppercase text-[10px] font-bold">Focus Mode Active // {data.docId}</span>
-      </div>
+        <ArrowLeft size={12} className="text-[#cc0000]" /> Exit Focus Mode
+      </button>
 
       <div className="max-w-screen-2xl mx-auto space-y-8">
         
