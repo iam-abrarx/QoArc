@@ -197,7 +197,7 @@ export default function LabDetailPage() {
                     <button
                       key={section.id}
                       onClick={() => scrollToSection(section.id)}
-                      className={`w-full text-left font-fraunces text-base italic transition-all duration-300 flex items-center gap-4 py-1.5 border-l-2 pl-4
+                      className={`w-full text-left font-sans text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-4 py-1.5 border-l-2 pl-4
                         ${isActive 
                           ? 'border-[#cc0000] text-[#cc0000] font-bold translate-x-2' 
                           : 'border-transparent text-primary/50 hover:text-primary'
@@ -264,7 +264,7 @@ export default function LabDetailPage() {
                     <span>No. {data.docId}</span>
                   </div>
                   
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-fraunces font-black text-primary leading-tight italic">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-primary leading-tight">
                     {data.name}
                   </h1>
                   
@@ -280,8 +280,8 @@ export default function LabDetailPage() {
                   ref={sectionRefs.abstract} 
                   className="space-y-6 scroll-mt-28"
                 >
-                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
-                    <span className="text-[#cc0000] font-sans text-xs not-italic">01 //</span> Abstract
+                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                    <span className="text-[#cc0000] font-mono text-xs">01 //</span> Abstract
                   </h2>
                   <div className="bg-primary/5 p-6 md:p-8 border-l-2 border-primary/20">
                     <p className="text-lg text-primary/80 font-fraunces font-light italic leading-relaxed">
@@ -297,7 +297,7 @@ export default function LabDetailPage() {
                     {data.metrics.map((m: any) => (
                       <div key={m.label} className="bg-[#f8fafc] border border-primary/5 p-6 text-center shadow-sm">
                         <div className="text-[9px] font-bold uppercase tracking-widest text-primary/40 mb-2">{m.label}</div>
-                        <div className="text-3xl font-fraunces font-bold text-primary italic leading-none">{m.val}</div>
+                        <div className="text-3xl font-display font-bold text-primary leading-none">{m.val}</div>
                       </div>
                     ))}
                   </div>
@@ -309,8 +309,8 @@ export default function LabDetailPage() {
                   ref={sectionRefs.motivation} 
                   className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
                 >
-                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
-                    <span className="text-[#cc0000] font-sans text-xs not-italic">02 //</span> Commercial Incentive & Objective
+                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                    <span className="text-[#cc0000] font-mono text-xs">02 //</span> Commercial Incentive & Objective
                   </h2>
                   <p className="text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
                     {data.motivation}
@@ -323,8 +323,8 @@ export default function LabDetailPage() {
                   ref={sectionRefs.methodology} 
                   className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
                 >
-                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
-                    <span className="text-[#cc0000] font-sans text-xs not-italic">03 //</span> Research Methodology & Design
+                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                    <span className="text-[#cc0000] font-mono text-xs">03 //</span> Research Methodology & Design
                   </h2>
                   <p className="text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
                     {data.methodology}
@@ -337,8 +337,8 @@ export default function LabDetailPage() {
                   ref={sectionRefs.tech} 
                   className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
                 >
-                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
-                    <span className="text-[#cc0000] font-sans text-xs not-italic">04 //</span> Technical Infrastructure Stack
+                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                    <span className="text-[#cc0000] font-mono text-xs">04 //</span> Technical Infrastructure Stack
                   </h2>
                   <div className="flex flex-wrap gap-3 pt-2">
                     {data.tech.map((t: string) => (
@@ -358,8 +358,8 @@ export default function LabDetailPage() {
                   ref={sectionRefs.results} 
                   className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
                 >
-                  <h2 className="text-xl font-fraunces font-bold text-primary flex items-center gap-3 italic">
-                    <span className="text-[#cc0000] font-sans text-xs not-italic">05 //</span> Derived Value & Findings
+                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                    <span className="text-[#cc0000] font-mono text-xs">05 //</span> Derived Value & Findings
                   </h2>
                   <div className="bg-[#cc0000]/5 border-l-2 border-[#cc0000] p-6 md:p-8">
                     <p className="text-lg text-primary/80 font-fraunces font-light italic leading-relaxed">

@@ -89,10 +89,10 @@ export default function LabPage() {
           <div className="inline-flex items-center gap-3 px-6 py-2 bg-primary/5 border border-primary/10 rounded-none text-precision shadow-sharp">
             <Beaker size={14} className="text-primary animate-pulse" /> QOARC Blog // Product & Research Insights
           </div>
-          <h1 className="text-7xl md:text-9xl font-fraunces font-black tracking-tighter text-primary italic leading-[0.8]">
+          <h1 className="text-7xl md:text-9xl font-display font-medium tracking-tighter text-primary italic leading-[0.8]">
             QOARC <span className="opacity-40">Lab.</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-xl text-primary/60 font-fraunces font-light italic leading-relaxed border-l border-primary/20 pl-8 text-center">
+          <p className="max-w-2xl mx-auto text-xl text-primary/60 font-sans leading-relaxed border-l border-primary/20 pl-8 text-center">
             Our writing hub for sharing insights on our own products, advanced machine learning research, and ideas.
           </p>
         </motion.div>
@@ -150,13 +150,13 @@ export default function LabPage() {
                     <span className="flex items-center gap-1.5"><Clock size={12} /> {featuredPost.readTime}</span>
                   </div>
 
-                  {/* Title (Fraunces) */}
-                  <h2 className="text-4xl md:text-5xl font-fraunces font-bold text-primary group-hover:text-[#cc0000] transition-colors leading-tight italic">
+                  {/* Title */}
+                  <h2 className="text-4xl md:text-5xl font-display font-semibold text-primary group-hover:text-[#cc0000] transition-colors leading-tight italic">
                     {featuredPost.title}
                   </h2>
 
                   {/* Desc */}
-                  <p className="text-primary/60 font-fraunces font-light italic leading-relaxed text-base">
+                  <p className="text-primary/60 font-sans leading-relaxed text-base">
                     {filteredPosts[0]?.desc}
                   </p>
                 </div>
@@ -199,10 +199,10 @@ export default function LabPage() {
                         <span className="w-1 h-1 rounded-full bg-primary/10"></span>
                         <span>{post.date}</span>
                       </div>
-                      <h3 className="text-2xl font-fraunces font-bold text-primary group-hover:text-[#cc0000] transition-colors leading-tight italic">
+                      <h3 className="text-2xl font-display font-semibold text-primary group-hover:text-[#cc0000] transition-colors leading-tight italic">
                         {post.title}
                       </h3>
-                      <p className="text-sm text-primary/50 font-fraunces font-light italic leading-relaxed">
+                      <p className="text-sm text-primary/50 font-sans leading-relaxed">
                         {post.desc}
                       </p>
                     </div>
