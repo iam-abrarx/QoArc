@@ -125,19 +125,42 @@ export default function LabDetailPage() {
     results: useRef<HTMLElement>(null)
   };
 
-  const hasAutoTriggered = useRef(false);
+  const hasExitedManually = useRef(false);
 
-  // Auto trigger distraction-free view on scroll down
+  // Trigger focus mode on scroll down, and restore on scroll up
   useEffect(() => {
-    if (isFocusMode) return;
-
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > 250 && !hasAutoTriggered.current) {
-        setIsFocusMode(true);
-        hasAutoTriggered.current = true;
-      } else if (currentScrollY <= 50) {
-        hasAutoTriggered.current = false;
+      if (currentScrollY > 200) {
+        if (!isFocusMode && !hasExitedManually.current) {
+          setIsFocusMode(true);
+          try {
+            const element = document.documentElement;
+            if (element.requestFullscreen) {
+              element.requestFullscreen().catch(() => {});
+            } else if ((element as any).webkitRequestFullscreen) {
+              (element as any).webkitRequestFullscreen();
+            } else if ((element as any).msRequestFullscreen) {
+              (element as any).msRequestFullscreen();
+            }
+          } catch (e) {}
+        }
+      } else {
+        hasExitedManually.current = false; // Reset when scrolling back to top
+        if (isFocusMode) {
+          setIsFocusMode(false);
+          try {
+            if (document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement) {
+              if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+              } else if ((document as any).webkitExitFullscreen) {
+                (document as any).webkitExitFullscreen();
+              } else if ((document as any).msExitFullscreen) {
+                (document as any).msExitFullscreen();
+              }
+            }
+          } catch (e) {}
+        }
       }
     };
 
@@ -151,6 +174,10 @@ export default function LabDetailPage() {
       const isCurrentlyFullscreen = !!document.fullscreenElement || 
                                     !!(document as any).webkitFullscreenElement || 
                                     !!(document as any).msFullscreenElement;
+      
+      if (!isCurrentlyFullscreen && isFocusMode) {
+        hasExitedManually.current = true;
+      }
       setIsFocusMode(isCurrentlyFullscreen);
     };
 
@@ -163,7 +190,7 @@ export default function LabDetailPage() {
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       document.removeEventListener('msfullscreenchange', handleFullscreenChange);
     };
-  }, []);
+  }, [isFocusMode]);
 
   // Toggle global class on HTML to slide/fade navbar and footer seamlessly
   useEffect(() => {
@@ -246,6 +273,7 @@ export default function LabDetailPage() {
 
   const toggleFocusMode = async (enable: boolean) => {
     if (enable) {
+      hasExitedManually.current = false;
       try {
         const element = document.documentElement;
         if (element.requestFullscreen) {
@@ -262,6 +290,7 @@ export default function LabDetailPage() {
         setIsFocusMode(true);
       }
     } else {
+      hasExitedManually.current = true;
       try {
         if (document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).msFullscreenElement) {
           if (document.exitFullscreen) {
