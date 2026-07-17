@@ -1,6 +1,22 @@
 import React from 'react';
 import DynamicNodeTemplate from '@/components/DynamicNodeTemplate';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
+import JsonLd from '@/components/JsonLd';
+import { serviceSchema, breadcrumbSchema } from '@/lib/seo';
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const content = contentMap[slug];
+  if (!content) return { title: 'IT Consulting' };
+  const path = `/services/it-consulting/${slug}`;
+  return {
+    title: content.title,
+    description: content.desc,
+    alternates: { canonical: path },
+    openGraph: { title: `${content.title} | QOARC`, description: content.desc, url: path, type: 'website', ...(content.visual ? { images: [{ url: content.visual }] } : {}) },
+  };
+}
 
 const contentMap: Record<string, any> = {
   'gtm-strategy-consulting': {
@@ -70,7 +86,22 @@ export default async function ITConsultingPage({ params }: { params: Promise<{ s
     notFound();
   }
 
-  return <DynamicNodeTemplate content={content} />;
+  const path = `/services/it-consulting/${slug}`;
+  return (
+    <>
+      <JsonLd
+        data={[
+          serviceSchema({ name: content.title, description: content.desc, path, image: content.visual, serviceType: content.title }),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Services', path: '/services' },
+            { name: content.title, path },
+          ]),
+        ]}
+      />
+      <DynamicNodeTemplate content={content} />
+    </>
+  );
 }
 
 export async function generateStaticParams() {

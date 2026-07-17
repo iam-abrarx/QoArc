@@ -9,6 +9,8 @@ import LeadCaptureModal from "@/components/LeadCaptureModal";
 import LoadingScreen from "@/components/LoadingScreen";
 import ChatWidget from "@/components/ChatWidget";
 import { ChatProvider } from "@/context/ChatContext";
+import JsonLd from "@/components/JsonLd";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
 
 const notoSerif = Noto_Serif({
   subsets: ["latin"],
@@ -52,18 +54,11 @@ export const metadata: Metadata = {
     title: "QOARC | Architecting Autonomous Intelligence",
     description: "A full-service AI product studio. We build intelligent SaaS and automate business operations.",
     siteName: "QOARC",
-    images: [{
-      url: "/og-image.png",
-      width: 1200,
-      height: 630,
-      alt: "QOARC AI Studio",
-    }],
   },
   twitter: {
     card: "summary_large_image",
     title: "QOARC | Architecting Autonomous Intelligence",
     description: "A full-service AI product studio. We build intelligent SaaS and automate business operations.",
-    images: ["/og-image.png"],
     creator: "@qoarc",
   },
   robots: {
@@ -80,9 +75,14 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "48x48" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/favicon.svg",
   },
   verification: {
     google: "google02fe45cf459d4d4a",
@@ -97,6 +97,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${notoSerif.variable} ${manrope.variable} ${fraunces.variable}`}>
       <body className="bg-surface text-on-surface font-sans antialiased overflow-x-hidden">
+        <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <LoadingScreen />
         <PortfolioProvider>
           <LeadCaptureProvider>

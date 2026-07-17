@@ -4,6 +4,13 @@ import TeamPageClient from './team-client';
 export const metadata: Metadata = {
   title: "Meet the Team | QOARC",
   description: "Get to know the architects, engineers, and product strategists building sovereign AI systems and high-end software solutions at QOARC.",
+  alternates: { canonical: "/about/team" },
+  openGraph: {
+    title: "Meet the Team | QOARC",
+    description: "The architects, engineers, and product strategists behind QOARC.",
+    url: "/about/team",
+    type: "website",
+  },
 };
 
 export default function Page() {
