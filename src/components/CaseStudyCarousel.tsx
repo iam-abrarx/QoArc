@@ -2,13 +2,14 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  ChevronLeft,
+  ChevronRight,
   ArrowRight,
   Monitor,
   Smartphone,
-  CheckCircle2
+  CheckCircle2,
+  Star
 } from 'lucide-react';
 
 import { usePortfolio } from '@/context/PortfolioContext';
@@ -62,16 +63,8 @@ export default function CaseStudyCarousel() {
   const cs = caseStudies[current];
 
   return (
-    <section className="py-32 px-8 bg-[#ebf5ff] border-t border-primary/5">
-      <div className="max-w-screen-2xl mx-auto space-y-16">
-        {/* Header - Centered */}
-        <div className="text-center space-y-4">
-           <div className="text-precision text-[#0024ff]/60 uppercase tracking-widest">Engineering Showcase // 2026</div>
-           <h2 className="text-4xl md:text-5xl font-display font-medium text-[#002046] tracking-tight leading-none group">
-              Real-World Case Studies in <span className="opacity-40">Intelligent Software Development</span>
-           </h2>
-        </div>
-
+    <section id="case-studies" className="py-56 md:py-72 px-8 bg-[#ebf5ff] border-t border-primary/5">
+      <div className="max-w-screen-2xl mx-auto space-y-24">
         {/* Carousel Content */}
         <div className="relative">
            {/* Side Navigation Buttons */}
@@ -118,11 +111,25 @@ export default function CaseStudyCarousel() {
                       </h3>
                    </div>
 
-                    <div className="space-y-4">
-                       <p className="text-lg text-[#002046]/70 leading-relaxed font-sans max-w-xl">
-                          {cs.solutions || cs.solution || cs.description}
-                       </p>
-                    </div>
+                    {cs.testimonial?.quote ? (
+                      /* Client review: star rating + quoted words from the client */
+                      <div className="space-y-5">
+                         <div className="flex gap-1 text-[#FFD700]">
+                            {[...Array(Math.min(5, Math.max(1, cs.testimonial.rating ?? 5)))].map((_, i) => (
+                               <Star key={i} size={18} fill="currentColor" stroke="none" />
+                            ))}
+                         </div>
+                         <blockquote className="text-lg text-[#002046]/70 leading-relaxed font-fraunces font-light italic max-w-xl">
+                            &ldquo;{cs.testimonial.quote}&rdquo;
+                         </blockquote>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                         <p className="text-lg text-[#002046]/70 leading-relaxed font-sans max-w-xl">
+                            {cs.solutions || cs.solution || cs.description}
+                         </p>
+                      </div>
+                    )}
 
                     <div className="pt-8">
                        <a 

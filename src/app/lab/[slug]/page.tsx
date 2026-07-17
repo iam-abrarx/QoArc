@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import LabDetailPageClient from './detail-client';
 import JsonLd from '@/components/JsonLd';
@@ -80,7 +81,9 @@ export default async function Page({ params }: Props) {
           ]),
         ]}
       />
-      <LabDetailPageClient />
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#f0f2f5]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+        <LabDetailPageClient />
+      </Suspense>
     </>
   );
 }

@@ -47,8 +47,9 @@ export interface PortfolioItem {
   // Trust & Metadata
   testimonial?: {
     quote: string;
-    author: string;
-    role: string;
+    author?: string;
+    role?: string;
+    rating?: number; // 1–5 stars shown on the home carousel
   };
   impact?: string;
   relatedProjectIds?: string[];
@@ -97,7 +98,13 @@ export const initialProjects: PortfolioItem[] = [
     isFeatured: true,
     year: "2024",
     techStack: ["Next.js", "Prisma", "PostgreSQL"],
-    url: "https://bancat.org.bd"
+    url: "https://bancat.org.bd",
+    testimonial: {
+      quote: "QOARC built a powerful platform for our cancer charity. It makes it simple for donors to find and support patients in real-time. The site is easy to use in both English and Bangla, helping us reach more people.",
+      author: "Dr. Rafiq Ahmed",
+      role: "Director of Operations, BANCAT Bangladesh",
+      rating: 5
+    }
   },
   {
     id: "asialinkage",
@@ -124,7 +131,13 @@ export const initialProjects: PortfolioItem[] = [
     isFeatured: true,
     year: "2023",
     techStack: ["TypeScript", "ElasticSearch", "Tailwind CSS"],
-    url: "https://asialinkage.com"
+    url: "https://asialinkage.com",
+    testimonial: {
+      quote: "QOARC built a comprehensive digital catalog for our business. They created a structured website where all our products are beautifully categorized and easily accessible to our clients. It completely transformed how we showcase our inventory.",
+      author: "Shafiqul Islam",
+      role: "Managing Director, AsiaLinkage",
+      rating: 5
+    }
   },
   {
     id: "2go",
@@ -151,7 +164,13 @@ export const initialProjects: PortfolioItem[] = [
     isFeatured: true,
     year: "2024",
     techStack: ["React", "Stripe", "Framer Motion"],
-    url: "https://bout2go.com"
+    url: "https://bout2go.com",
+    testimonial: {
+      quote: "Our new website is fast, modern, and looks great. QOARC made the shopping experience so much smoother for our customers. We've seen a huge improvement in how people interact with our brand.",
+      author: "Noel Miazi",
+      role: "Head of Digital, 2GO",
+      rating: 5
+    }
   },
   {
     id: "elizabeth",
@@ -178,6 +197,12 @@ export const initialProjects: PortfolioItem[] = [
     isFeatured: true,
     year: "2023",
     techStack: ["Three.js", "GSAP", "Next.js"],
-    url: "#"
+    url: "#",
+    testimonial: {
+      quote: "QOARC turned my photography portfolio into a high-end digital magazine. The cinematic feel and private client areas have completely changed how I present my work to filmmakers. It's truly elite.",
+      author: "Elizabeth Kalinina",
+      role: "Director of Photography",
+      rating: 5
+    }
   }
 ];

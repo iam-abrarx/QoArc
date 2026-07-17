@@ -42,13 +42,13 @@ export default function LeadCaptureModal() {
              {/* Close Button Node */}
              <button 
                 onClick={closeModal}
-                className="absolute top-10 right-10 w-12 h-12 rounded-none bg-white border border-primary/5 flex items-center justify-center text-primary/40 hover:text-primary hover:bg-white transition-all shadow-sharp z-[102] group"
+                className="absolute top-6 right-6 w-10 h-10 rounded-none bg-white border border-primary/5 flex items-center justify-center text-primary/40 hover:text-primary hover:bg-white transition-all shadow-sharp z-[102] group"
              >
-                <X size={20} className="group-hover:rotate-90 transition-transform duration-500" />
+                <X size={18} className="group-hover:rotate-90 transition-transform duration-500" />
              </button>
 
              {/* Form Wrapper - Fixed height or scrollable */}
-             <div className="flex-1 overflow-y-auto custom-scrollbar pt-20">
+             <div className="flex-1 overflow-y-auto custom-scrollbar pt-12">
                 <LeadCaptureForm />
              </div>
 

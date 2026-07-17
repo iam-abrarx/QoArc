@@ -6,7 +6,7 @@ import {
   PlusCircle, LogOut, ArrowLeft, Edit3, Edit2, Quote, Trash2, List, 
   Rocket, PlayCircle, Image, FileText, ChevronRight, 
   Layout, Save, X, Plus, AlertCircle, CheckCircle2,
-  Lock, ArrowRight, Loader2, Mail, LayoutGrid, Download, Briefcase, Monitor
+  Lock, ArrowRight, Loader2, Mail, LayoutGrid, Download, Briefcase, Monitor, Eye, Star
 } from 'lucide-react';
 import { usePortfolio, JobOpening, LabItem } from '@/context/PortfolioContext';
 import { PartnerLogo } from '@/context/PortfolioContext';
@@ -14,8 +14,8 @@ import { PortfolioItem } from '@/lib/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAssetFromDB } from '@/lib/idb';
 import { ImageInput, ImageArrayInput } from '@/components/admin/ImageInput';
-import LabBlockEditor from '@/components/admin/LabBlockEditor';
-import { LabBlock } from '@/lib/labBlocks';
+import LabVisualBuilder from '@/components/admin/LabVisualBuilder';
+import { convertLegacyToBlocks } from '@/lib/labBlocks';
 
 const todayLabel = () =>
   new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -112,6 +112,27 @@ function AdminContent() {
 
   const [newLabItem, setNewLabItem] = useState<Partial<LabItem>>(emptyLabItem());
   const [editingLabId, setEditingLabId] = useState<string | null>(null);
+
+  // Synchronize the current editor draft to localStorage for real-time previewing
+  useEffect(() => {
+    if (newLabItem) {
+      localStorage.setItem('qoarc_lab_preview', JSON.stringify(newLabItem));
+    }
+  }, [newLabItem]);
+
+  const handlePreviewLive = () => {
+    localStorage.setItem('qoarc_lab_preview', JSON.stringify(newLabItem));
+    const previewSlug = newLabItem.slug || 'preview';
+    window.open(`/lab/${previewSlug}?preview=true`, 'qoarc_preview_window');
+  };
+
+  // Keep the live-preview window in sync while composing: every draft change is
+  // mirrored to localStorage, which the preview tab listens to via `storage`.
+  useEffect(() => {
+    if (activeTab === 'lab' && (newLabItem.name || newLabItem.content?.length)) {
+      localStorage.setItem('qoarc_lab_preview', JSON.stringify(newLabItem));
+    }
+  }, [newLabItem, activeTab]);
 
   const [footerSettings, setFooterSettings] = useState(footerInfo);
   
@@ -442,7 +463,7 @@ function AdminContent() {
                 <button
                   key={tab.id}
                   onClick={() => { setActiveTab(tab.id); setShowEditor(false); }}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${active ? activeClass : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${active ? activeClass : 'text-white/60 hover:text-white hover:bg-white/5'}`}
                 >
                   <tab.icon size={14} strokeWidth={3} /> {tab.label}
                   {'badge' in tab && tab.badge > 0 && (
@@ -495,7 +516,7 @@ function AdminContent() {
               <div className="flex items-center gap-4">
                 <button 
                   onClick={() => setShowEditor(false)}
-                  className="w-12 h-12 rounded-none bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white/20 transition-all text-text-muted hover:text-white"
+                  className="w-12 h-12 rounded-none bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white/20 transition-all text-white/60 hover:text-white"
                 >
                   <ArrowLeft size={20} />
                 </button>
@@ -534,7 +555,7 @@ function AdminContent() {
                        onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                        type="text" 
                        placeholder="e.g. EcoEnergy Smart Dashboard" 
-                       className="w-full bg-transparent border-b border-white/10 py-4 text-4xl font-display font-black focus:border-accent-blue outline-none transition-all placeholder:text-white/30 tracking-tighter text-white"
+                       className="w-full bg-transparent border-b border-white/10 py-4 text-4xl font-display font-black focus:border-accent-blue outline-none transition-all placeholder:text-white/45 tracking-tighter text-white"
                      />
                    </div>
 
@@ -573,7 +594,7 @@ function AdminContent() {
                    </h3>
 
                    <div className="space-y-6">
-                     <label className="text-xs uppercase tracking-[0.3em] text-text-muted font-bold">Project Intro / Summary</label>
+                     <label className="text-xs uppercase tracking-[0.3em] text-white/60 font-bold">Project Intro / Summary</label>
                      <textarea value={newItem.description} onChange={(e) => setNewItem({ ...newItem, description: e.target.value })} placeholder="Brief high-level overview..." className="w-full bg-bg-dark border border-white/5 rounded-none px-8 py-6 focus:border-accent-blue outline-none min-h-[120px] text-lg leading-relaxed transition-all text-white" />
                    </div>
 
@@ -586,7 +607,7 @@ function AdminContent() {
                        { label: 'Outcome / Result', key: 'outcome' as keyof PortfolioItem, color: 'green-500' }
                      ].map((section) => (
                        <div key={section.key} className="space-y-4">
-                         <label className={`text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold flex items-center gap-2`}>
+                         <label className={`text-[10px] uppercase tracking-[0.3em] text-white/60 font-bold flex items-center gap-2`}>
                             <span className={`w-2 h-2 rounded-none bg-${section.color}`}></span> {section.label}
                          </label>
                          <textarea 
@@ -623,7 +644,7 @@ function AdminContent() {
                           <div key={idx} className="flex flex-col gap-3 p-6 bg-bg-dark/40 border border-white/5 relative group">
                             <button type="button" onClick={() => removeStat(idx)} className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-all font-bold">×</button>
                             <input value={stat.value} onChange={(e) => updateStatField(idx, 'value', e.target.value)} type="text" placeholder="Value (+40%)" className="bg-transparent border-b border-white/10 py-2 outline-none text-2xl font-display font-medium text-accent-blue text-white" />
-                            <input value={stat.label} onChange={(e) => updateStatField(idx, 'label', e.target.value)} type="text" placeholder="Label (Processing Speed)" className="bg-transparent py-1 outline-none text-[10px] uppercase tracking-widest text-text-muted text-white" />
+                            <input value={stat.label} onChange={(e) => updateStatField(idx, 'label', e.target.value)} type="text" placeholder="Label (Processing Speed)" className="bg-transparent py-1 outline-none text-[10px] uppercase tracking-widest text-white/70" />
                           </div>
                         ))}
                       </div>
@@ -747,7 +768,7 @@ function AdminContent() {
                     
                     <div className="space-y-4">
                       <div className="flex items-center justify-between bg-bg-dark/50 p-4 rounded-none border border-white/5">
-                        <span className="text-xs font-bold text-text-muted uppercase tracking-widest">Featured Project</span>
+                        <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Featured Project</span>
                         <button 
                           onClick={() => setNewItem({ ...newItem, isFeatured: !newItem.isFeatured })}
                           className={`w-12 h-6 rounded-none transition-all relative ${newItem.isFeatured ? 'bg-accent-blue' : 'bg-white/10'}`}
@@ -756,7 +777,7 @@ function AdminContent() {
                         </button>
                       </div>
                       <div className="flex items-center justify-between bg-bg-dark/50 p-4 rounded-none border border-white/5">
-                        <span className="text-xs font-bold text-text-muted uppercase tracking-widest">Status</span>
+                        <span className="text-xs font-bold text-white/60 uppercase tracking-widest">Status</span>
                         <select 
                           value={newItem.status} 
                           onChange={(e) => setNewItem({ ...newItem, status: e.target.value as 'draft' | 'published' })}
@@ -766,6 +787,41 @@ function AdminContent() {
                           <option value="draft">Draft</option>
                         </select>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6 pt-8 border-t border-white/5">
+                    <h3 className="text-xl font-display font-bold flex items-center gap-3">
+                      <Quote className="text-accent-blue" size={20} /> Client Review
+                    </h3>
+                    <p className="text-[10px] text-white/60 leading-relaxed -mt-2">Shown on the home “Real-World Case Studies” carousel as stars + quote.</p>
+                    <div className="space-y-3">
+                      <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Star Rating</label>
+                      <div className="flex gap-1.5">
+                        {[1, 2, 3, 4, 5].map((n) => {
+                          const rating = newItem.testimonial?.rating ?? 5;
+                          return (
+                            <button
+                              key={n}
+                              type="button"
+                              onClick={() => setNewItem({ ...newItem, testimonial: { quote: newItem.testimonial?.quote || '', ...newItem.testimonial, rating: n } })}
+                              className={`transition-all hover:scale-110 ${n <= rating ? 'text-[#FFD700]' : 'text-white/25'}`}
+                            >
+                              <Star size={22} fill="currentColor" stroke="none" />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Client&apos;s Words (Quote)</label>
+                      <textarea
+                        value={newItem.testimonial?.quote || ''}
+                        onChange={(e) => setNewItem({ ...newItem, testimonial: { rating: 5, ...newItem.testimonial, quote: e.target.value } })}
+                        placeholder="What the client said about this project…"
+                        className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none text-sm text-white min-h-[110px] leading-relaxed italic"
+                      />
+                      <p className="text-[10px] text-white/55">Leave empty to fall back to the project summary text.</p>
                     </div>
                   </div>
 
@@ -889,7 +945,7 @@ function AdminContent() {
                     </div>
                     
                     <div className="bg-white/5 rounded-xl px-5 py-3 flex items-center justify-between">
-                      <span className="text-[11px] font-medium text-text-muted truncate max-w-[140px]">{item.url}</span>
+                      <span className="text-[11px] font-medium text-white/60 truncate max-w-[140px]">{item.url}</span>
                       <ChevronRight size={14} className="text-accent-blue group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
@@ -900,7 +956,7 @@ function AdminContent() {
             {portfolioItems.length === 0 && (
               <div className="text-center py-32 border-2 border-dashed border-white/5 rounded-none bg-white/[0.01]">
                 <PlusCircle className="mx-auto text-white/5 mb-8" size={80} strokeWidth={0.5} />
-                <p className="text-text-muted text-xl font-medium mb-10">The registry is currently empty.</p>
+                <p className="text-white/60 text-xl font-medium mb-10">The registry is currently empty.</p>
                 <button onClick={handleCreateNew} className="bg-accent-blue text-white px-12 py-5 rounded-none font-black hover:scale-105 transition-all shadow-glow-blue">
                   Initiate New Case Study
                 </button>
@@ -980,7 +1036,7 @@ function AdminContent() {
 
                        <div className="pt-12 border-t border-white/5 mt-auto">
                           <div className="text-white/70 font-black tracking-[0.4em] uppercase mb-3">Transmission Timestamp</div>
-                          <div className="text-sm font-bold text-white/40 font-mono tracking-tight">{msg.date}</div>
+                          <div className="text-sm font-bold text-white/60 font-mono tracking-tight">{msg.date}</div>
                        </div>
                     </div>
 
@@ -995,7 +1051,7 @@ function AdminContent() {
                          
                          {msg.assets && msg.assets.length > 0 && (
                            <div className="mt-8 space-y-4 relative z-10">
-                             <div className="text-[10px] uppercase font-black text-text-muted tracking-[0.4em]">Attached Assets</div>
+                             <div className="text-[10px] uppercase font-black text-white/60 tracking-[0.4em]">Attached Assets</div>
                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                {msg.assets.map(asset => (
                                  <button
@@ -1007,7 +1063,7 @@ function AdminContent() {
                                       <p className="text-sm font-bold text-white truncate max-w-[200px]">{asset.name}</p>
                                       <p className="text-[10px] text-white/60">{(asset.size / 1024 / 1024).toFixed(2)} MB</p>
                                     </div>
-                                    <div className="w-10 h-10 rounded-none bg-white/5 flex items-center justify-center group-hover:bg-accent-blue group-hover:text-white text-text-muted transition-colors flex-shrink-0">
+                                    <div className="w-10 h-10 rounded-none bg-white/5 flex items-center justify-center group-hover:bg-accent-blue group-hover:text-white text-white/60 transition-colors flex-shrink-0">
                                       <Download size={16} />
                                     </div>
                                  </button>
@@ -1032,7 +1088,7 @@ function AdminContent() {
                   <Mail className="mx-auto text-white/5 mb-10" size={100} strokeWidth={0.5} />
                 </motion.div>
                 <p className="text-white/80 font-display font-black tracking-tight mb-4">Registry Silent</p>
-                <p className="text-text-muted/50 font-medium">Inbound signals haven't been detected yet.</p>
+                <p className="text-white/45 font-medium">Inbound signals haven't been detected yet.</p>
               </div>
             )}
           </motion.div>
@@ -1303,29 +1359,38 @@ function AdminContent() {
             key="lab"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-12 pb-32"
+            className="pb-24 -mx-6 lg:-mx-10 px-6 lg:px-10 py-10 bg-[#f0f2f5] text-primary space-y-10"
           >
-            <div className="flex items-center justify-between border-b border-white/5 pb-8 group">
-              <h2 className="text-3xl font-display font-black flex items-center gap-5 tracking-tighter">
-                <Rocket className="text-accent-blue group-hover:scale-110 transition-transform" size={32} /> Lab // Article Studio
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-primary/10 pb-6 group">
+              <h2 className="text-3xl font-display font-black flex items-center gap-5 tracking-tighter text-primary">
+                <Rocket className="text-[#0047ff] group-hover:scale-110 transition-transform" size={32} /> Lab // Article Studio
               </h2>
-              <span className="text-white/70 font-black uppercase tracking-[0.4em] bg-white/5 px-6 py-3 rounded-none border border-white/5">
+              <span className="text-primary/65 font-black uppercase tracking-[0.4em] bg-white px-6 py-3 rounded-none border border-primary/10 text-[10px]">
                 Published Articles: {labItems.length}
               </span>
             </div>
 
-            <div className="bg-bg-card border border-white/5 rounded-none p-8 md:p-12 shadow-2xl relative overflow-hidden">
-               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent-blue via-accent-purple to-accent-blue bg-[length:200%_auto] animate-gradient"></div>
-               <div className="flex items-center justify-between mb-10">
-                 <h3 className="text-2xl font-display font-bold flex items-center gap-3">
-                   {editingLabId ? <Edit3 className="text-accent-purple" size={24} /> : <PlusCircle className="text-accent-blue" size={24} />}
+            <div className="space-y-6">
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                 <h3 className="text-xl font-display font-bold flex items-center gap-3 text-primary">
+                   {editingLabId ? <Edit3 className="text-accent-purple" size={20} /> : <PlusCircle className="text-[#0047ff]" size={20} />}
                    {editingLabId ? 'Edit Article' : 'Compose New Article'}
+                   <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/60 bg-white border border-primary/10 px-3 py-1.5">Visual Builder — edits render exactly as published</span>
                  </h3>
-                 {editingLabId && (
-                   <button type="button" onClick={() => { setEditingLabId(null); setNewLabItem(emptyLabItem()); }} className="text-[10px] uppercase tracking-widest font-black text-white/50 hover:text-white bg-white/5 px-5 py-2.5 border border-white/5 transition-all">
-                     Cancel Edit
+                 <div className="flex items-center gap-3">
+                   <button
+                     type="button"
+                     onClick={handlePreviewLive}
+                     className="text-[10px] uppercase tracking-widest font-black text-[#0047ff] hover:text-white bg-white hover:bg-[#0047ff] px-5 py-2.5 border border-[#0047ff]/30 transition-all flex items-center gap-1.5"
+                   >
+                     <Eye size={12} /> Live Preview
                    </button>
-                 )}
+                   {editingLabId && (
+                     <button type="button" onClick={() => { setEditingLabId(null); setNewLabItem(emptyLabItem()); }} className="text-[10px] uppercase tracking-widest font-black text-primary/65 hover:text-primary bg-white px-5 py-2.5 border border-primary/10 transition-all">
+                       Cancel Edit
+                     </button>
+                   )}
+                 </div>
                </div>
 
                <form
@@ -1353,127 +1418,110 @@ function AdminContent() {
                     setNewLabItem(emptyLabItem());
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="space-y-10"
+                  className="space-y-6"
                >
-                 {/* Title */}
-                 <div className="space-y-3">
-                   <label className="text-xs uppercase tracking-[0.3em] text-accent-blue font-black opacity-80">Article Title</label>
-                   <input type="text" value={newLabItem.name || ''} onChange={e => setNewLabItem({ ...newLabItem, name: e.target.value })} placeholder="e.g. Modeling PFAS Rigidity with Neural Kinetics" className="w-full bg-transparent border-b border-white/10 py-3 text-3xl font-display font-black focus:border-accent-blue outline-none transition-all placeholder:text-white/20 tracking-tight text-white" required />
-                 </div>
+                 {/* Live visual builder — the article edited exactly as it publishes */}
+                 <LabVisualBuilder
+                   item={newLabItem}
+                   onChange={(patch) => setNewLabItem(prev => ({ ...prev, ...patch }))}
+                   notify={showToast}
+                 />
 
-                 {/* Meta grid */}
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                   <div className="space-y-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Slug (URL)</label>
-                     <input type="text" value={newLabItem.slug || ''} onChange={e => setNewLabItem({ ...newLabItem, slug: e.target.value })} placeholder="auto from title" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
-                   </div>
-                   <div className="space-y-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Type</label>
-                     <select value={newLabItem.type || 'research'} onChange={e => setNewLabItem({ ...newLabItem, type: e.target.value as 'product' | 'research' })} className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white">
-                       <option value="research">Scientific Research</option>
-                       <option value="product">Product Case</option>
-                     </select>
-                   </div>
-                   <div className="space-y-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Category Label</label>
-                     <input type="text" value={newLabItem.category || ''} onChange={e => setNewLabItem({ ...newLabItem, category: e.target.value })} placeholder="RESEARCH, ENGINEERING…" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
-                   </div>
-                   <div className="space-y-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Reference Node</label>
-                     <input type="text" value={newLabItem.node || ''} onChange={e => setNewLabItem({ ...newLabItem, node: e.target.value })} placeholder="0x01 // NEURAL" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
-                   </div>
-                   <div className="space-y-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Date</label>
-                     <input type="text" value={newLabItem.date || ''} onChange={e => setNewLabItem({ ...newLabItem, date: e.target.value })} placeholder="July 18, 2026" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
-                   </div>
-                   <div className="space-y-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Read Time</label>
-                     <input type="text" value={newLabItem.readTime || ''} onChange={e => setNewLabItem({ ...newLabItem, readTime: e.target.value })} placeholder="5 min read" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
-                   </div>
-                   <div className="space-y-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Document ID</label>
-                     <input type="text" value={newLabItem.docId || ''} onChange={e => setNewLabItem({ ...newLabItem, docId: e.target.value })} placeholder="QOARC-2026-001" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
-                   </div>
-                   <div className="flex items-center justify-between bg-bg-dark/50 px-4 py-3 border border-white/5 md:col-span-2">
-                     <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">Feature on Lab Homepage</span>
-                     <button type="button" onClick={() => setNewLabItem({ ...newLabItem, featured: !newLabItem.featured })} className={`w-12 h-6 rounded-none transition-all relative ${newLabItem.featured ? 'bg-accent-blue' : 'bg-white/10'}`}>
-                       <div className={`absolute top-1 w-4 h-4 bg-white rounded-none transition-all ${newLabItem.featured ? 'left-7' : 'left-1'}`}></div>
-                     </button>
+                 {/* Publish settings */}
+                 <div className="bg-white border border-primary/10 p-6 md:p-8 space-y-5 shadow-sharp">
+                   <div className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Publish Settings</div>
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                     <div className="space-y-1.5">
+                       <label className="text-[9px] uppercase tracking-[0.25em] text-primary/65 font-black">Slug (URL)</label>
+                       <input type="text" value={newLabItem.slug || ''} onChange={e => setNewLabItem({ ...newLabItem, slug: e.target.value })} placeholder="auto from title" className="w-full bg-[#f8fafc] border border-primary/10 rounded-none px-4 py-2.5 focus:border-[#0047ff] outline-none text-sm text-primary" />
+                     </div>
+                     <div className="space-y-1.5">
+                       <label className="text-[9px] uppercase tracking-[0.25em] text-primary/65 font-black">Type</label>
+                       <select value={newLabItem.type || 'research'} onChange={e => setNewLabItem({ ...newLabItem, type: e.target.value as 'product' | 'research' })} className="w-full bg-[#f8fafc] border border-primary/10 rounded-none px-4 py-2.5 focus:border-[#0047ff] outline-none text-sm text-primary">
+                         <option value="research">Scientific Research</option>
+                         <option value="product">Product Case</option>
+                       </select>
+                     </div>
+                     <div className="space-y-1.5">
+                       <label className="text-[9px] uppercase tracking-[0.25em] text-primary/65 font-black">Reference Node</label>
+                       <input type="text" value={newLabItem.node || ''} onChange={e => setNewLabItem({ ...newLabItem, node: e.target.value })} placeholder="0x01 // NEURAL" className="w-full bg-[#f8fafc] border border-primary/10 rounded-none px-4 py-2.5 focus:border-[#0047ff] outline-none text-sm text-primary" />
+                     </div>
+                     <div className="space-y-1.5 md:col-span-2">
+                       <label className="text-[9px] uppercase tracking-[0.25em] text-primary/65 font-black">Excerpt / Card Summary</label>
+                       <textarea value={newLabItem.desc || ''} onChange={e => setNewLabItem({ ...newLabItem, desc: e.target.value })} placeholder="Short summary shown on article cards…" className="w-full bg-[#f8fafc] border border-primary/10 rounded-none px-4 py-2.5 focus:border-[#0047ff] outline-none text-sm text-primary min-h-[72px] leading-relaxed" />
+                     </div>
+                     <div className="flex items-center justify-between bg-[#f8fafc] px-4 py-3 border border-primary/10 self-end">
+                       <span className="text-[9px] font-black text-primary/60 uppercase tracking-widest">Feature on Lab Homepage</span>
+                       <button type="button" onClick={() => setNewLabItem({ ...newLabItem, featured: !newLabItem.featured })} className={`w-12 h-6 rounded-none transition-all relative ${newLabItem.featured ? 'bg-[#0047ff]' : 'bg-primary/15'}`}>
+                         <div className={`absolute top-1 w-4 h-4 bg-white rounded-none transition-all ${newLabItem.featured ? 'left-7' : 'left-1'}`}></div>
+                       </button>
+                     </div>
                    </div>
                  </div>
 
-                 {/* Cover image + excerpt */}
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-white/5">
-                   <ImageInput label="Cover Image (list & hero)" value={newLabItem.imageUrl || ''} onChange={(url) => setNewLabItem({ ...newLabItem, imageUrl: url })} notify={showToast} previewClass="w-32 h-24" />
-                   <div className="space-y-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Excerpt / Card Summary</label>
-                     <textarea value={newLabItem.desc || ''} onChange={e => setNewLabItem({ ...newLabItem, desc: e.target.value })} placeholder="Short summary shown on article cards…" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white min-h-[104px] leading-relaxed" />
-                   </div>
-                 </div>
-
-                 {/* Block content editor */}
-                 <div className="space-y-4 pt-8 border-t border-white/5">
-                   <div className="flex items-center gap-3">
-                     <FileText className="text-accent-purple" size={20} />
-                     <h4 className="text-lg font-display font-bold text-white">Article Content</h4>
-                     <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Block editor</span>
-                   </div>
-                   <LabBlockEditor
-                     blocks={(newLabItem.content as LabBlock[]) || []}
-                     onChange={(next) => setNewLabItem({ ...newLabItem, content: next })}
-                     notify={showToast}
-                   />
-                 </div>
-
-                 <div className="flex gap-4 pt-6 border-t border-white/5">
-                   <button type="submit" className={`${editingLabId ? 'bg-accent-purple shadow-accent-purple/20' : 'bg-accent-blue shadow-accent-blue/20'} text-white px-10 py-4 rounded-none font-black hover:scale-105 transition-all flex items-center gap-2 shadow-xl`}>
-                     <Save size={18} /> {editingLabId ? 'Update & Publish' : 'Publish Article'}
-                   </button>
-                 </div>
+                 <div className="flex flex-wrap gap-4">
+                    <button type="submit" className={`${editingLabId ? 'bg-accent-purple' : 'bg-[#0047ff]'} text-white px-10 py-4 rounded-none font-black hover:scale-[1.02] transition-all flex items-center gap-2 shadow-xl`}>
+                      <Save size={18} /> {editingLabId ? 'Update & Publish' : 'Publish Article'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handlePreviewLive}
+                      className="text-[#0047ff] hover:text-white bg-white hover:bg-[#0047ff] border border-[#0047ff]/30 px-8 py-4 rounded-none font-black transition-all flex items-center gap-2"
+                    >
+                      <Eye size={18} /> Live Preview
+                    </button>
+                  </div>
                </form>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="space-y-4 pt-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">Published Articles</div>
+              <div className="grid grid-cols-1 gap-4">
               {labItems.map((item) => (
-                <div key={item.id} className="bg-bg-dark border border-white/5 rounded-none p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 group hover:border-accent-blue/30 transition-all shadow-xl">
-                  <div className="flex gap-6 items-center min-w-0">
-                    <div className="w-24 h-20 flex-shrink-0 bg-bg-card border border-white/10 overflow-hidden">
+                <div key={item.id} className="bg-white border border-primary/10 rounded-none p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 group hover:border-[#0047ff]/40 transition-all shadow-sharp">
+                  <div className="flex gap-5 items-center min-w-0">
+                    <div className="w-24 h-20 flex-shrink-0 bg-[#f8fafc] border border-primary/10 overflow-hidden">
                       {item.imageUrl
                         ? <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-white/20"><Image size={22} /></div>}
+                        : <div className="w-full h-full flex items-center justify-center text-primary/20"><Image size={22} /></div>}
                     </div>
                     <div className="space-y-1.5 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-[9px] font-black uppercase tracking-[0.3em] px-2 py-1 border ${item.type === 'product' ? 'text-accent-purple bg-accent-purple/5 border-accent-purple/20' : 'text-accent-blue bg-accent-blue/5 border-accent-blue/20'}`}>{item.type || 'research'}</span>
-                        {item.featured && <span className="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-400 bg-yellow-400/5 border border-yellow-400/20 px-2 py-1">Featured</span>}
-                        <span className="text-[9px] text-white/40 font-mono">{(item.content?.length || 0)} blocks</span>
+                        <span className={`text-[9px] font-black uppercase tracking-[0.3em] px-2 py-1 border ${item.type === 'product' ? 'text-accent-purple bg-accent-purple/5 border-accent-purple/20' : 'text-[#0047ff] bg-[#0047ff]/5 border-[#0047ff]/20'}`}>{item.type || 'research'}</span>
+                        {item.featured && <span className="text-[9px] font-black uppercase tracking-[0.3em] text-amber-600 bg-amber-500/10 border border-amber-500/30 px-2 py-1">Featured</span>}
+                        <span className="text-[9px] text-primary/60 font-mono">{(item.content?.length || 0)} blocks</span>
                       </div>
-                      <h4 className="text-xl font-display font-black tracking-tight text-white group-hover:text-accent-blue transition-colors truncate max-w-md">{item.name}</h4>
-                      <p className="text-sm text-white/60 max-w-xl leading-relaxed truncate">{item.desc}</p>
+                      <h4 className="text-lg font-display font-black tracking-tight text-primary group-hover:text-[#0047ff] transition-colors truncate max-w-md">{item.name}</h4>
+                      <p className="text-sm text-primary/65 max-w-xl leading-relaxed truncate">{item.desc}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={() => {
                         setEditingLabId(item.id);
-                        setNewLabItem({ ...item, content: Array.isArray(item.content) ? item.content : [] });
+                        let blocks = Array.isArray(item.content) ? item.content : [];
+                        if (blocks.length === 0) {
+                          blocks = convertLegacyToBlocks(item);
+                        }
+                        setNewLabItem({ ...item, content: blocks });
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-12 h-12 bg-white/5 hover:bg-accent-blue hover:text-white transition-all flex items-center justify-center text-white border border-white/10"
+                      className="w-11 h-11 bg-[#f8fafc] hover:bg-[#0047ff] hover:text-white transition-all flex items-center justify-center text-primary border border-primary/10"
                     >
-                      <Edit3 size={18} />
+                      <Edit3 size={17} />
                     </button>
-                    <button onClick={() => triggerConfirm('Delete this article permanently?', () => { deleteLabItem(item.id); showToast('Article deleted.'); })} className="w-12 h-12 bg-white/5 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center border border-white/10"><Trash2 size={18} /></button>
+                    <button onClick={() => triggerConfirm('Delete this article permanently?', () => { deleteLabItem(item.id); showToast('Article deleted.'); })} className="w-11 h-11 bg-[#f8fafc] text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center border border-primary/10"><Trash2 size={17} /></button>
                   </div>
                 </div>
               ))}
 
               {labItems.length === 0 && (
-                <div className="text-center py-24 bg-bg-card/50 rounded-none border-2 border-dashed border-white/5">
-                  <Rocket className="mx-auto text-white/5 mb-6" size={60} strokeWidth={1} />
-                  <p className="text-white/90 text-xl font-display font-medium">No articles published yet.</p>
+                <div className="text-center py-24 bg-white rounded-none border-2 border-dashed border-primary/10">
+                  <Rocket className="mx-auto text-primary/10 mb-6" size={60} strokeWidth={1} />
+                  <p className="text-primary/70 text-xl font-display font-medium">No articles published yet.</p>
                 </div>
               )}
+              </div>
             </div>
           </motion.div>
         ) : activeTab === 'settings' ? (

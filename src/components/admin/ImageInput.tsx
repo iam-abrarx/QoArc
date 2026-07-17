@@ -35,7 +35,7 @@ function Thumb({ url, fit = 'cover', className = '' }: { url?: string; fit?: 'co
 
   if (!url) {
     return (
-      <div className={`flex items-center justify-center bg-bg-dark border border-dashed border-white/15 text-white/25 ${className}`}>
+      <div className={`flex items-center justify-center bg-bg-dark border border-dashed border-white/15 text-white/45 ${className}`}>
         <ImageOff size={22} />
       </div>
     );
@@ -136,7 +136,7 @@ export function ImageInput({
               <button
                 type="button"
                 onClick={() => onChange('')}
-                className="px-3 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-black text-white/50 hover:text-white bg-white/5 hover:bg-red-500/80 border border-white/5 transition-all flex items-center gap-1.5"
+                className="px-3 py-2.5 rounded-none text-[10px] uppercase tracking-widest font-black text-white/60 hover:text-white bg-white/5 hover:bg-red-500/80 border border-white/5 transition-all flex items-center gap-1.5"
               >
                 <X size={12} /> Clear
               </button>
@@ -187,7 +187,7 @@ export function ImageArrayInput({ label, values, onChange, notify, fit = 'cover'
     <div className="space-y-4">
       <div className="flex items-center justify-between border-b border-white/5 pb-2">
         <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black">{label}</label>
-        <span className="text-[10px] text-white/40 font-bold">{values.length} item{values.length === 1 ? '' : 's'}</span>
+        <span className="text-[10px] text-white/60 font-bold">{values.length} item{values.length === 1 ? '' : 's'}</span>
       </div>
 
       <div className={`grid grid-cols-1 ${gridCols} gap-4`}>
@@ -217,7 +217,7 @@ export function ImageArrayInput({ label, values, onChange, notify, fit = 'cover'
         ))}
 
         {/* Upload-to-add tile */}
-        <label className="cursor-pointer flex flex-col items-center justify-center gap-2 aspect-video min-h-[120px] bg-bg-dark/30 border-2 border-dashed border-white/10 hover:border-accent-blue/40 text-white/40 hover:text-accent-blue transition-all">
+        <label className="cursor-pointer flex flex-col items-center justify-center gap-2 aspect-video min-h-[120px] bg-bg-dark/30 border-2 border-dashed border-white/10 hover:border-accent-blue/40 text-white/60 hover:text-accent-blue transition-all">
           {uploadingIdx === -2 ? <Loader2 size={24} className="animate-spin" /> : <UploadCloud size={24} />}
           <span className="text-[9px] uppercase tracking-widest font-black">{uploadingIdx === -2 ? 'Uploading' : 'Upload image'}</span>
           <input type="file" accept="image/*" className="hidden" disabled={uploadingIdx !== null}
@@ -226,7 +226,7 @@ export function ImageArrayInput({ label, values, onChange, notify, fit = 'cover'
       </div>
 
       <button type="button" onClick={addEmpty}
-        className="text-[10px] font-black uppercase tracking-widest text-white/50 hover:text-accent-blue flex items-center gap-1.5 transition-colors">
+        className="text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-accent-blue flex items-center gap-1.5 transition-colors">
         <Plus size={12} /> Add URL manually
       </button>
     </div>

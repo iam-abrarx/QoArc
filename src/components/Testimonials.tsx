@@ -16,13 +16,9 @@ export default function Testimonials() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-8">
           <div className="space-y-6">
-            <div className="text-precision text-primary/40 uppercase tracking-widest">Client Feedback // Trust Node</div>
             <h2 className="text-5xl md:text-7xl font-display font-medium text-primary tracking-tight leading-none whitespace-nowrap">
               Our Clients <span className="opacity-40">Say.</span>
             </h2>
-          </div>
-          <div className="text-precision text-primary/40 hidden md:block max-w-xs text-right italic font-medium">
-            Click any card below to expand and view the full case details.
           </div>
         </div>
 
@@ -116,7 +112,7 @@ export default function Testimonials() {
 
                           {/* Footer Links */}
                           <div className="flex flex-wrap items-center gap-6 pt-4 border-t border-white/5">
-                            {t.companyUrl && t.companyUrl !== '#' && (
+                             {t.companyUrl && t.companyUrl !== '#' && (
                               <a 
                                 href={t.companyUrl} 
                                 target="_blank" 
@@ -126,16 +122,6 @@ export default function Testimonials() {
                               >
                                 <FileText size={14} />
                                 Visit Company Website
-                              </a>
-                            )}
-                            {t.projectUrl && t.projectUrl !== '#' && (
-                              <a 
-                                href={t.projectUrl} 
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex items-center gap-2 text-white/50 hover:text-white font-bold text-xs tracking-tight transition-colors"
-                              >
-                                <ExternalLink size={14} />
-                                View Project Case
                               </a>
                             )}
                           </div>

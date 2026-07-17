@@ -24,6 +24,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       tablet_mockups = ${JSON.stringify(body.tabletMockups || [])},
       desktop_mockups = ${JSON.stringify(body.desktopMockups || [])},
       video_url = ${body.videoUrl || null}, url = ${body.url || '#'},
+      testimonial = ${body.testimonial ? JSON.stringify(body.testimonial) : null},
       meta_title = ${body.metaTitle || null}, meta_description = ${body.metaDescription || null},
       is_featured = ${body.isFeatured || false}, status = ${body.status || 'published'},
       device_type = ${body.deviceType || 'desktop'}, primary_color = ${body.primaryColor || '#002046'},

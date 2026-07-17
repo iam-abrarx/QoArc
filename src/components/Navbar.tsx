@@ -96,7 +96,6 @@ const navItems = [
     ]
   },
   { name: 'Lab', href: '/lab' },
-  { name: 'Work', href: '/work' }, 
   { 
     name: 'About', 
     href: '/about',
@@ -127,7 +126,7 @@ export default function Navbar() {
     return (
       <motion.nav 
         initial={{ y: -100 }}
-        animate={{ y: 0 }}
+        animate={{ y: isScrolled ? -100 : 0 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="fixed top-0 left-0 w-full z-50 bg-transparent py-5"
       >
@@ -199,60 +198,35 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                       exit={{ opacity: 0, y: 10, scale: 0.98, filter: 'blur(4px)' }}
                       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                      className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 bg-[#001026] border border-white/10 rounded-none shadow-premium z-50 overflow-hidden ${item.isMega ? 'w-[850px]' : 'w-62'}`}
+                      className={`absolute top-full left-1/2 -translate-x-1/2 mt-4 bg-[#001026] border border-white/10 rounded-none shadow-premium z-50 overflow-hidden ${item.isMega ? 'w-[700px]' : 'w-62'}`}
                     >
                       {item.isMega ? (
-                        <div className="flex relative z-10 h-full min-h-[400px]">
-                          {/* Blurb Side */}
-                          <div className="w-[300px] bg-primary p-10 flex flex-col justify-between text-white relative overflow-hidden group/blurb">
-                            <div className="relative z-10 transition-transform duration-700 group-hover/blurb:-translate-y-2">
-                              <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-none flex items-center justify-center mb-6">
-                                <Sparkles className="text-white/80" size={24} />
-                              </div>
-                              <h3 className="text-2xl font-display font-medium italic mb-4 leading-tight">{item.name}</h3>
-                              <p className="text-white/60 text-sm leading-relaxed font-medium tracking-tight">
-                                {item.description}
-                              </p>
-                            </div>
-                            
-                            <Link href={item.href} className="group/btn relative z-10 flex items-center gap-2 text-sm font-bold tracking-widest uppercase hover:text-white transition-colors duration-300">
-                              Explore All
-                              <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
-                            </Link>
-
-                            {/* Background Image */}
-                            <div className="absolute inset-0 z-0">
-                              <img 
-                                src={item.image} 
-                                alt={item.name} 
-                                className="w-full h-full object-cover opacity-20 filter grayscale transition-transform duration-1000 group-hover/blurb:scale-110" 
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent"></div>
-                            </div>
-                          </div>
-
-                          {/* Content Side */}
-                          <div className="flex-1 p-10 bg-[#001830]">
-                            <div className="grid grid-cols-2 gap-10">
-                              {item.categories?.map((cat) => (
-                                <div key={cat.label} className="space-y-6">
-                                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 border-b border-white/5 pb-3">
-                                    {cat.label}
-                                  </div>
-                                  <div className="flex flex-col gap-1">
-                                    {cat.items.map((sub) => (
-                                      <Link
-                                        key={sub.name}
-                                        href={sub.href}
-                                        className="text-[13px] font-bold text-white/60 hover:text-white hover:bg-white/5 px-4 py-2.5 rounded-none transition-all duration-300 block"
-                                      >
-                                        {sub.name}
-                                      </Link>
-                                    ))}
-                                  </div>
+                        <div className="w-full p-10 bg-[#001830]">
+                          <div className="grid grid-cols-2 gap-10">
+                            {item.categories?.map((cat) => (
+                              <div key={cat.label} className="space-y-6">
+                                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 border-b border-white/5 pb-3">
+                                  {cat.label}
                                 </div>
-                              ))}
-                            </div>
+                                <div className="flex flex-col gap-1">
+                                  {cat.items.map((sub) => (
+                                    <Link
+                                      key={sub.name}
+                                      href={sub.href}
+                                      className="group/item flex items-center justify-between text-[13px] font-bold text-white/60 hover:text-white hover:bg-white/5 border-l-2 border-transparent hover:border-primary px-4 py-3 rounded-none transition-all duration-300 block"
+                                    >
+                                      <span className="transition-transform duration-300 group-hover/item:translate-x-1">
+                                        {sub.name}
+                                      </span>
+                                      <ArrowRight 
+                                        size={14} 
+                                        className="text-primary opacity-0 -translate-x-2 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300" 
+                                      />
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       ) : (

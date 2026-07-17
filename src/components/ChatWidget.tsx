@@ -163,14 +163,9 @@ export default function ChatWidget() {
             <div className="absolute inset-0 border-2 border-primary rounded-full animate-ping opacity-20"></div>
             
             <div className="relative z-10 flex items-center justify-center">
-               <Cpu size={24} className="group-hover:hidden transition-all duration-300" />
-               <MessageSquare size={24} className="hidden group-hover:block transition-all duration-300" />
+               <MessageSquare size={24} />
             </div>
-            
-            {/* Node identifier tag (subtle) */}
-             <div className="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full flex items-center justify-center">
-                 <div className="w-[3px] h-[3px] bg-white rounded-full"></div>
-             </div>
+
           </motion.button>
         )}
       </AnimatePresence>

@@ -84,24 +84,16 @@ export default function EngineeringModalities() {
   const [openIndex, setOpenIndex] = useState<number>(-1);
 
   return (
-    <motion.section 
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+    <section 
       className="py-36 md:py-48 px-8 bg-white cad-line overflow-hidden border-t-[0.5px] border-primary/10"
     >
       <div className="max-w-screen-2xl mx-auto space-y-24">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-12">
           <div className="space-y-6">
-            <div className="text-precision text-primary/40 uppercase tracking-widest">Global Ops // Service Framework</div>
             <h3 className="text-7xl font-display font-medium text-primary tracking-tight leading-none">
                The Services <br /> <span className="opacity-40">Portfolio.</span>
             </h3>
-          </div>
-          <div className="text-precision text-primary/40 hidden md:block max-w-xs text-right italic font-medium">
-            04 Active Sectors // Full-Stack, AI & Global Industries
           </div>
         </div>
 
@@ -227,6 +219,6 @@ export default function EngineeringModalities() {
           })}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

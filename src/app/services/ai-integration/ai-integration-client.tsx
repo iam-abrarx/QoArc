@@ -191,9 +191,9 @@ export default function AIIntegrationPage() {
                <p className="text-xl text-primary/60 italic border-l-[0.5px] border-primary/20 pl-8 leading-tight">
                   Automating the extraction of 12,000+ medicinal chemistry papers with 97.2% human-parity accuracy.
                </p>
-               <Link href="/work/bancat" className="inline-flex items-center gap-4 text-precision text-primary hover:text-secondary border-b-[0.5px] border-primary/10 pb-2 transition-all">
-                  Analysis Report <ArrowRight size={10} />
-               </Link>
+                <Link href="/#case-studies" className="inline-flex items-center gap-4 text-precision text-primary hover:text-secondary border-b-[0.5px] border-primary/10 pb-2 transition-all">
+                   View Case Study <ArrowRight size={10} />
+                </Link>
             </motion.div>
             <motion.div 
                initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}

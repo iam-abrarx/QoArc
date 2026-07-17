@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
@@ -19,6 +19,8 @@ import {
   ShieldAlert,
   Server,
   Zap,
+  Calendar,
+  Clock,
   ShoppingBag,
   Eye,
   Minimize2,
@@ -41,8 +43,38 @@ export default function LabDetailPage() {
   const { openModal } = useLeadCapture();
   const { labItems } = usePortfolio();
   const { slug } = useParams();
+  const searchParams = useSearchParams();
+  const isPreview = searchParams.get('preview') === 'true';
 
-  const data = labItems?.find(p => p.slug === slug) || labItems?.find(p => p.id === slug) || labItems?.[0];
+  const [previewData, setPreviewData] = useState<any>(null);
+
+  useEffect(() => {
+    if (isPreview) {
+      const loadPreview = () => {
+        const stored = localStorage.getItem('qoarc_lab_preview');
+        if (stored) {
+          try {
+            setPreviewData(JSON.parse(stored));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      };
+      
+      loadPreview();
+      
+      const handleStorage = (e: StorageEvent) => {
+        if (e.key === 'qoarc_lab_preview') {
+          loadPreview();
+        }
+      };
+      window.addEventListener('storage', handleStorage);
+      return () => window.removeEventListener('storage', handleStorage);
+    }
+  }, [isPreview]);
+
+  const dbData = labItems?.find(p => p.slug === slug) || labItems?.find(p => p.id === slug) || labItems?.[0];
+  const data = isPreview && previewData ? previewData : dbData;
 
   const blocks = hasBlockContent(data?.content) ? data.content : null;
   const toc = useMemo(() => (blocks ? getToc(blocks) : LEGACY_TOC), [blocks]);
@@ -316,12 +348,22 @@ export default function LabDetailPage() {
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-primary leading-tight">
                     {data.name}
                   </h1>
-                  
+
                   <div className="pt-4 flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-bold text-primary/60 font-mono">
+                    {data.category && <span className="text-[#cc0000] uppercase tracking-widest">{data.category}</span>}
+                    {data.date && <span className="flex items-center gap-1.5"><Calendar size={12} className="text-[#cc0000]" /> {data.date}</span>}
+                    {data.readTime && <span className="flex items-center gap-1.5"><Clock size={12} className="text-[#cc0000]" /> {data.readTime}</span>}
                     <span className="flex items-center gap-1.5"><Terminal size={12} className="text-[#cc0000]" /> AUTHOR: QOARC LABS</span>
                     <span className="flex items-center gap-1.5"><FlaskConical size={12} className="text-[#cc0000]" /> CLASSIFICATION: OPEN RESEARCH</span>
                   </div>
                 </div>
+
+                {/* Cover image */}
+                {data.imageUrl && (
+                  <div className="border border-primary/10 bg-primary/5 overflow-hidden -mt-4">
+                    <img src={data.imageUrl} alt={data.name} className="w-full max-h-[480px] object-cover" />
+                  </div>
+                )}
 
                 {blocks ? (
                   /* Block-based article body (Gutenberg-style content) */

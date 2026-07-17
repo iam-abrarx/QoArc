@@ -60,3 +60,39 @@ export function getToc(blocks: LabBlock[]): TocEntry[] {
 export function hasBlockContent(content: unknown): content is LabBlock[] {
   return Array.isArray(content) && content.length > 0;
 }
+
+export function convertLegacyToBlocks(item: any): LabBlock[] {
+  const blocks: LabBlock[] = [];
+  
+  if (item.abstract) {
+    blocks.push({ type: 'heading', level: 2, text: 'Abstract' });
+    blocks.push({ type: 'paragraph', text: item.abstract });
+  }
+  
+  if (item.metrics && item.metrics.length > 0) {
+    blocks.push({ type: 'heading', level: 3, text: 'Key Performance Metrics' });
+    blocks.push({ type: 'metrics', items: item.metrics.map((m: any) => ({ label: m.label || '', val: m.val || '' })) });
+  }
+  
+  if (item.motivation) {
+    blocks.push({ type: 'heading', level: 2, text: 'Commercial Incentive & Objective' });
+    blocks.push({ type: 'paragraph', text: item.motivation });
+  }
+  
+  if (item.methodology) {
+    blocks.push({ type: 'heading', level: 2, text: 'Research Methodology & Design' });
+    blocks.push({ type: 'paragraph', text: item.methodology });
+  }
+  
+  if (item.tech && item.tech.length > 0) {
+    blocks.push({ type: 'heading', level: 2, text: 'Technical Infrastructure Stack' });
+    blocks.push({ type: 'list', ordered: false, items: item.tech });
+  }
+  
+  if (item.results) {
+    blocks.push({ type: 'heading', level: 2, text: 'Derived Value & Findings' });
+    blocks.push({ type: 'paragraph', text: item.results });
+  }
+  
+  return blocks;
+}

@@ -37,14 +37,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ): MetadataRoute.Sitemap[number] => ({ url: absoluteUrl(path), lastModified: now, changeFrequency, priority });
 
   // Dynamic slugs (best effort; fall back to known static content).
-  const [labSlugs, projectSlugsRemote] = await Promise.all([
+  const [labSlugs] = await Promise.all([
     fetchSlugs('/api/lab-items'),
-    fetchSlugs('/api/projects'),
   ]);
   const labs = Array.from(new Set([...LAB_FALLBACK, ...labSlugs]));
-  const projects = Array.from(
-    new Set([...initialProjects.map((p) => p.slug).filter(Boolean), ...projectSlugsRemote]),
-  ) as string[];
 
   return [
     entry('/', 1.0, 'weekly'),
@@ -54,8 +50,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...IT_CONSULTING.map((s) => entry(`/services/it-consulting/${s}`, 0.7)),
     ...AI_DATA.map((s) => entry(`/ai-data/${s}`, 0.7)),
     ...INDUSTRIES.map((s) => entry(`/industries/${s}`, 0.7)),
-    entry('/work', 0.9, 'weekly'),
-    ...projects.map((s) => entry(`/work/${s}`, 0.7)),
     entry('/lab', 0.9, 'weekly'),
     ...labs.map((s) => entry(`/lab/${s}`, 0.7)),
     entry('/pricing', 0.7),

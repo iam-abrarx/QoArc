@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Linkedin, Mail, Globe, Sparkles, MapPin, Clock } from 'lucide-react';
+import { Linkedin, Mail, Sparkles } from 'lucide-react';
 import { usePortfolio } from '@/context/PortfolioContext';
 
 const footerLinks = [
@@ -29,7 +29,6 @@ const footerLinks = [
   {
     title: 'Company',
     links: [
-      { name: 'Work / Portfolio', href: '/work' },
       { name: 'Our Team', href: '/about/team' },
       { name: 'How We Work', href: '/about/how-we-work' },
       { name: 'Careers', href: '/about/careers' },
@@ -40,7 +39,7 @@ const footerLinks = [
     title: 'Strategic',
     links: [
       { name: 'Industries', href: '#' },
-      { name: 'Case Studies', href: '/work' },
+      { name: 'Case Studies', href: '/#case-studies' },
       { name: 'Solutions', href: '/#solutions' },
       { name: 'Partnerships', href: '/contact' }
     ]
@@ -101,30 +100,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Tactical Info Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-10 border-y border-white/5 mb-12">
-          <div className="flex items-center gap-4 text-white/40">
-            <MapPin size={18} />
-            <span className="text-xs font-bold uppercase tracking-widest leading-relaxed">
-              Dhaka, Bangladesh <br/> <span className="opacity-50">Headquarters</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-4 text-white/40">
-            <Clock size={18} />
-            <span className="text-xs font-bold uppercase tracking-widest leading-relaxed">
-              GMT +6 <br/> <span className="opacity-50">US & EU Overlap Windows</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-4 text-white/40">
-            <Globe size={18} />
-            <span className="text-xs font-bold uppercase tracking-widest leading-relaxed">
-              Global Transmission <br/> <span className="opacity-50">Invoicing in USD / EUR</span>
-            </span>
-          </div>
-        </div>
-
         {/* Legal & Copyright */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] font-bold uppercase tracking-[0.3em] text-white/20">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 pt-12">
           <div className="flex gap-10">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Engagement</Link>
