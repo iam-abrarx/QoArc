@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -26,6 +26,16 @@ import {
 } from 'lucide-react';
 import { useLeadCapture } from '@/context/LeadCaptureContext';
 import { usePortfolio } from '@/context/PortfolioContext';
+import LabBlocks from '@/components/lab/LabBlocks';
+import { getToc, hasBlockContent, TocEntry } from '@/lib/labBlocks';
+
+const LEGACY_TOC: TocEntry[] = [
+  { id: 'abstract', text: '01. Abstract & Overview', level: 2 },
+  { id: 'motivation', text: '02. Commercial Incentive', level: 2 },
+  { id: 'methodology', text: '03. Research Methodology', level: 2 },
+  { id: 'tech', text: '04. Technical Infrastructure', level: 2 },
+  { id: 'results', text: '05. Derived Value & Results', level: 2 },
+];
 
 export default function LabDetailPage() {
   const { openModal } = useLeadCapture();
@@ -34,16 +44,11 @@ export default function LabDetailPage() {
 
   const data = labItems?.find(p => p.slug === slug) || labItems?.find(p => p.id === slug) || labItems?.[0];
 
-  const [activeSection, setActiveSection] = useState('abstract');
+  const blocks = hasBlockContent(data?.content) ? data.content : null;
+  const toc = useMemo(() => (blocks ? getToc(blocks) : LEGACY_TOC), [blocks]);
+
+  const [activeSection, setActiveSection] = useState(toc[0]?.id || 'abstract');
   const [isFocusMode, setIsFocusMode] = useState(false);
-  
-  const sectionRefs = {
-    abstract: useRef<HTMLElement>(null),
-    motivation: useRef<HTMLElement>(null),
-    methodology: useRef<HTMLElement>(null),
-    tech: useRef<HTMLElement>(null),
-    results: useRef<HTMLElement>(null)
-  };
 
   const hasExitedManually = useRef(false);
 
@@ -123,17 +128,16 @@ export default function LabDetailPage() {
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
-    
-    Object.values(sectionRefs).forEach(ref => {
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
+
+    toc.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
     });
 
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [toc]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -189,6 +193,16 @@ export default function LabDetailPage() {
       }
     }
   };
+
+  // labItems load asynchronously; on a direct page load `data` is briefly
+  // undefined. Guard the render (all hooks above already ran) to avoid a crash.
+  if (!data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f0f2f5]">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
 
   return (
     <div className="selection:bg-primary selection:text-white bg-[#f0f2f5] pt-32 pb-24 px-4 md:px-8 transition-all duration-700">
@@ -258,25 +272,23 @@ export default function LabDetailPage() {
             <div className="space-y-6 p-4">
               <h3 className="text-precision text-primary/40">Outline // Contents</h3>
               <nav className="space-y-4">
-                {[
-                  { id: 'abstract', label: '01. Abstract & Overview' },
-                  { id: 'motivation', label: '02. Commercial Incentive' },
-                  { id: 'methodology', label: '03. Research Methodology' },
-                  { id: 'tech', label: '04. Technical Infrastructure' },
-                  { id: 'results', label: '05. Derived Value & Results' }
-                ].map(section => {
+                {toc.length === 0 && (
+                  <span className="text-xs text-primary/30 italic">No sections</span>
+                )}
+                {toc.map(section => {
                   const isActive = activeSection === section.id;
                   return (
                     <button
                       key={section.id}
                       onClick={() => scrollToSection(section.id)}
-                      className={`w-full text-left font-sans text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-4 py-1.5 border-l-2 pl-4
-                        ${isActive 
-                          ? 'border-[#cc0000] text-[#cc0000] font-bold translate-x-2' 
+                      className={`w-full text-left font-sans text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-4 py-1.5 border-l-2
+                        ${section.level === 3 ? 'pl-8 text-[11px]' : 'pl-4'}
+                        ${isActive
+                          ? 'border-[#cc0000] text-[#cc0000] font-bold translate-x-2'
                           : 'border-transparent text-primary/50 hover:text-primary'
                         }`}
                     >
-                      {section.label}
+                      {section.text}
                     </button>
                   );
                 })}
@@ -311,99 +323,85 @@ export default function LabDetailPage() {
                   </div>
                 </div>
 
-                {/* Section 1: Abstract */}
-                <section 
-                  id="abstract" 
-                  ref={sectionRefs.abstract} 
-                  className="space-y-6 scroll-mt-28"
-                >
-                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
-                    <span className="text-[#cc0000] font-mono text-xs">01 //</span> Abstract
-                  </h2>
-                  <div className="bg-primary/5 p-6 md:p-8 border-l-2 border-primary/20">
-                    <p className="text-lg text-primary/80 font-fraunces font-light italic leading-relaxed">
-                      {data.abstract}
-                    </p>
-                  </div>
-                </section>
-
-                {/* Research Parameters Table */}
-                <section className="space-y-6 pt-4 border-t border-primary/5">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-primary/40">Key Performance Metrics</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {data.metrics.map((m: any) => (
-                      <div key={m.label} className="bg-[#f8fafc] border border-primary/5 p-6 text-center shadow-sm">
-                        <div className="text-[9px] font-bold uppercase tracking-widest text-primary/40 mb-2">{m.label}</div>
-                        <div className="text-3xl font-display font-bold text-primary leading-none">{m.val}</div>
+                {blocks ? (
+                  /* Block-based article body (Gutenberg-style content) */
+                  <LabBlocks blocks={blocks} />
+                ) : (
+                  <>
+                    {/* Section 1: Abstract */}
+                    <section id="abstract" className="space-y-6 scroll-mt-28">
+                      <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                        <span className="text-[#cc0000] font-mono text-xs">01 //</span> Abstract
+                      </h2>
+                      <div className="bg-primary/5 p-6 md:p-8 border-l-2 border-primary/20">
+                        <p className="text-lg text-primary/80 font-fraunces font-light italic leading-relaxed">
+                          {data.abstract}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                </section>
+                    </section>
 
-                {/* Section 2: Motivation */}
-                <section 
-                  id="motivation" 
-                  ref={sectionRefs.motivation} 
-                  className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
-                >
-                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
-                    <span className="text-[#cc0000] font-mono text-xs">02 //</span> Commercial Incentive & Objective
-                  </h2>
-                  <p className="text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
-                    {data.motivation}
-                  </p>
-                </section>
+                    {/* Research Parameters Table */}
+                    {data.metrics?.length > 0 && (
+                      <section className="space-y-6 pt-4 border-t border-primary/5">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-primary/40">Key Performance Metrics</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          {data.metrics.map((m: any) => (
+                            <div key={m.label} className="bg-[#f8fafc] border border-primary/5 p-6 text-center shadow-sm">
+                              <div className="text-[9px] font-bold uppercase tracking-widest text-primary/40 mb-2">{m.label}</div>
+                              <div className="text-3xl font-display font-bold text-primary leading-none">{m.val}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    )}
 
-                {/* Section 3: Methodology */}
-                <section 
-                  id="methodology" 
-                  ref={sectionRefs.methodology} 
-                  className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
-                >
-                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
-                    <span className="text-[#cc0000] font-mono text-xs">03 //</span> Research Methodology & Design
-                  </h2>
-                  <p className="text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
-                    {data.methodology}
-                  </p>
-                </section>
+                    {/* Section 2: Motivation */}
+                    <section id="motivation" className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28">
+                      <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                        <span className="text-[#cc0000] font-mono text-xs">02 //</span> Commercial Incentive & Objective
+                      </h2>
+                      <p className="text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
+                        {data.motivation}
+                      </p>
+                    </section>
 
-                {/* Section 4: Tech Stack */}
-                <section 
-                  id="tech" 
-                  ref={sectionRefs.tech} 
-                  className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
-                >
-                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
-                    <span className="text-[#cc0000] font-mono text-xs">04 //</span> Technical Infrastructure Stack
-                  </h2>
-                  <div className="flex flex-wrap gap-3 pt-2">
-                    {data.tech.map((t: string) => (
-                      <span 
-                        key={t} 
-                        className="px-6 py-2.5 bg-[#f8fafc] border border-primary/5 text-xs font-bold text-primary font-mono shadow-sm"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </section>
+                    {/* Section 3: Methodology */}
+                    <section id="methodology" className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28">
+                      <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                        <span className="text-[#cc0000] font-mono text-xs">03 //</span> Research Methodology & Design
+                      </h2>
+                      <p className="text-lg text-primary/70 leading-relaxed font-fraunces font-light italic">
+                        {data.methodology}
+                      </p>
+                    </section>
 
-                {/* Section 5: Results */}
-                <section 
-                  id="results" 
-                  ref={sectionRefs.results} 
-                  className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28"
-                >
-                  <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
-                    <span className="text-[#cc0000] font-mono text-xs">05 //</span> Derived Value & Findings
-                  </h2>
-                  <div className="bg-[#cc0000]/5 border-l-2 border-[#cc0000] p-6 md:p-8">
-                    <p className="text-lg text-primary/80 font-fraunces font-light italic leading-relaxed">
-                      {data.results}
-                    </p>
-                  </div>
-                </section>
+                    {/* Section 4: Tech Stack */}
+                    <section id="tech" className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28">
+                      <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                        <span className="text-[#cc0000] font-mono text-xs">04 //</span> Technical Infrastructure Stack
+                      </h2>
+                      <div className="flex flex-wrap gap-3 pt-2">
+                        {data.tech?.map((t: string) => (
+                          <span key={t} className="px-6 py-2.5 bg-[#f8fafc] border border-primary/5 text-xs font-bold text-primary font-mono shadow-sm">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </section>
+
+                    {/* Section 5: Results */}
+                    <section id="results" className="space-y-6 pt-8 border-t border-primary/5 scroll-mt-28">
+                      <h2 className="text-lg font-display font-bold text-primary flex items-center gap-3">
+                        <span className="text-[#cc0000] font-mono text-xs">05 //</span> Derived Value & Findings
+                      </h2>
+                      <div className="bg-[#cc0000]/5 border-l-2 border-[#cc0000] p-6 md:p-8">
+                        <p className="text-lg text-primary/80 font-fraunces font-light italic leading-relaxed">
+                          {data.results}
+                        </p>
+                      </div>
+                    </section>
+                  </>
+                )}
 
                 {/* Footer Disclaimer */}
                 <div className="pt-12 border-t border-primary/10 text-center text-[10px] text-primary/30 space-y-2">

@@ -20,6 +20,24 @@ export function renderBold(input: string, tag: 'b' | 'strong' = 'b'): string {
   );
 }
 
+/**
+ * Escape HTML, then apply a safe subset of inline markdown:
+ * **bold**, *italic*, `code`, and [label](url) links with scheme validation.
+ * Because the markers are ASCII they survive escaping, so no raw HTML can pass.
+ */
+export function renderInline(input: string): string {
+  let s = escapeHtml(input);
+  s = s.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-primary/10 text-[#cc0000] text-[0.85em] font-mono rounded-sm">$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label, url) =>
+    isSafeUrl(url)
+      ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#cc0000] underline underline-offset-2 hover:opacity-70 transition-opacity">${label}</a>`
+      : label,
+  );
+  return s;
+}
+
 const SAFE_URL_SCHEME = /^(https?:|mailto:)/i;
 
 export function isSafeUrl(url: string): boolean {

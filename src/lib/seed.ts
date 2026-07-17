@@ -1,7 +1,7 @@
 // Seed script — run with: npx tsx src/lib/seed.ts
-// This creates all tables and inserts the default data into Neon PostgreSQL.
+// This creates all tables and inserts the default data into Supabase PostgreSQL.
 
-import { neon } from '@neondatabase/serverless';
+import postgres from 'postgres';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
@@ -10,7 +10,7 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
-const sql = neon(DATABASE_URL);
+const sql = postgres(DATABASE_URL, { prepare: false, ssl: 'require' });
 
 async function seed() {
   console.log('🔧 Creating tables...');
@@ -128,6 +128,17 @@ async function seed() {
 
   console.log('✅ Tables created.');
 
+  // --- Privacy hardening: enable Row Level Security on every table ---
+  // Supabase auto-exposes public tables through its REST API using the anon key.
+  // Enabling RLS with no policies blocks that public API entirely, while our
+  // server-side postgres connection (table owner) still bypasses RLS. This keeps
+  // PII in contact_submissions from ever being readable via the anon key.
+  console.log('🔒 Enabling Row Level Security...');
+  for (const table of ['projects', 'testimonials', 'job_openings', 'partner_logos', 'lab_items', 'contact_submissions']) {
+    await sql`ALTER TABLE ${sql(table)} ENABLE ROW LEVEL SECURITY`;
+  }
+  console.log('  ✅ RLS enabled on all tables.');
+
   // --- Seed testimonials ---
   console.log('📝 Seeding testimonials...');
   const testimonials = [
@@ -195,7 +206,9 @@ async function seed() {
   console.log('\n🎉 Database seeded successfully!');
 }
 
-seed().catch((err) => {
-  console.error('❌ Seed failed:', err);
-  process.exit(1);
-});
+seed()
+  .catch((err) => {
+    console.error('❌ Seed failed:', err);
+    process.exitCode = 1;
+  })
+  .finally(() => sql.end());

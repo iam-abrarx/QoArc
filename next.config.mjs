@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Keep the native-ish postgres.js driver out of the bundler so it runs as a
+  // normal Node module in server routes.
+  serverExternalPackages: ['postgres'],
   images: {
     remotePatterns: [
       {

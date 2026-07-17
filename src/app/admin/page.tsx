@@ -8,12 +8,40 @@ import {
   Layout, Save, X, Plus, AlertCircle, CheckCircle2,
   Lock, ArrowRight, Loader2, Mail, LayoutGrid, Download, Briefcase, Monitor
 } from 'lucide-react';
-import { usePortfolio, JobOpening } from '@/context/PortfolioContext';
+import { usePortfolio, JobOpening, LabItem } from '@/context/PortfolioContext';
 import { PartnerLogo } from '@/context/PortfolioContext';
 import { PortfolioItem } from '@/lib/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAssetFromDB } from '@/lib/idb';
 import { ImageInput, ImageArrayInput } from '@/components/admin/ImageInput';
+import LabBlockEditor from '@/components/admin/LabBlockEditor';
+import { LabBlock } from '@/lib/labBlocks';
+
+const todayLabel = () =>
+  new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+const emptyLabItem = (): Partial<LabItem> => ({
+  name: '',
+  slug: '',
+  node: '',
+  category: 'RESEARCH',
+  type: 'research',
+  date: todayLabel(),
+  readTime: '5 min read',
+  docId: 'QOARC-2026-GEN',
+  imageUrl: '',
+  desc: '',
+  abstract: '',
+  featured: false,
+  license: 'Open source research under Apache 2.0 license',
+  arxiv: '',
+  metrics: [],
+  motivation: '',
+  methodology: '',
+  tech: [],
+  results: '',
+  content: [],
+});
 
 function AdminContent() {
 
@@ -82,12 +110,8 @@ function AdminContent() {
   });
   const [editingTestimonialId, setEditingTestimonialId] = useState<string | null>(null);
 
-  const [newLabItem, setNewLabItem] = useState<any>({
-    id: '',
-    name: '',
-    description: '',
-    category: ''
-  });
+  const [newLabItem, setNewLabItem] = useState<Partial<LabItem>>(emptyLabItem());
+  const [editingLabId, setEditingLabId] = useState<string | null>(null);
 
   const [footerSettings, setFooterSettings] = useState(footerInfo);
   
@@ -1275,7 +1299,7 @@ function AdminContent() {
             </div>
           </motion.div>
         ) : activeTab === 'lab' ? (
-          <motion.div 
+          <motion.div
             key="lab"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1283,53 +1307,173 @@ function AdminContent() {
           >
             <div className="flex items-center justify-between border-b border-white/5 pb-8 group">
               <h2 className="text-3xl font-display font-black flex items-center gap-5 tracking-tighter">
-                <Rocket className="text-accent-blue group-hover:scale-110 transition-transform" size={32} /> Lab Registry
+                <Rocket className="text-accent-blue group-hover:scale-110 transition-transform" size={32} /> Lab // Article Studio
               </h2>
+              <span className="text-white/70 font-black uppercase tracking-[0.4em] bg-white/5 px-6 py-3 rounded-none border border-white/5">
+                Published Articles: {labItems.length}
+              </span>
             </div>
 
-            <div className="bg-bg-card border border-white/5 rounded-none p-12 shadow-2xl relative overflow-hidden">
-               <h3 className="text-2xl font-display font-bold flex items-center gap-3 mb-8">
-                 <PlusCircle className="text-accent-blue" size={24} /> New Lab Entry
-               </h3>
-               <form 
+            <div className="bg-bg-card border border-white/5 rounded-none p-8 md:p-12 shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-accent-blue via-accent-purple to-accent-blue bg-[length:200%_auto] animate-gradient"></div>
+               <div className="flex items-center justify-between mb-10">
+                 <h3 className="text-2xl font-display font-bold flex items-center gap-3">
+                   {editingLabId ? <Edit3 className="text-accent-purple" size={24} /> : <PlusCircle className="text-accent-blue" size={24} />}
+                   {editingLabId ? 'Edit Article' : 'Compose New Article'}
+                 </h3>
+                 {editingLabId && (
+                   <button type="button" onClick={() => { setEditingLabId(null); setNewLabItem(emptyLabItem()); }} className="text-[10px] uppercase tracking-widest font-black text-white/50 hover:text-white bg-white/5 px-5 py-2.5 border border-white/5 transition-all">
+                     Cancel Edit
+                   </button>
+                 )}
+               </div>
+
+               <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    addLabItem(newLabItem);
-                    setNewLabItem({ id: '', name: '', desc: '', node: '' });
-                  }} 
-                  className="space-y-6"
+                    if (!newLabItem.name?.trim()) { showToast('Article title is required.', 'error'); return; }
+                    const slugify = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                    const payload = {
+                      ...emptyLabItem(),
+                      ...newLabItem,
+                      slug: (newLabItem.slug || slugify(newLabItem.name || '')).trim(),
+                      desc: newLabItem.desc || '',
+                      abstract: newLabItem.abstract || newLabItem.desc || '',
+                      content: newLabItem.content || [],
+                    } as LabItem;
+
+                    if (editingLabId) {
+                      updateLabItem({ ...payload, id: editingLabId });
+                      showToast('Article updated & published.');
+                    } else {
+                      addLabItem(payload);
+                      showToast('Article published to the Lab.');
+                    }
+                    setEditingLabId(null);
+                    setNewLabItem(emptyLabItem());
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="space-y-10"
                >
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                   <div className="space-y-3">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black">Reference (e.g. 0x01)</label>
-                     <input type="text" value={newLabItem.node} onChange={e => setNewLabItem({...newLabItem, node: e.target.value})} className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none text-white" required />
-                   </div>
-                   <div className="space-y-3">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black">Case Name</label>
-                     <input type="text" value={newLabItem.name} onChange={e => setNewLabItem({...newLabItem, name: e.target.value})} className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none text-white" required />
-                   </div>
-                 </div>
+                 {/* Title */}
                  <div className="space-y-3">
-                    <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black">Description</label>
-                    <textarea value={newLabItem.desc} onChange={e => setNewLabItem({...newLabItem, desc: e.target.value})} className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none text-white" required />
+                   <label className="text-xs uppercase tracking-[0.3em] text-accent-blue font-black opacity-80">Article Title</label>
+                   <input type="text" value={newLabItem.name || ''} onChange={e => setNewLabItem({ ...newLabItem, name: e.target.value })} placeholder="e.g. Modeling PFAS Rigidity with Neural Kinetics" className="w-full bg-transparent border-b border-white/10 py-3 text-3xl font-display font-black focus:border-accent-blue outline-none transition-all placeholder:text-white/20 tracking-tight text-white" required />
                  </div>
-                 <button type="submit" className="bg-accent-blue text-white px-8 py-4 rounded-none font-black hover:scale-105 transition-all w-full md:w-auto">Initialize Lab Item</button>
+
+                 {/* Meta grid */}
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                   <div className="space-y-2">
+                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Slug (URL)</label>
+                     <input type="text" value={newLabItem.slug || ''} onChange={e => setNewLabItem({ ...newLabItem, slug: e.target.value })} placeholder="auto from title" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Type</label>
+                     <select value={newLabItem.type || 'research'} onChange={e => setNewLabItem({ ...newLabItem, type: e.target.value as 'product' | 'research' })} className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white">
+                       <option value="research">Scientific Research</option>
+                       <option value="product">Product Case</option>
+                     </select>
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Category Label</label>
+                     <input type="text" value={newLabItem.category || ''} onChange={e => setNewLabItem({ ...newLabItem, category: e.target.value })} placeholder="RESEARCH, ENGINEERING…" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Reference Node</label>
+                     <input type="text" value={newLabItem.node || ''} onChange={e => setNewLabItem({ ...newLabItem, node: e.target.value })} placeholder="0x01 // NEURAL" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Date</label>
+                     <input type="text" value={newLabItem.date || ''} onChange={e => setNewLabItem({ ...newLabItem, date: e.target.value })} placeholder="July 18, 2026" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Read Time</label>
+                     <input type="text" value={newLabItem.readTime || ''} onChange={e => setNewLabItem({ ...newLabItem, readTime: e.target.value })} placeholder="5 min read" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Document ID</label>
+                     <input type="text" value={newLabItem.docId || ''} onChange={e => setNewLabItem({ ...newLabItem, docId: e.target.value })} placeholder="QOARC-2026-001" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white" />
+                   </div>
+                   <div className="flex items-center justify-between bg-bg-dark/50 px-4 py-3 border border-white/5 md:col-span-2">
+                     <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">Feature on Lab Homepage</span>
+                     <button type="button" onClick={() => setNewLabItem({ ...newLabItem, featured: !newLabItem.featured })} className={`w-12 h-6 rounded-none transition-all relative ${newLabItem.featured ? 'bg-accent-blue' : 'bg-white/10'}`}>
+                       <div className={`absolute top-1 w-4 h-4 bg-white rounded-none transition-all ${newLabItem.featured ? 'left-7' : 'left-1'}`}></div>
+                     </button>
+                   </div>
+                 </div>
+
+                 {/* Cover image + excerpt */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-white/5">
+                   <ImageInput label="Cover Image (list & hero)" value={newLabItem.imageUrl || ''} onChange={(url) => setNewLabItem({ ...newLabItem, imageUrl: url })} notify={showToast} previewClass="w-32 h-24" />
+                   <div className="space-y-2">
+                     <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Excerpt / Card Summary</label>
+                     <textarea value={newLabItem.desc || ''} onChange={e => setNewLabItem({ ...newLabItem, desc: e.target.value })} placeholder="Short summary shown on article cards…" className="w-full bg-bg-dark border border-white/5 rounded-none px-4 py-3 focus:border-accent-blue outline-none text-sm text-white min-h-[104px] leading-relaxed" />
+                   </div>
+                 </div>
+
+                 {/* Block content editor */}
+                 <div className="space-y-4 pt-8 border-t border-white/5">
+                   <div className="flex items-center gap-3">
+                     <FileText className="text-accent-purple" size={20} />
+                     <h4 className="text-lg font-display font-bold text-white">Article Content</h4>
+                     <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Block editor</span>
+                   </div>
+                   <LabBlockEditor
+                     blocks={(newLabItem.content as LabBlock[]) || []}
+                     onChange={(next) => setNewLabItem({ ...newLabItem, content: next })}
+                     notify={showToast}
+                   />
+                 </div>
+
+                 <div className="flex gap-4 pt-6 border-t border-white/5">
+                   <button type="submit" className={`${editingLabId ? 'bg-accent-purple shadow-accent-purple/20' : 'bg-accent-blue shadow-accent-blue/20'} text-white px-10 py-4 rounded-none font-black hover:scale-105 transition-all flex items-center gap-2 shadow-xl`}>
+                     <Save size={18} /> {editingLabId ? 'Update & Publish' : 'Publish Article'}
+                   </button>
+                 </div>
                </form>
             </div>
 
             <div className="grid grid-cols-1 gap-6">
               {labItems.map((item) => (
-                <div key={item.id} className="bg-bg-dark border border-white/5 rounded-none p-8 flex items-center justify-between group hover:border-accent-blue/30 transition-all shadow-xl">
-                  <div className="flex gap-8 items-center">
-                    <div className="text-xl font-mono text-accent-blue font-black bg-accent-blue/5 px-4 py-2 border border-accent-blue/20">{item.node}</div>
-                    <div className="space-y-1">
-                      <h4 className="text-xl font-display font-black uppercase tracking-tighter text-white group-hover:text-accent-blue transition-colors">{item.name}</h4>
-                      <p className="text-sm text-white/80 max-w-xl mt-2 leading-relaxed italic">{item.desc}</p>
+                <div key={item.id} className="bg-bg-dark border border-white/5 rounded-none p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 group hover:border-accent-blue/30 transition-all shadow-xl">
+                  <div className="flex gap-6 items-center min-w-0">
+                    <div className="w-24 h-20 flex-shrink-0 bg-bg-card border border-white/10 overflow-hidden">
+                      {item.imageUrl
+                        ? <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                        : <div className="w-full h-full flex items-center justify-center text-white/20"><Image size={22} /></div>}
+                    </div>
+                    <div className="space-y-1.5 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-[9px] font-black uppercase tracking-[0.3em] px-2 py-1 border ${item.type === 'product' ? 'text-accent-purple bg-accent-purple/5 border-accent-purple/20' : 'text-accent-blue bg-accent-blue/5 border-accent-blue/20'}`}>{item.type || 'research'}</span>
+                        {item.featured && <span className="text-[9px] font-black uppercase tracking-[0.3em] text-yellow-400 bg-yellow-400/5 border border-yellow-400/20 px-2 py-1">Featured</span>}
+                        <span className="text-[9px] text-white/40 font-mono">{(item.content?.length || 0)} blocks</span>
+                      </div>
+                      <h4 className="text-xl font-display font-black tracking-tight text-white group-hover:text-accent-blue transition-colors truncate max-w-md">{item.name}</h4>
+                      <p className="text-sm text-white/60 max-w-xl leading-relaxed truncate">{item.desc}</p>
                     </div>
                   </div>
-                  <button onClick={() => deleteLabItem(item.id)} className="w-12 h-12 bg-white/5 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center border border-white/10 shadow-lg"><Trash2 size={20} /></button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => {
+                        setEditingLabId(item.id);
+                        setNewLabItem({ ...item, content: Array.isArray(item.content) ? item.content : [] });
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="w-12 h-12 bg-white/5 hover:bg-accent-blue hover:text-white transition-all flex items-center justify-center text-white border border-white/10"
+                    >
+                      <Edit3 size={18} />
+                    </button>
+                    <button onClick={() => triggerConfirm('Delete this article permanently?', () => { deleteLabItem(item.id); showToast('Article deleted.'); })} className="w-12 h-12 bg-white/5 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center border border-white/10"><Trash2 size={18} /></button>
+                  </div>
                 </div>
               ))}
+
+              {labItems.length === 0 && (
+                <div className="text-center py-24 bg-bg-card/50 rounded-none border-2 border-dashed border-white/5">
+                  <Rocket className="mx-auto text-white/5 mb-6" size={60} strokeWidth={1} />
+                  <p className="text-white/90 text-xl font-display font-medium">No articles published yet.</p>
+                </div>
+              )}
             </div>
           </motion.div>
         ) : activeTab === 'settings' ? (

@@ -104,3 +104,23 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
   assets JSONB DEFAULT '[]',
   submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- ---------------------------------------------------------------------------
+-- Privacy hardening for Supabase (IMPORTANT)
+--
+-- Supabase automatically exposes every table in the `public` schema through its
+-- REST API (PostgREST), authenticated with the project's publishable/anon key —
+-- which is public by design. Enabling Row Level Security with NO policies makes
+-- that public API return nothing and reject all writes, so sensitive data (e.g.
+-- the PII in contact_submissions) can never be read via the anon key.
+--
+-- The app itself connects with the `postgres` role (the table owner), which
+-- bypasses RLS, so all API routes keep full access. Keep the `service_role` key
+-- secret and never ship it to the browser.
+-- ---------------------------------------------------------------------------
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
+ALTER TABLE job_openings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE partner_logos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lab_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;

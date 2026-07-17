@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { PortfolioItem, initialProjects } from '@/lib/portfolio';
+import { LabBlock } from '@/lib/labBlocks';
 
 export interface ContactSubmission {
   id: string;
@@ -65,6 +66,7 @@ export interface LabItem {
   results: string;
   arxiv: string;
   license: string;
+  content?: LabBlock[];
 }
 
 export interface FooterInfo {
