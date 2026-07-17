@@ -1,17 +1,16 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Hero from '@/components/Hero';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLeadCapture } from '@/context/LeadCaptureContext';
-import { usePortfolio } from '@/context/PortfolioContext';
 import EngineeringModalities from '@/components/EngineeringModalities';
 import CaseStudyCarousel from '@/components/CaseStudyCarousel';
 import Testimonials from '@/components/Testimonials';
 import ContactSection from '@/components/ContactSection';
-import { ArrowUpRight } from 'lucide-react';
+import { Beaker, X, ArrowRight } from 'lucide-react';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30, filter: 'blur(10px)' },
@@ -21,7 +20,48 @@ const fadeInUp = {
 };
 
 export default function HomePage() {
-  const { labItems } = usePortfolio();
+  const [showLabPopup, setShowLabPopup] = useState(false);
+
+  useEffect(() => {
+    // Check if dismissed in this session
+    const isDismissed = sessionStorage.getItem('lab-popup-dismissed') === 'true';
+    if (isDismissed) return;
+
+    const handleScroll = () => {
+      const contactEl = document.getElementById('contact');
+      if (!contactEl) return;
+
+      const scrollPosition = window.scrollY + window.innerHeight;
+      
+      // Calculate threshold: triggers only after the Contact Us section is at least 80% scrolled
+      const threshold = contactEl.offsetTop + (contactEl.offsetHeight * 0.8);
+      
+      if (scrollPosition >= threshold) {
+        setShowLabPopup(true);
+      } else {
+        setShowLabPopup(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const dismissPopup = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowLabPopup(false);
+    sessionStorage.setItem('lab-popup-dismissed', 'true');
+    
+    // Automatically scroll to the absolute footer bottom
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    }, 100);
+  };
+
   return (
     <div className="bg-surface relative selection:bg-primary selection:text-white">
       {/* 1. Hero Section - Redesigned to Blue Dark */}
@@ -83,42 +123,78 @@ export default function HomePage() {
       {/* 4. Selected Work - Carousel Redesign */}
       <CaseStudyCarousel />
 
-      {/* 5b. Lab Projects - Dark Node Row */}
-      <section className="py-20 px-8 bg-[#001026] text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
-          <div className="w-full h-full" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-        </div>
-        <div className="max-w-screen-2xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-            {labItems.slice(0, 2).map((p, i) => (
-              <Link key={p.id} href="/lab" className="group relative px-12 py-10 first:pl-0 border-l border-white/5 first:border-l-0 hover:bg-white/[0.03] transition-all">
-                {/* Vertical Divider */}
-                {i > 0 && (
-                  <div className="absolute left-0 top-12 bottom-12 w-[1px] bg-[#4A90D9] opacity-10 group-hover:opacity-100 transition-opacity"></div>
-                )}
-                
-                <div className="space-y-6 flex flex-col items-center text-center">
-                  <div className="flex items-center justify-center relative w-full">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#4A90D9]">{p.node}</span>
-                    <ArrowUpRight size={16} className="absolute right-0 text-white/20 group-hover:text-white transition-all transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                  </div>
-                  <div className="space-y-2 flex flex-col items-center">
-                    <h4 className="text-4xl font-display font-medium text-white group-hover:text-[#4A90D9] transition-colors italic leading-none max-w-lg">{p.name}</h4>
-                    <p className="text-sm text-white/40 max-w-md group-hover:text-white/60 transition-colors leading-relaxed italic">
-                      {p.desc}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* 4.7 Testimonials - Our Clients Say */}
       <Testimonials />
       {/* 4.8 Contact Section - Minimalist Integration */}
       <ContactSection />
+
+      {/* Cinematic Reveal Lab Popup */}
+      <AnimatePresence>
+        {showLabPopup && (
+          <motion.div
+            initial={{ opacity: 0, filter: 'blur(15px)' }}
+            animate={{ opacity: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, filter: 'blur(15px)' }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 bg-[#001026]/95 backdrop-blur-xl text-white flex flex-col justify-center items-center p-8 md:p-24 z-[99999] overflow-hidden"
+          >
+            {/* Ambient grid overlay */}
+            <div className="absolute inset-0 bg-grid opacity-[0.03] pointer-events-none"></div>
+
+            {/* Glowing orb background lights for high-end look */}
+            <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-[#4A90D9]/10 rounded-full blur-[120px] pointer-events-none"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#8B5CF6]/5 rounded-full blur-[150px] pointer-events-none"></div>
+
+            <button 
+              onClick={dismissPopup}
+              className="absolute top-8 right-8 md:top-12 md:right-12 text-white/50 hover:text-white transition-colors p-4 z-10 flex items-center gap-2 group/btn"
+              aria-label="Dismiss transmission"
+            >
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-0 group-hover/btn:opacity-100 transition-opacity">Dismiss Transmission</span>
+              <X size={24} />
+            </button>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="max-w-5xl w-full space-y-12 text-center relative z-10"
+            >
+              <div className="space-y-6">
+                <h3 className="text-3xl md:text-5xl lg:text-7xl font-display font-medium text-white tracking-tighter leading-none italic md:whitespace-nowrap">
+                  We Share Our Findings with Everyone.
+                </h3>
+                <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto font-sans leading-relaxed border-l-2 border-[#4A90D9]/30 pl-6 md:pl-8 text-left md:text-center">
+                  No gatekeeping. We publish our neural network blueprints, Graph Convolutional models, and real-world system architectures openly. Step inside the QOARC Lab registry.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-6">
+                <Link 
+                  href="/lab"
+                  onClick={(e) => {
+                    // Also save dismissed so it doesn't open immediately on page change/back navigation
+                    sessionStorage.setItem('lab-popup-dismissed', 'true');
+                  }}
+                  className="w-full sm:w-auto flex items-center justify-center gap-4 px-10 py-5 bg-white text-primary hover:bg-[#4A90D9] hover:text-white transition-all duration-500 font-bold uppercase tracking-widest text-xs shadow-2xl hover:scale-105 active:scale-95"
+                >
+                  <span>Enter the QOARC Lab</span>
+                  <ArrowRight size={16} />
+                </Link>
+                
+                <button
+                  onClick={dismissPopup}
+                  className="w-full sm:w-auto flex items-center justify-center gap-4 px-10 py-5 bg-white/5 border border-white/10 hover:bg-white/10 text-white/70 hover:text-white transition-all duration-300 font-bold uppercase tracking-widest text-xs"
+                >
+                  Return to Site
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

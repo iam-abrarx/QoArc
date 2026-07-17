@@ -3,70 +3,22 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock, Calendar, Beaker, Filter } from 'lucide-react';
-
-const blogPosts = [
-  {
-    slug: 'pfas-rigidity',
-    title: 'Large-scale PFAS generation for safety and toxicity analysis',
-    category: 'RESEARCH // GNN',
-    date: 'July 12, 2026',
-    readTime: '8 min read',
-    desc: 'Applying Hybrid GNN architectures and the molecular rigidity hypothesis to predict environmental persistence and toxicity of PFAS in water cycles before chemical synthesis.',
-    imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop',
-    featured: true,
-    type: 'research'
-  },
-  {
-    slug: 'animal-weight',
-    title: 'Animal Weight Estimation from Images via Segment Anything 2',
-    category: 'RESEARCH // COMPUTER VISION',
-    date: 'June 28, 2026',
-    readTime: '5 min read',
-    desc: 'Using SAM2 and Depth Anything v2 for precision agricultural livestock observation and non-invasive weight mass estimation.',
-    imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop',
-    featured: false,
-    type: 'research'
-  },
-  {
-    slug: 'bancat-tech',
-    title: 'Architecting Real-Time Donor Synchronization for BANcat',
-    category: 'PRODUCT // HEALTHCARE',
-    date: 'July 15, 2026',
-    readTime: '6 min read',
-    desc: 'How we built a bi-lingual, zero-latency donor communication system and real-time patient support ledger tracking for the BANCAT cancer charity foundation.',
-    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1000&auto=format&fit=crop',
-    featured: false,
-    type: 'product'
-  },
-  {
-    slug: 'asialinkage-tech',
-    title: 'Scalable B2B Catalog Categorization and Search Systems',
-    category: 'PRODUCT // ENTERPRISE',
-    date: 'July 10, 2026',
-    readTime: '7 min read',
-    desc: 'A technical study on custom relational database designs, catalog classifications, and indexing schemas built to organize business inventories for AsiaLinkage.',
-    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop',
-    featured: false,
-    type: 'product'
-  },
-  {
-    slug: '2go-tech',
-    title: 'Optimizing E-Commerce User Conversion and Fluid Checkout',
-    category: 'PRODUCT // RETAIL',
-    date: 'July 05, 2026',
-    readTime: '5 min read',
-    desc: 'Revamping the digital checkout funnel and state synchronization for 2GO Bangladesh retail platform, resulting in minimized shopping friction.',
-    imageUrl: 'https://images.unsplash.com/photo-1557821552-17105176677c?q=80&w=1000&auto=format&fit=crop',
-    featured: false,
-    type: 'product'
-  }
-];
+import { ArrowRight, Clock, Calendar, Beaker, Loader2 } from 'lucide-react';
+import { usePortfolio } from '@/context/PortfolioContext';
 
 export default function LabPage() {
+  const { labItems } = usePortfolio();
   const [activeFilter, setActiveFilter] = useState<'all' | 'product' | 'research'>('all');
 
-  const filteredPosts = blogPosts.filter(p => {
+  if (!labItems) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
+
+  const filteredPosts = labItems.filter(p => {
     if (activeFilter === 'all') return true;
     return p.type === activeFilter;
   });
@@ -106,9 +58,9 @@ export default function LabPage() {
               <h3 className="text-precision text-primary/40 uppercase tracking-widest text-[9px] font-bold">Filter Archives</h3>
               <nav className="flex flex-col gap-2">
                 {[
-                  { id: 'all', label: 'All Articles', count: blogPosts.length },
-                  { id: 'product', label: 'Product Cases', count: blogPosts.filter(p => p.type === 'product').length },
-                  { id: 'research', label: 'Scientific Research', count: blogPosts.filter(p => p.type === 'research').length }
+                  { id: 'all', label: 'All Articles', count: labItems.length },
+                  { id: 'product', label: 'Product Cases', count: labItems.filter(p => p.type === 'product').length },
+                  { id: 'research', label: 'Scientific Research', count: labItems.filter(p => p.type === 'research').length }
                 ].map(f => {
                   const isActive = activeFilter === f.id;
                   return (
@@ -147,7 +99,7 @@ export default function LabPage() {
                   <div className="lg:col-span-7 h-[350px] lg:h-[550px] relative overflow-hidden bg-primary/5">
                     <img 
                       src={featuredPost.imageUrl} 
-                      alt={featuredPost.title} 
+                      alt={featuredPost.name} 
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
                     />
                     <div className="absolute inset-0 bg-primary/10 mix-blend-multiply group-hover:opacity-0 transition-opacity"></div>
@@ -167,7 +119,7 @@ export default function LabPage() {
 
                       {/* Title */}
                       <h2 className="text-4xl md:text-5xl font-display font-semibold text-primary group-hover:text-[#cc0000] transition-colors leading-tight italic">
-                        {featuredPost.title}
+                        {featuredPost.name}
                       </h2>
 
                       {/* Desc */}
@@ -184,7 +136,7 @@ export default function LabPage() {
               </motion.div>
             )}
 
-            {/* Secondary Posts Grid */}
+            {/* Secondary Grid */}
             {secondaryPosts.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {secondaryPosts.map((post, i) => (
@@ -200,7 +152,7 @@ export default function LabPage() {
                       <div className="h-[240px] relative overflow-hidden bg-primary/5">
                         <img 
                           src={post.imageUrl} 
-                          alt={post.title} 
+                          alt={post.name} 
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                         />
                         <div className="absolute inset-0 bg-primary/10 mix-blend-multiply group-hover:opacity-0 transition-opacity"></div>
@@ -215,7 +167,7 @@ export default function LabPage() {
                             <span>{post.date}</span>
                           </div>
                           <h3 className="text-2xl font-display font-semibold text-primary group-hover:text-[#cc0000] transition-colors leading-tight italic">
-                            {post.title}
+                            {post.name}
                           </h3>
                           <p className="text-sm text-primary/50 font-sans leading-relaxed">
                             {post.desc}

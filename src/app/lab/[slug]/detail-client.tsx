@@ -21,97 +21,18 @@ import {
   Zap,
   ShoppingBag,
   Eye,
-  Minimize2
+  Minimize2,
+  Loader2
 } from 'lucide-react';
 import { useLeadCapture } from '@/context/LeadCaptureContext';
-
-const labData: Record<string, any> = {
-  'pfas-rigidity': {
-    docId: 'QOARC-2026-PFAS',
-    name: 'PFAS Rigidity Modeling',
-    abstract: 'Applying Hybrid GNN architectures and molecular rigidity hypotheses to predict the structural resilience and environmental persistence of Per- and Polyfluoroalkyl Substances (PFAS) in industrial water cycles.',
-    metrics: [
-      { val: '5.2M', label: 'Candidates Modeled' },
-      { val: '98.5%', label: 'Prediction Precision' },
-      { val: 'SAM2 + GNN', label: 'Neural Architecture' }
-    ],
-    motivation: 'Commercial filtration systems lack the ability to predict molecular degradation at scale. This research aims to identify "Unicorn" leads for biodegradable alternatives before synthesis.',
-    methodology: 'The "Dual Brain" architecture combines Graph Convolutional Networks (GCN) with RDKit molecular descriptors. We utilized transfer learning from the ChEMBL database to specialize our toxicity prediction on fluorinated chains.',
-    tech: ['Python', 'PyTorch', 'RDKit', 'ChEMBL', 'Neo4j', 'Ray Serve'],
-    results: 'Our model identified 14 candidates for alternative surfactants that demonstrate a 60% higher degradation rate in standardized environmental simulations while maintaining industrial surfactant efficiency.',
-    arxiv: 'https://arxiv.org/abs/example',
-    license: 'Available for commercial licensing or custom development'
-  },
-  'animal-weight': {
-    docId: 'QOARC-2026-ANIM',
-    name: 'Animal Weight Estimation',
-    abstract: 'Applying advanced computer vision with Segment Anything 2 (SAM2) and Depth Anything v2 for non-invasive, precision agricultural livestock observation and mass estimation.',
-    metrics: [
-      { val: 'SAM2 + Depth', label: 'Neural Architecture' },
-      { val: '92.4%', label: 'Estimation Accuracy' },
-      { val: '0.8s', label: 'Inference Speed' }
-    ],
-    motivation: 'Traditional methods of livestock weight measurement are highly stress-inducing and logistically complex. This research leverages dual-perspective imaging to automate precise mass calculations in real-time.',
-    methodology: 'The model utilizes SAM2 to segment the animal profile from background clutter, while Depth Anything v2 produces high-resolution relative depth maps. An integrated regression transformer maps the spatial volume to actual mass.',
-    tech: ['Python', 'PyTorch', 'SAM 2', 'Depth Anything', 'OpenCV', 'FastAPI'],
-    results: 'Evaluations on sheep and cattle cohorts demonstrated an estimation error rate of less than 7.6% under varied outdoor lighting conditions, paving the way for fully automated livestock monitoring.',
-    arxiv: 'https://arxiv.org/abs/example-sam2',
-    license: 'Open source research under Apache 2.0 license'
-  },
-  'bancat-tech': {
-    docId: 'QOARC-2026-BANCAT',
-    name: 'Real-Time Sync on BANcat',
-    abstract: 'Designing zero-latency distributed data pipelines and dual-language state management systems to power real-time cancer support and direct donor connections.',
-    metrics: [
-      { val: '99.9%', label: 'Sync Accuracy' },
-      { val: '<150ms', label: 'Sync Latency' },
-      { val: 'PostgreSQL', label: 'Transaction Engine' }
-    ],
-    motivation: 'Oncology charity organizations face massive friction in allocating emergency funds to patients in real-time, often plagued by disconnected payment logs and delayed balance sheets.',
-    methodology: 'We engineered a bi-directional synchronization loop combining PostgreSQL transaction isolation levels (Serializable) with custom WebSocket channels to broadcast donor updates to client portals concurrently.',
-    tech: ['Next.js', 'Prisma', 'PostgreSQL', 'WebSockets', 'Tailwind CSS'],
-    results: 'Successfully processed donations supporting over 500 cancer patients in Bangladesh, maintaining absolute sync precision and a 0% double-ledger rate.',
-    arxiv: 'https://bancat.org.bd',
-    license: 'Proprietary platform architecture for non-profit operations'
-  },
-  'asialinkage-tech': {
-    docId: 'QOARC-2026-ASIA',
-    name: 'B2B Catalog Indexing Engines',
-    abstract: 'Developing structured database schemas, multi-tier caching architectures, and search indexes to organize and serve extensive commercial catalogs for regional trade networks.',
-    metrics: [
-      { val: '75%', label: 'Query Speedup' },
-      { val: '10K+', label: 'Catalog SKUs' },
-      { val: 'Redis', label: 'Caching Tier' }
-    ],
-    motivation: 'B2B wholesale trading environments experience heavy database performance degradation when searching and filtering large, nested product hierarchies.',
-    methodology: 'The engine implements PostgreSQL compound indexes alongside a write-through caching layer on Redis. Complex product variants are structured in JSONB fields, utilizing GIN indexes for fast fuzzy search queries.',
-    tech: ['Next.js', 'PostgreSQL', 'Redis', 'Tailwind CSS', 'Framer Motion'],
-    results: 'Achieved a 75% reduction in product listing query times, handling 10,000+ business items with instant autocomplete responses.',
-    arxiv: 'https://asialinkage.com',
-    license: 'Custom B2B licensing option available'
-  },
-  '2go-tech': {
-    docId: 'QOARC-2026-2GO',
-    name: 'checkout funnel optimization',
-    abstract: 'Refactoring checkout state sync and client-side memory storage to streamline retail transactions and minimize cart abandonment in local delivery platforms.',
-    metrics: [
-      { val: '35%', label: 'Conversion Lift' },
-      { val: 'Optimistic UI', label: 'State Sync' },
-      { val: 'React Context', label: 'Cart Management' }
-    ],
-    motivation: 'Traditional e-commerce checkouts often suffer from slow server-side cart state resolution, causing shopping cart abandonments and bad user retention.',
-    methodology: 'We redesigned the checkout funnel by moving the primary cart state to local storage with optimistic UI updates. API requests are batched and executed asynchronously in the background, keeping the path-to-purchase completely fluid.',
-    tech: ['Next.js', 'Framer Motion', 'React Context', 'Tailwind CSS'],
-    results: 'Cut down checkout steps from 6 to 3, achieving a 35% improvement in retail order completions for 2GO Bangladesh.',
-    arxiv: 'https://bout2go.com',
-    license: 'Commercial deployment architecture for retail platforms'
-  }
-};
+import { usePortfolio } from '@/context/PortfolioContext';
 
 export default function LabDetailPage() {
   const { openModal } = useLeadCapture();
+  const { labItems } = usePortfolio();
   const { slug } = useParams();
-  const data = labData[slug as string] || labData['pfas-rigidity'];
+
+  const data = labItems?.find(p => p.slug === slug) || labItems?.find(p => p.id === slug) || labItems?.[0];
 
   const [activeSection, setActiveSection] = useState('abstract');
   const [isFocusMode, setIsFocusMode] = useState(false);

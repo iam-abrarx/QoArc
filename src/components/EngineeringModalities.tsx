@@ -81,11 +81,17 @@ const categories = [
 ];
 
 export default function EngineeringModalities() {
-  const [openIndex, setOpenIndex] = useState<number>(0);
+  const [openIndex, setOpenIndex] = useState<number>(-1);
 
   return (
-    <section className="py-24 px-8 bg-white cad-line overflow-hidden border-t-[0.5px] border-primary/10">
-      <div className="max-w-screen-2xl mx-auto space-y-16">
+    <motion.section 
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+      className="py-36 md:py-48 px-8 bg-white cad-line overflow-hidden border-t-[0.5px] border-primary/10"
+    >
+      <div className="max-w-screen-2xl mx-auto space-y-24">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-12">
           <div className="space-y-6">
@@ -112,7 +118,7 @@ export default function EngineeringModalities() {
                 {/* Accordion Trigger */}
                 <button
                   onClick={() => setOpenIndex(isOpen ? -1 : index)}
-                  className="w-full py-6 flex items-center gap-8 text-left group transition-all"
+                  className="w-full py-10 md:py-12 flex items-center gap-8 text-left group transition-all"
                 >
                   <div className={`text-[#cc0000] flex-shrink-0 transition-transform duration-500 font-display text-3xl font-light w-8 flex justify-center`}>
                     {isOpen ? '—' : '+'}
@@ -132,14 +138,14 @@ export default function EngineeringModalities() {
                       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="pb-12 pt-4 grid lg:grid-cols-2 gap-12 items-start">
+                      <div className="pb-20 pt-8 grid lg:grid-cols-2 gap-12 items-start">
                         {/* Left Content */}
-                        <div className="space-y-10">
-                          <p className="text-xl text-primary/80 font-sans leading-tight max-w-2xl border-l-[0.5px] border-primary/20 pl-8">
+                        <div className="space-y-16">
+                          <p className="text-xl text-primary/80 font-sans leading-relaxed max-w-2xl border-l-[0.5px] border-primary/20 pl-8">
                             {item.desc}
                           </p>
                           
-                          <div className="grid md:grid-cols-2 gap-x-12 gap-y-6 pl-8 pt-4">
+                          <div className="grid md:grid-cols-2 gap-x-12 gap-y-8 pl-8 pt-4">
                             {item.links.map((link, i) => (
                               <motion.div 
                                 key={link.name}
@@ -221,6 +227,6 @@ export default function EngineeringModalities() {
           })}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

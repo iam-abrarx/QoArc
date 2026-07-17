@@ -7,8 +7,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const { id } = await params;
     const body = await request.json();
 
+    const { name, node, ...rest } = body;
+    const jsonDesc = JSON.stringify({
+      ...rest,
+      slug: rest.slug || id,
+      desc: rest.desc || rest.description || ''
+    });
+
     await sql`UPDATE lab_items SET
-      name = ${body.name}, description = ${body.desc}, node = ${body.node || null}
+      name = ${name}, description = ${jsonDesc}, node = ${node || null}
     WHERE id = ${id}`;
 
     return NextResponse.json({ success: true });

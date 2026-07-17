@@ -7,7 +7,7 @@ import { usePortfolio } from '@/context/PortfolioContext';
 
 export default function Testimonials() {
   const { testimonials } = usePortfolio();
-  const [expandedId, setExpandedId] = useState<string | null>('1');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
     <section className="py-32 px-8 bg-white overflow-hidden border-t-[0.5px] border-primary/10">
@@ -16,8 +16,8 @@ export default function Testimonials() {
         <div className="flex flex-col md:flex-row justify-between items-end gap-8">
           <div className="space-y-6">
             <div className="text-precision text-primary/40 uppercase tracking-widest">Client Feedback // Trust Node</div>
-            <h2 className="text-7xl font-display font-medium text-primary tracking-tight leading-none">
-              Our Clients <br /> <span className="opacity-40">Say.</span>
+            <h2 className="text-5xl md:text-7xl font-display font-medium text-primary tracking-tight leading-none whitespace-nowrap">
+              Our Clients <span className="opacity-40">Say.</span>
             </h2>
           </div>
           <div className="text-precision text-primary/40 hidden md:block max-w-xs text-right italic font-medium">
@@ -26,7 +26,7 @@ export default function Testimonials() {
         </div>
 
         {/* Stacked Testimonials Container */}
-        <div className="relative flex flex-col pt-12">
+        <div className="relative flex flex-col border border-primary/10 divide-y divide-primary/10 overflow-hidden">
           {testimonials.map((t, index) => {
             const isExpanded = expandedId === t.id;
             
@@ -38,26 +38,25 @@ export default function Testimonials() {
                 style={{ 
                   zIndex: isExpanded ? 50 : index + 10,
                 }}
-                className={`relative border border-primary/10 p-8 md:p-10 transition-all duration-500 cursor-pointer 
-                  ${index > 0 ? '-mt-8' : 'mt-0'} 
+                className={`relative p-8 md:p-10 transition-all duration-500 cursor-pointer 
                   ${isExpanded 
-                    ? 'bg-gradient-to-br from-primary via-[#002046] to-[#001026] text-white shadow-premium scale-[1.01]' 
-                    : 'bg-[#F8FAFC] text-primary hover:bg-[#F1F5F9] hover:-translate-y-2 shadow-sm'
+                    ? 'bg-gradient-to-br from-primary via-[#002046] to-[#001026] text-white shadow-premium scale-[1.01] z-20 border-y border-primary/20 first:border-t-0 last:border-b-0' 
+                    : 'bg-[#F8FAFC] text-primary hover:bg-[#F1F5F9] z-10'
                   }`}
               >
                 {/* Banner Header - Always Visible */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
                   {/* Left: Company & Author Info */}
-                  <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-12">
+                  <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-8 flex-1 w-full md:w-auto">
                     {/* Company Logo/Name */}
-                    <div className={`text-3xl font-display font-black tracking-tighter italic ${isExpanded ? 'text-[#4A90D9]' : t.logoColor}`}>
+                    <div className={`text-3xl font-display font-black tracking-tighter italic shrink-0 md:w-72 ${isExpanded ? 'text-[#4A90D9]' : t.logoColor}`}>
                       {t.company}
                     </div>
                     {/* Divider (Desktop only) */}
-                    <div className={`hidden md:block w-[1px] h-6 ${isExpanded ? 'bg-white/10' : 'bg-primary/10'}`}></div>
+                    <div className={`hidden md:block w-[1px] h-8 shrink-0 ${isExpanded ? 'bg-white/10' : 'bg-primary/10'}`}></div>
                     {/* Author brief */}
-                    <div className="space-y-0.5">
-                      <h4 className={`text-lg font-display font-bold ${isExpanded ? 'text-white' : 'text-primary'}`}>
+                    <div className="space-y-0.5 min-w-0 flex-1 md:flex-initial">
+                      <h4 className={`text-lg font-display font-bold ${isExpanded ? 'text-white' : 'text-primary'} truncate`}>
                         {t.authorName}
                       </h4>
                       <p className={`text-xs ${isExpanded ? 'text-white/50' : 'text-primary/40'} font-medium`}>
