@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { SESSION_COOKIE, verifySessionToken } from '@/lib/auth';
+import { rateLimit, clientIp } from '@/lib/rate-limit';
 
 // Public API endpoints that never require authentication.
 // - GET on content collections powers the public site.
@@ -35,9 +36,32 @@ function isPublic(pathname: string, method: string): boolean {
   return false; // PUT / PATCH / DELETE and everything else -> protected
 }
 
+// Per-endpoint rate limits (requests / window) keyed by client IP.
+function rateLimitFor(pathname: string, method: string): { limit: number; windowMs: number } | null {
+  if (method === 'POST' && pathname === '/api/auth/login') {
+    return { limit: 10, windowMs: 10 * 60_000 }; // brute-force guard
+  }
+  if (method === 'POST' && (pathname === '/api/contact' || pathname === '/api/careers' || pathname === '/api/submissions')) {
+    return { limit: 5, windowMs: 60_000 }; // spam guard
+  }
+  return null;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const method = request.method;
+
+  const limitRule = rateLimitFor(pathname, method);
+  if (limitRule) {
+    const ip = clientIp(request);
+    const { ok, retryAfter } = rateLimit(`${pathname}:${ip}`, limitRule.limit, limitRule.windowMs);
+    if (!ok) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+      );
+    }
+  }
 
   if (isPublic(pathname, method)) {
     return NextResponse.next();

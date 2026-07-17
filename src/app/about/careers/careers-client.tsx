@@ -28,7 +28,7 @@ const fadeInUp = {
 // Roles are now managed via PortfolioContext
 
 export default function CareersPage() {
-  const { jobOpenings, addSubmission } = usePortfolio();
+  const { jobOpenings } = usePortfolio();
   const [selectedRole, setSelectedRole] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -50,8 +50,8 @@ export default function CareersPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 20 * 1024 * 1024) {
-        alert('File size exceeds 20MB limit.');
+      if (file.size > 3 * 1024 * 1024) {
+        alert('File size exceeds the 3MB limit.');
         return;
       }
       setCvFileName(file.name);
@@ -72,27 +72,19 @@ export default function CareersPage() {
       email,
       role: selectedRole,
       videoUrl,
-      cvFile
+      cvFile,
+      cvFileName,
     };
 
     try {
-      // Server-side logging via API route
-      await fetch('/api/careers', {
+      // Persist the application (and store the CV server-side).
+      const res = await fetch('/api/careers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
-      // Save to local context for visibility in Admin Dashboard
-      addSubmission({
-        name,
-        email,
-        company: 'N/A',
-        phone: 'N/A',
-        service: `[CAREERS]: ${selectedRole}`,
-        message: `Application for ${selectedRole}\nVideo Introduction: ${videoUrl}`,
-        assets: cvFile ? [{ id: Date.now().toString(), name: cvFileName, size: Math.round(cvFile.length * (3/4)) }] : []
-      });
+      if (!res.ok) throw new Error('Submission failed');
 
       setIsSubmitting(false);
       setIsSubmitted(true);

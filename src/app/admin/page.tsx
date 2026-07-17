@@ -13,6 +13,7 @@ import { PartnerLogo } from '@/context/PortfolioContext';
 import { PortfolioItem } from '@/lib/portfolio';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAssetFromDB } from '@/lib/idb';
+import { ImageInput, ImageArrayInput } from '@/components/admin/ImageInput';
 
 function AdminContent() {
 
@@ -297,9 +298,15 @@ function AdminContent() {
     setNewItem(prev => ({ ...prev, stats: arr }));
   };
 
-  const handleDownloadAsset = async (id: string, name: string) => {
+  const handleDownloadAsset = async (asset: { id: string; name: string; url?: string }) => {
+    // Newer submissions store the file on Vercel Blob; just open its URL.
+    if (asset.url) {
+      window.open(asset.url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    // Legacy fallback: files that were only kept in this browser's IndexedDB.
     try {
-      const file = await getAssetFromDB(id);
+      const file = await getAssetFromDB(asset.id);
       if (!file) {
         alert("File not found in local browser storage.");
         return;
@@ -307,7 +314,7 @@ function AdminContent() {
       const url = URL.createObjectURL(file);
       const a = document.createElement('a');
       a.href = url;
-      a.download = name;
+      a.download = asset.name;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -376,73 +383,54 @@ function AdminContent() {
 
   return (
     <div className="bg-bg-dark min-h-screen">
-      <div className="max-w-7xl mx-auto py-32 px-6">
+      <div className="max-w-[1600px] mx-auto py-24 px-6 lg:px-10">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 border-b border-white/10 pb-8 gap-6">
-          <div>
-            <h1 className="text-4xl font-display font-bold tracking-tight text-white">System <span className="text-accent-blue font-black">Control</span></h1>
-            <p className="text-white/70 mt-1 font-black italic tracking-widest uppercase text-[10px]">Portfolio Management & Strategic Inquiries</p>
-          </div>
-        
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-6 w-full md:w-auto">
-          <div className="max-w-full overflow-x-auto whitespace-nowrap scrollbar-none flex-nowrap bg-white/5 p-1.5 rounded-xl border border-white/10 backdrop-blur-3xl flex items-center">
-            <button 
-              onClick={() => { setActiveTab('projects'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'projects' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+        <div className="mb-10 border-b border-white/10 pb-8 space-y-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-4xl font-display font-bold tracking-tight text-white">System <span className="text-accent-blue font-black">Control</span></h1>
+              <p className="text-white/70 mt-1 font-black italic tracking-widest uppercase text-[10px]">Portfolio Management & Strategic Inquiries</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="group flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] bg-white text-black hover:bg-red-600 hover:text-white px-8 py-4 rounded-xl transition-all border border-white/10 shrink-0"
             >
-              <Layout size={14} strokeWidth={3} /> Projects
-            </button>
-            <button 
-              onClick={() => { setActiveTab('testimonials'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'testimonials' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-            >
-              <FileText size={14} strokeWidth={3} /> Testimonials
-            </button>
-            <button 
-              onClick={() => { setActiveTab('lab'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'lab' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-            >
-              <Rocket size={14} strokeWidth={3} /> Lab
-            </button>
-            <button 
-              onClick={() => { setActiveTab('logos'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'logos' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-            >
-              <Image size={14} strokeWidth={3} /> Logos
-            </button>
-            <button 
-              onClick={() => { setActiveTab('messages'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'messages' ? 'bg-accent-purple text-white shadow-xl shadow-accent-purple/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-            >
-              <Mail size={14} strokeWidth={3} /> Messages 
-              {contactSubmissions.length > 0 && (
-                <span className="bg-accent-purple text-white px-2 py-0.5 rounded-md text-[9px] font-black border border-white/20 ml-2 animate-pulse">
-                  {contactSubmissions.length}
-                </span>
-              )}
-            </button>
-            <button 
-              onClick={() => { setActiveTab('careers'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'careers' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-            >
-              <Briefcase size={14} strokeWidth={3} /> Careers
-            </button>
-            <button 
-              onClick={() => { setActiveTab('settings'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'settings' ? 'bg-accent-purple text-white shadow-xl shadow-accent-purple/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
-            >
-              <Loader2 size={14} strokeWidth={3} /> Settings
+              <LogOut size={16} strokeWidth={3} className="group-hover:-translate-x-1 transition-transform" /> Sign Out
             </button>
           </div>
 
-          <button 
-            onClick={handleLogout}
-            className="group flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] bg-white text-black hover:bg-red-600 hover:text-white px-8 py-4 rounded-xl transition-all border border-white/10 shrink-0"
-          >
-            <LogOut size={16} strokeWidth={3} className="group-hover:-translate-x-1 transition-transform" /> Sign Out
-          </button>
+          {/* Tab Navigation — wraps instead of scrolling, so nothing is clipped */}
+          <div className="flex flex-wrap gap-1.5 bg-white/5 p-1.5 rounded-xl border border-white/10 backdrop-blur-3xl">
+            {([
+              { id: 'projects', label: 'Projects', icon: Layout, accent: 'blue' },
+              { id: 'testimonials', label: 'Testimonials', icon: FileText, accent: 'blue' },
+              { id: 'lab', label: 'Lab', icon: Rocket, accent: 'blue' },
+              { id: 'logos', label: 'Logos', icon: Image, accent: 'blue' },
+              { id: 'messages', label: 'Messages', icon: Mail, accent: 'purple', badge: contactSubmissions.length },
+              { id: 'careers', label: 'Careers', icon: Briefcase, accent: 'blue' },
+              { id: 'settings', label: 'Settings', icon: Loader2, accent: 'purple' },
+            ] as const).map((tab) => {
+              const active = activeTab === tab.id;
+              const activeClass = tab.accent === 'purple'
+                ? 'bg-accent-purple text-white shadow-xl shadow-accent-purple/40'
+                : 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40';
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id); setShowEditor(false); }}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${active ? activeClass : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                >
+                  <tab.icon size={14} strokeWidth={3} /> {tab.label}
+                  {'badge' in tab && tab.badge > 0 && (
+                    <span className="bg-accent-purple text-white px-2 py-0.5 rounded-md text-[9px] font-black border border-white/20 ml-1 animate-pulse">
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
       {/* Stats Bar */}
       {!showEditor && (
@@ -625,61 +613,46 @@ function AdminContent() {
                    </h3>
 
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                     <div className="space-y-4">
-                        <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Thumbnail / Cover Image</label>
-                        <input value={newItem.imageUrl} onChange={(e) => setNewItem({ ...newItem, imageUrl: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-none px-6 py-4 outline-none text-xs text-white" />
-                     </div>
-                     <div className="space-y-4">
-                        <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Hero Showcase Image</label>
-                        <input value={newItem.heroImage} onChange={(e) => setNewItem({ ...newItem, heroImage: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-none px-6 py-4 outline-none text-xs text-white" />
-                     </div>
+                     <ImageInput
+                       label="Thumbnail / Cover Image"
+                       value={newItem.imageUrl || ''}
+                       onChange={(url) => setNewItem({ ...newItem, imageUrl: url })}
+                       notify={showToast}
+                     />
+                     <ImageInput
+                       label="Hero Showcase Image"
+                       value={newItem.heroImage || ''}
+                       onChange={(url) => setNewItem({ ...newItem, heroImage: url })}
+                       notify={showToast}
+                     />
                    </div>
                     <div className="space-y-8 pt-8 border-t border-white/5">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                        <div className="space-y-6">
-                          <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                             <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black">Desktop Mockups (Array)</label>
-                             <button type="button" onClick={() => addArrayItem('desktopMockups')} className="text-[10px] text-accent-blue underline">+ Add</button>
-                          </div>
-                          <div className="space-y-3">
-                            {newItem.desktopMockups?.map((img, idx) => (
-                              <div key={idx} className="flex gap-2">
-                                <input value={img} onChange={(e) => updateArrayField('desktopMockups', idx, e.target.value)} type="text" placeholder="URL..." className="flex-1 bg-bg-dark border border-white/5 px-4 py-3 outline-none text-xs text-white" />
-                                <button type="button" onClick={() => removeArrayItem('desktopMockups', idx)} className="text-red-500 px-2 font-bold">×</button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="space-y-6">
-                          <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                             <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black">Mobile Mockups (Array)</label>
-                             <button type="button" onClick={() => addArrayItem('mobileMockups')} className="text-[10px] text-accent-blue underline">+ Add</button>
-                          </div>
-                          <div className="space-y-3">
-                            {newItem.mobileMockups?.map((img, idx) => (
-                              <div key={idx} className="flex gap-2">
-                                <input value={img} onChange={(e) => updateArrayField('mobileMockups', idx, e.target.value)} type="text" placeholder="URL..." className="flex-1 bg-bg-dark border border-white/5 px-4 py-3 outline-none text-xs text-white" />
-                                <button type="button" onClick={() => removeArrayItem('mobileMockups', idx)} className="text-red-400 px-2 font-bold">×</button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        <ImageArrayInput
+                          label="Desktop Mockups"
+                          values={newItem.desktopMockups || []}
+                          onChange={(v) => setNewItem({ ...newItem, desktopMockups: v })}
+                          notify={showToast}
+                          columns={1}
+                        />
+                        <ImageArrayInput
+                          label="Mobile Mockups"
+                          values={newItem.mobileMockups || []}
+                          onChange={(v) => setNewItem({ ...newItem, mobileMockups: v })}
+                          notify={showToast}
+                          columns={1}
+                        />
                       </div>
                     </div>
 
-                   <div className="space-y-8">
-                     <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                       <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Production Gallery</label>
-                       <button onClick={() => addArrayItem('galleryImages')} className="text-[10px] font-black uppercase text-accent-blue bg-accent-blue/5 px-4 py-2 rounded-none hover:bg-accent-blue hover:text-white transition-all">Add Image</button>
-                     </div>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {newItem.galleryImages?.map((img, idx) => (
-                           <div key={idx} className="flex items-center gap-4 group">
-                             <input value={img} onChange={(e) => updateArrayField('galleryImages', idx, e.target.value)} type="text" placeholder="Image URL..." className="flex-1 bg-bg-dark border border-white/5 rounded-none px-6 py-4 outline-none text-xs text-white" />
-                             <button onClick={() => removeArrayItem('galleryImages', idx)} className="w-12 h-12 text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white rounded-none transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"><Trash2 size={18} /></button>
-                           </div>
-                        ))}
-                     </div>
+                   <div className="pt-8 border-t border-white/5">
+                     <ImageArrayInput
+                       label="Production Gallery"
+                       values={newItem.galleryImages || []}
+                       onChange={(v) => setNewItem({ ...newItem, galleryImages: v })}
+                       notify={showToast}
+                       columns={2}
+                     />
                    </div>
                 </div>
 
@@ -801,10 +774,14 @@ function AdminContent() {
                         ))}
                         <button type="button" onClick={() => addArrayItem('uiComponents')} className="text-xs text-accent-purple underline">+ Add Component</button>
                       </div>
-                      <div className="space-y-3">
-                        <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">System Architecture Diagram URL</label>
-                        <input value={newItem.systemDiagram} onChange={(e) => setNewItem({ ...newItem, systemDiagram: e.target.value })} type="text" placeholder="https://..." className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 outline-none text-sm text-white" />
-                      </div>
+                      <ImageInput
+                        label="System Architecture Diagram"
+                        value={newItem.systemDiagram || ''}
+                        onChange={(url) => setNewItem({ ...newItem, systemDiagram: url })}
+                        notify={showToast}
+                        fit="contain"
+                        previewClass="w-full h-32"
+                      />
                       <div className="space-y-3">
                         <label className="text-[10px] uppercase tracking-[0.3em] text-white/70 font-black">Diagram Caption</label>
                         <input value={newItem.systemDiagramCaption} onChange={(e) => setNewItem({ ...newItem, systemDiagramCaption: e.target.value })} type="text" placeholder="Pipeline description..." className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 outline-none text-sm text-white" />
@@ -999,7 +976,7 @@ function AdminContent() {
                                {msg.assets.map(asset => (
                                  <button
                                    key={asset.id}
-                                   onClick={() => handleDownloadAsset(asset.id, asset.name)}
+                                   onClick={() => handleDownloadAsset(asset)}
                                    className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-none hover:bg-accent-blue/10 hover:border-accent-blue/30 transition-all text-left group"
                                  >
                                     <div className="flex flex-col overflow-hidden">
@@ -1214,45 +1191,15 @@ function AdminContent() {
                      <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black">LinkedIn URL</label>
                      <input type="text" value={newTestimonial.authorLinkedin} onChange={e => setNewTestimonial({...newTestimonial, authorLinkedin: e.target.value})} className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none text-white" />
                    </div>
-                   <div className="space-y-3 md:col-span-2">
-                     <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black flex items-center">
-                       Author Profile Image 
-                       {newTestimonial.authorImage?.startsWith('https://z50m8u0xhlij7sue') && <span className="text-green-500 lowercase tracking-normal ml-2 bg-green-500/10 px-2 py-0.5">(Cloud hosted)</span>}
-                     </label>
-                     <div className="flex gap-4">
-                       <input type="text" value={newTestimonial.authorImage} onChange={e => setNewTestimonial({...newTestimonial, authorImage: e.target.value})} placeholder="https://... or upload" className="flex-1 bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none text-white" required />
-                       <label className="cursor-pointer bg-accent-blue/10 hover:bg-accent-blue hover:text-white text-accent-blue px-8 py-4 rounded-none font-black transition-all flex items-center justify-center shrink-0 border border-accent-blue/20 tracking-widest text-[10px] uppercase">
-                          Upload Node
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                if (file.size > 5 * 1024 * 1024) {
-                                  alert('Image size must be less than 5MB.');
-                                  return;
-                                }
-                                try {
-                                  const formData = new FormData();
-                                  formData.append('file', file);
-                                  const res = await fetch('/api/upload', { method: 'POST', body: formData });
-                                  const data = await res.json();
-                                  if (data.url) {
-                                    setNewTestimonial({ ...newTestimonial, authorImage: data.url });
-                                  } else {
-                                    alert('Upload failed: ' + (data.error || 'Unknown error'));
-                                  }
-                                } catch (err) {
-                                  alert('Upload failed. Please try again.');
-                                  console.error(err);
-                                }
-                              }
-                            }} 
-                          />
-                       </label>
-                     </div>
+                   <div className="md:col-span-2">
+                     <ImageInput
+                       label="Author Profile Image"
+                       value={newTestimonial.authorImage || ''}
+                       onChange={(url) => setNewTestimonial({ ...newTestimonial, authorImage: url })}
+                       notify={showToast}
+                       previewClass="w-20 h-20"
+                       required
+                     />
                    </div>
                  </div>
                  <div className="space-y-3">
@@ -1465,14 +1412,13 @@ function AdminContent() {
                  <PlusCircle className="text-accent-blue" size={24} /> Add New Logo
                </h3>
                <form onSubmit={handleAddLogo} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-                 <div className="md:col-span-2 space-y-3">
-                   <label className="text-[10px] uppercase tracking-[0.3em] text-accent-blue font-black">Image URL</label>
-                   <input 
-                     type="text" 
-                     value={newLogo.url}
-                     onChange={e => setNewLogo({ ...newLogo, url: e.target.value })}
-                     placeholder="https://example.com/logo.png" 
-                     className="w-full bg-bg-dark border border-white/5 rounded-xl px-5 py-4 focus:border-accent-blue outline-none transition-all text-white"
+                 <div className="md:col-span-2">
+                   <ImageInput
+                     label="Logo Image"
+                     value={newLogo.url || ''}
+                     onChange={(url) => setNewLogo({ ...newLogo, url })}
+                     notify={showToast}
+                     fit="contain"
                      required
                    />
                  </div>

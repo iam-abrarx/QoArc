@@ -12,7 +12,7 @@ export interface ContactSubmission {
   service?: string;
   message: string;
   date: string;
-  assets?: { id: string, name: string, size: number }[];
+  assets?: { id: string, name: string, size: number, url?: string }[];
 }
 
 export interface PartnerLogo {

@@ -22,7 +22,6 @@ import {
   Mail,
   Phone
 } from 'lucide-react';
-import { usePortfolio } from '@/context/PortfolioContext';
 
 type FormData = {
   projectTypes: string[];
@@ -43,7 +42,6 @@ const STEPS = [
 ];
 
 export default function LeadCaptureForm() {
-  const { addSubmission } = usePortfolio();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -63,12 +61,6 @@ export default function LeadCaptureForm() {
   const handleSubmitSequence = async () => {
     setIsSubmitting(true);
     try {
-      await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      
       const messageBody = `
 Project Types: ${formData.projectTypes.join(', ')}
 Journey Stages: ${formData.journeyStages.join(', ')}
@@ -76,13 +68,19 @@ Support Types: ${formData.supportTypes.join(', ')}
 Assets/Links: ${formData.assets || 'None'}
       `.trim();
 
-      addSubmission({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        service: formData.projectTypes.join(', ') || 'General Inquiry',
-        message: messageBody,
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          service: formData.projectTypes.join(', ') || 'General Inquiry',
+          message: messageBody,
+        }),
       });
+
+      if (!res.ok) throw new Error('Submission failed');
 
       setIsSubmitting(false);
       setIsSubmitted(true);
