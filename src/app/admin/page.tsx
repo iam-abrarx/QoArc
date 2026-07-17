@@ -34,10 +34,32 @@ function AdminContent() {
   const [loginError, setLoginError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const handleSeedData = () => {
-    if (confirm('Forces-sync with real content? This will ensure all dynamic sections have initial data.')) {
-      alert('The real content is now the default seed in the codebase. Clear your browser storage to see it as the fresh initial state.');
+  // custom UI states
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [logoBg, setLogoBg] = useState<'dark' | 'light' | 'checkerboard'>('dark');
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
     }
+  }, [toast]);
+
+  const triggerConfirm = (message: string, onConfirm: () => void) => {
+    setConfirmDialog({ message, onConfirm: () => { onConfirm(); setConfirmDialog(null); } });
+  };
+
+  const handleSeedData = () => {
+    triggerConfirm('Forces-sync with real content? This will ensure all dynamic sections have initial data.', () => {
+      showToast('The real content is now the default seed in the codebase. Clear browser storage to see fresh initial state.');
+    });
   };
 
   const [showEditor, setShowEditor] = useState(false);
@@ -305,9 +327,9 @@ function AdminContent() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full bg-bg-card border border-white/5 p-12 rounded-none glow-blue text-center"
+          className="max-w-md w-full bg-bg-card border border-white/5 p-12 rounded-2xl shadow-2xl text-center"
         >
-          <div className="w-16 h-16 bg-gradient-to-br from-accent-blue to-accent-purple rounded-none flex items-center justify-center mx-auto mb-8 shadow-xl shadow-accent-blue/20">
+          <div className="w-16 h-16 bg-gradient-to-br from-accent-blue to-accent-purple rounded-xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-accent-blue/20">
             <Lock className="text-white" size={32} />
           </div>
           <h1 className="text-3xl font-display font-bold mb-8">Admin Access</h1>
@@ -317,12 +339,12 @@ function AdminContent() {
               onChange={(e) => setPassword(e.target.value)}
               type="password" 
               placeholder="Enter Password" 
-              className="w-full bg-bg-dark border border-white/10 rounded-none px-6 py-4 focus:ring-2 focus:ring-accent-blue outline-none transition-all text-white"
+              className="w-full bg-bg-dark border border-white/10 rounded-xl px-6 py-4 focus:ring-2 focus:ring-accent-blue outline-none transition-all text-white"
             />
             <button 
               type="submit"
               disabled={isAuthenticating}
-              className="w-full bg-white text-black py-4 rounded-none font-bold hover:bg-accent-blue hover:text-white transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2 group disabled:opacity-50"
+              className="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-accent-blue hover:text-white transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2 group disabled:opacity-50"
             >
               {isAuthenticating ? (
                 <>Authenticating... <Loader2 className="animate-spin" size={18} /></>
@@ -347,52 +369,52 @@ function AdminContent() {
             <p className="text-white/70 mt-1 font-black italic tracking-widest uppercase text-[10px]">Portfolio Management & Strategic Inquiries</p>
           </div>
         
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex bg-white/5 p-1.5 rounded-none border border-white/10 backdrop-blur-3xl">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-6 w-full md:w-auto">
+          <div className="max-w-full overflow-x-auto whitespace-nowrap scrollbar-none flex-nowrap bg-white/5 p-1.5 rounded-xl border border-white/10 backdrop-blur-3xl flex items-center">
             <button 
               onClick={() => { setActiveTab('projects'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-none font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${activeTab === 'projects' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'projects' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <Layout size={14} strokeWidth={3} /> Projects
             </button>
             <button 
               onClick={() => { setActiveTab('testimonials'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-none font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${activeTab === 'testimonials' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'testimonials' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <FileText size={14} strokeWidth={3} /> Testimonials
             </button>
             <button 
               onClick={() => { setActiveTab('lab'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-none font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${activeTab === 'lab' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'lab' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <Rocket size={14} strokeWidth={3} /> Lab
             </button>
             <button 
               onClick={() => { setActiveTab('logos'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-none font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${activeTab === 'logos' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'logos' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <Image size={14} strokeWidth={3} /> Logos
             </button>
             <button 
               onClick={() => { setActiveTab('messages'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-none font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${activeTab === 'messages' ? 'bg-accent-purple text-white shadow-xl shadow-accent-purple/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'messages' ? 'bg-accent-purple text-white shadow-xl shadow-accent-purple/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <Mail size={14} strokeWidth={3} /> Messages 
               {contactSubmissions.length > 0 && (
-                <span className="bg-accent-purple text-white px-2 py-0.5 rounded-none text-[9px] font-black border border-white/20 ml-2 animate-pulse">
+                <span className="bg-accent-purple text-white px-2 py-0.5 rounded-md text-[9px] font-black border border-white/20 ml-2 animate-pulse">
                   {contactSubmissions.length}
                 </span>
               )}
             </button>
             <button 
               onClick={() => { setActiveTab('careers'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-none font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${activeTab === 'careers' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'careers' ? 'bg-accent-blue text-white shadow-xl shadow-accent-blue/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <Briefcase size={14} strokeWidth={3} /> Careers
             </button>
             <button 
               onClick={() => { setActiveTab('settings'); setShowEditor(false); }}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-none font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${activeTab === 'settings' ? 'bg-accent-purple text-white shadow-xl shadow-accent-purple/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all duration-300 shrink-0 ${activeTab === 'settings' ? 'bg-accent-purple text-white shadow-xl shadow-accent-purple/40' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
             >
               <Loader2 size={14} strokeWidth={3} /> Settings
             </button>
@@ -400,7 +422,7 @@ function AdminContent() {
 
           <button 
             onClick={handleLogout}
-            className="group flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] bg-white text-black hover:bg-red-600 hover:text-white px-8 py-4 rounded-none transition-all border border-white/10"
+            className="group flex items-center justify-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] bg-white text-black hover:bg-red-600 hover:text-white px-8 py-4 rounded-xl transition-all border border-white/10 shrink-0"
           >
             <LogOut size={16} strokeWidth={3} className="group-hover:-translate-x-1 transition-transform" /> Sign Out
           </button>
@@ -828,9 +850,9 @@ function AdminContent() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="bg-bg-card/50 backdrop-blur-xl border border-white/5 rounded-none p-8 flex flex-col md:flex-row items-center gap-8 hover:border-accent-blue/20 transition-all group shadow-2xl"
+                  className="bg-bg-card/50 backdrop-blur-xl border border-white/5 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 hover:border-accent-blue/20 transition-all group shadow-2xl"
                 >
-                  <div className="w-full md:w-48 aspect-video md:aspect-square rounded-none overflow-hidden border border-white/10 bg-bg-dark flex-shrink-0 relative">
+                  <div className="w-full md:w-48 aspect-video md:aspect-square rounded-xl overflow-hidden border border-white/10 bg-bg-dark flex-shrink-0 relative">
                     <img src={item.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" alt={item.name} />
                     <div className="absolute inset-0 bg-accent-blue/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
@@ -839,11 +861,10 @@ function AdminContent() {
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[10px] font-black text-accent-blue uppercase tracking-[0.3em]">{item.client}</span>
                         <div className="flex items-center gap-2">
-                          <button onClick={() => handleEdit(item)} className="p-3 bg-white/5 hover:bg-accent-blue hover:text-white rounded-none transition-all duration-300">
+                          <button onClick={() => handleEdit(item)} className="p-3 bg-white/5 hover:bg-accent-blue hover:text-white rounded-lg transition-all duration-300">
                             <Edit3 size={18} />
                           </button>
-                          <button onClick={() => { if (confirm('Purge this record?')) deleteItem(item.id); }} className="p-3 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white rounded-none transition-all duration-300">
-
+                          <button onClick={() => triggerConfirm('Purge this record? All details will be deleted permanently.', () => { deleteItem(item.id); showToast('Project Case Study purged.'); })} className="p-3 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-all duration-300">
                             <Trash2 size={18} />
                           </button>
                         </div>
@@ -851,7 +872,7 @@ function AdminContent() {
                       <h4 className="text-2xl font-display font-bold leading-tight group-hover:text-accent-blue transition-colors mb-4">{item.name}</h4>
                     </div>
                     
-                    <div className="bg-white/5 rounded-none px-5 py-3 flex items-center justify-between">
+                    <div className="bg-white/5 rounded-xl px-5 py-3 flex items-center justify-between">
                       <span className="text-[11px] font-medium text-text-muted truncate max-w-[140px]">{item.url}</span>
                       <ChevronRight size={14} className="text-accent-blue group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -877,13 +898,12 @@ function AdminContent() {
             animate={{ opacity: 1 }}
             className="space-y-12 pb-32"
           >
-            {/* Messages Content omitted for brevity, keeping existing code */}
             <div className="flex items-center justify-between border-b border-white/5 pb-8 group">
               <h2 className="text-3xl font-display font-black flex items-center gap-5 tracking-tighter">
                 <Mail className="text-accent-purple group-hover:scale-110 transition-transform" size={32} /> Central Inquiries
               </h2>
               <div className="flex items-center gap-6">
-                 <span className="text-white/70 font-black uppercase tracking-[0.4em] bg-white/5 px-6 py-3 rounded-none border border-white/5">
+                 <span className="text-white/70 font-black uppercase tracking-[0.4em] bg-white/5 px-6 py-3 rounded-xl border border-white/5">
                   Synchronized Nodes: {contactSubmissions.length}
                 </span>
               </div>
@@ -896,17 +916,15 @@ function AdminContent() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="bg-bg-card/30 backdrop-blur-2xl border border-white/5 rounded-none p-12 shadow-2xl relative group hover:border-accent-purple/20 transition-all duration-500 overflow-hidden"
+                  className="bg-bg-card/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-12 shadow-2xl relative group hover:border-accent-purple/20 transition-all duration-500 overflow-hidden"
                 >
                   {/* Accent Highlight */}
                   <div className="absolute top-0 left-0 w-2 h-full bg-accent-purple/20 group-hover:bg-accent-purple transition-all"></div>
                   
                   <div className="absolute top-0 right-0 p-10 opacity-0 group-hover:opacity-100 transition-all transform scale-90 group-hover:scale-100">
                     <button 
-                      onClick={() => {
-                        if (confirm('Archive this submission?')) deleteSubmission(msg.id);
-                      }}
-                      className="w-16 h-16 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white rounded-none flex items-center justify-center transition-all shadow-2xl"
+                      onClick={() => triggerConfirm('Archive this inquiry submission?', () => { deleteSubmission(msg.id); showToast('Inquiry submission archived.'); })}
+                      className="w-16 h-16 bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white rounded-xl flex items-center justify-center transition-all shadow-2xl"
                     >
                       <Trash2 size={24} />
                     </button>
@@ -1102,24 +1120,22 @@ function AdminContent() {
                     <h4 className="text-2xl font-display font-black text-white tracking-tight">{job.title}</h4>
                     <p className="text-white/70 text-sm max-w-2xl leading-relaxed italic">{job.desc}</p>
                   </div>
-                  <button 
-                    onClick={() => {
-                      if (confirm('Decommission this position?')) deleteJobOpening(job.id);
-                    }}
-                    className="w-14 h-14 flex items-center justify-center text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white transition-all duration-300 rounded-none border border-red-500/10"
-                  >
-                    <Trash2 size={24} />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {jobOpenings.length === 0 && (
-              <div className="text-center py-24 bg-bg-card/50 rounded-none border-2 border-dashed border-white/5">
-                <Briefcase className="mx-auto text-white/5 mb-6" size={60} strokeWidth={1} />
-                <p className="text-white/90 text-xl font-display font-medium">No active recruitment nodes.</p>
-              </div>
-            )}
+                   <button 
+                     onClick={() => triggerConfirm('Decommission this recruitment position?', () => { deleteJobOpening(job.id); showToast('Recruitment position decommissioned.'); })}
+                     className="w-14 h-14 flex items-center justify-center text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white transition-all duration-300 rounded-xl border border-red-500/10"
+                   >
+                     <Trash2 size={24} />
+                   </button>
+                 </div>
+               ))}
+             </div>
+ 
+             {jobOpenings.length === 0 && (
+               <div className="text-center py-24 bg-bg-card/50 rounded-2xl border-2 border-dashed border-white/5">
+                 <Briefcase className="mx-auto text-white/5 mb-6" size={60} strokeWidth={1} />
+                 <p className="text-white/90 text-xl font-display font-medium">No active recruitment nodes.</p>
+               </div>
+             )}
           </motion.div>
         ) : activeTab === 'testimonials' ? (
           <motion.div 
@@ -1404,13 +1420,32 @@ function AdminContent() {
                 <Image className="text-accent-blue group-hover:scale-110 transition-transform" size={32} /> Partner Logos
               </h2>
               <div className="flex items-center gap-6">
-                 <span className="text-white/70 font-black uppercase tracking-[0.4em] bg-white/5 px-6 py-3 rounded-none border border-white/5">
-                  Grid Capacity: {partnerLogos.length} / 9
+                 <span className="text-white/70 font-black uppercase tracking-[0.4em] bg-white/5 px-6 py-3 rounded-xl border border-white/5">
+                  Registered Logos: {partnerLogos.length}
                 </span>
               </div>
             </div>
 
-            <div className="bg-bg-card border border-white/5 rounded-none p-12 shadow-2xl relative overflow-hidden">
+            {/* Visual Checkerboard Background Toggles */}
+            <div className="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/5">
+              <div className="text-xs font-bold text-white/70 uppercase tracking-widest">Logo Display Background</div>
+              <div className="flex bg-white/5 p-1 rounded-xl border border-white/5">
+                {(['dark', 'light', 'checkerboard'] as const).map(bg => (
+                  <button
+                    key={bg}
+                    type="button"
+                    onClick={() => setLogoBg(bg)}
+                    className={`px-5 py-2 rounded-lg transition-all text-[10px] font-black uppercase tracking-wider ${
+                      logoBg === bg ? 'bg-accent-blue text-white shadow-lg shadow-accent-blue/15' : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    {bg}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-bg-card border border-white/5 rounded-2xl p-12 shadow-2xl relative overflow-hidden">
                <h3 className="text-2xl font-display font-bold flex items-center gap-3 mb-8">
                  <PlusCircle className="text-accent-blue" size={24} /> Add New Logo
                </h3>
@@ -1422,7 +1457,7 @@ function AdminContent() {
                      value={newLogo.url}
                      onChange={e => setNewLogo({ ...newLogo, url: e.target.value })}
                      placeholder="https://example.com/logo.png" 
-                     className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none transition-all text-white"
+                     className="w-full bg-bg-dark border border-white/5 rounded-xl px-5 py-4 focus:border-accent-blue outline-none transition-all text-white"
                      required
                    />
                  </div>
@@ -1433,7 +1468,7 @@ function AdminContent() {
                      value={newLogo.alt}
                      onChange={e => setNewLogo({ ...newLogo, alt: e.target.value })}
                      placeholder="Brand Name" 
-                     className="w-full bg-bg-dark border border-white/5 rounded-none px-5 py-4 focus:border-accent-blue outline-none transition-all text-white"
+                     className="w-full bg-bg-dark border border-white/5 rounded-xl px-5 py-4 focus:border-accent-blue outline-none transition-all text-white"
                    />
                  </div>
                  <div className="flex items-center gap-4 pb-2">
@@ -1442,7 +1477,7 @@ function AdminContent() {
                        type="checkbox" 
                        checked={newLogo.isWide}
                        onChange={e => setNewLogo({ ...newLogo, isWide: e.target.checked })}
-                       className="w-5 h-5 rounded-none accent-accent-blue bg-bg-dark border-white/10"
+                       className="w-5 h-5 rounded-md accent-accent-blue bg-bg-dark border-white/10"
                      />
                      Wide Format (Spans 2 columns)
                    </label>
@@ -1450,8 +1485,7 @@ function AdminContent() {
                  <div className="md:col-span-4 mt-6">
                    <button 
                      type="submit" 
-                     disabled={partnerLogos.length >= 9}
-                     className="bg-accent-blue text-white px-8 py-4 rounded-none font-black hover:scale-105 transition-all w-full md:w-auto shadow-xl shadow-accent-blue/20 disabled:opacity-50 disabled:hover:scale-100"
+                     className="bg-accent-blue text-white px-8 py-4 rounded-xl font-black hover:scale-105 transition-all w-full md:w-auto shadow-xl shadow-accent-blue/20"
                    >
                      Add to Grid
                    </button>
@@ -1461,10 +1495,29 @@ function AdminContent() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {partnerLogos.map((logo) => (
-                <div key={logo.id} className={`bg-bg-dark border border-white/5 rounded-none p-6 relative group ${logo.isWide ? 'md:col-span-2' : ''}`}>
-                  <div className="aspect-[4/3] bg-white/[0.02] rounded-none flex items-center justify-center p-6 relative overflow-hidden text-center">
-                     <img src={logo.url} alt={logo.alt} className="w-full h-full object-contain filter grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300" 
-                        onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdib3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSJ3aGl0ZSI+SW52YWxpZCBVUkw8L3RleHQ+PC9zdmc+'; }}
+                <div key={logo.id} className={`bg-bg-dark border border-white/5 rounded-2xl p-6 relative group ${logo.isWide ? 'md:col-span-2' : ''}`}>
+                  <div 
+                    className="aspect-[4/3] rounded-xl flex items-center justify-center p-6 relative overflow-hidden text-center transition-all"
+                    style={
+                      logoBg === 'checkerboard'
+                        ? {
+                            backgroundImage: 'linear-gradient(45deg, #e5e5e5 25%, transparent 25%), linear-gradient(-45deg, #e5e5e5 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e5e5 75%), linear-gradient(-45deg, transparent 75%, #e5e5e5 75%)',
+                            backgroundSize: '20px 20px',
+                            backgroundPosition: '0 0, 0 0, 10px 10px, 10px 10px',
+                            backgroundColor: '#ffffff',
+                          }
+                        : logoBg === 'light'
+                        ? { backgroundColor: '#ffffff' }
+                        : { backgroundColor: 'rgba(255,255,255,0.02)' }
+                    }
+                  >
+                     <img 
+                       src={logo.url} 
+                       alt={logo.alt} 
+                       className={`w-full h-full object-contain transition-all duration-300 ${
+                         logoBg === 'dark' ? 'filter grayscale opacity-50 hover:grayscale-0 hover:opacity-100' : ''
+                       }`}
+                       onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdib3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSJ3aGl0ZSI+SW52YWxpZCBVUkw8L3RleHQ+PC9zdmc+'; }}
                      />
                   </div>
                   <div className="mt-4 flex items-center justify-between">
@@ -1473,10 +1526,8 @@ function AdminContent() {
                       <p className="text-xs text-white/60">{logo.isWide ? 'Wide (2 Cols)' : 'Square (1 Col)'}</p>
                     </div>
                     <button 
-                      onClick={() => {
-                        if (confirm('Remove this logo?')) deletePartnerLogo(logo.id);
-                      }}
-                      className="text-red-500 hover:text-red-400 p-2 bg-red-500/10 rounded-none transition-colors"
+                      onClick={() => triggerConfirm('Remove this partner logo?', () => { deletePartnerLogo(logo.id); showToast('Partner logo removed.'); })}
+                      className="text-red-500 hover:text-red-400 p-2 bg-red-500/10 rounded-lg transition-colors"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -1486,7 +1537,7 @@ function AdminContent() {
             </div>
 
             {partnerLogos.length === 0 && (
-              <div className="text-center py-20 bg-bg-card/50 rounded-none border-2 border-dashed border-white/5">
+              <div className="text-center py-20 bg-bg-card/50 rounded-2xl border-2 border-dashed border-white/5">
                 <Image className="mx-auto text-white/5 mb-6" size={60} strokeWidth={1} />
                 <p className="text-white/90 text-xl font-display font-medium">No partner logos configured.</p>
               </div>
@@ -1495,6 +1546,79 @@ function AdminContent() {
         )}
       </AnimatePresence>
       </div>
+
+      {/* Custom Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className={`fixed bottom-8 right-8 z-[100] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 border backdrop-blur-md ${
+              toast.type === 'success' 
+                ? 'bg-emerald-950/80 border-emerald-500/30 text-emerald-200' 
+                : toast.type === 'error'
+                ? 'bg-rose-950/80 border-rose-500/30 text-rose-200'
+                : 'bg-blue-950/80 border-blue-500/30 text-blue-200'
+            }`}
+          >
+            {toast.type === 'success' ? (
+              <CheckCircle2 className="text-emerald-400 shrink-0" size={20} />
+            ) : (
+              <AlertCircle className={toast.type === 'error' ? "text-rose-400 shrink-0" : "text-blue-400 shrink-0"} size={20} />
+            )}
+            <span className="text-sm font-semibold tracking-tight">{toast.message}</span>
+            <button onClick={() => setToast(null)} className="ml-4 hover:opacity-85 text-white/50 hover:text-white">
+              <X size={16} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Confirmation Modal */}
+      <AnimatePresence>
+        {confirmDialog && (
+          <div className="fixed inset-0 z-[90] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setConfirmDialog(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative max-w-md w-full bg-bg-card border border-white/10 p-8 rounded-2xl shadow-2xl z-10 space-y-6"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-accent-blue/10 flex items-center justify-center shrink-0 text-accent-blue">
+                  <AlertCircle size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-bold text-white mb-2">Confirm Action</h3>
+                  <p className="text-sm text-white/70 leading-relaxed">{confirmDialog.message}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setConfirmDialog(null)}
+                  className="px-5 py-2.5 rounded-xl font-semibold bg-white/5 hover:bg-white/10 transition-all text-sm text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDialog.onConfirm}
+                  className="px-6 py-2.5 rounded-xl font-bold bg-accent-blue text-white hover:bg-accent-blue/80 transition-all text-sm shadow-lg shadow-accent-blue/20"
+                >
+                  Confirm
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
