@@ -30,7 +30,16 @@ export default function StudioPage() {
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
   const [filter, setFilter] = useState('All');
   const [activeChapter, setActiveChapter] = useState('overview');
-  const [isAdmin] = useState(() => typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/auth/session')
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) setIsAdmin(d.authenticated === true); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const categories = ['All', 'Web', 'App', 'AI & IoT', 'Branding'];

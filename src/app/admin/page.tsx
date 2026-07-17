@@ -134,47 +134,62 @@ function AdminContent() {
   });
 
   useEffect(() => {
-    const auth = localStorage.getItem('isAdmin') === 'true';
-    setIsLoggedIn(auth);
-    
-    // Handle deep linking for edit
-    const editId = searchParams.get('edit');
-    if (editId && auth) {
-      const item = portfolioItems.find(i => i.id === editId);
-      if (item) {
-        handleEdit(item);
-      }
-    }
-  }, [portfolioItems, searchParams]);
+    let cancelled = false;
+    // Verify the session against the server; the cookie is httpOnly so the
+    // client cannot read or forge it.
+    (async () => {
+      try {
+        const res = await fetch('/api/auth/session');
+        const data = await res.json();
+        if (cancelled) return;
+        const auth = data.authenticated === true;
+        setIsLoggedIn(auth);
 
-  const sha256 = async (str: string) => {
-    const buf = new TextEncoder().encode(str);
-    const hash = await crypto.subtle.digest('SHA-256', buf);
-    return Array.from(new Uint8Array(hash))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-  };
+        // Handle deep linking for edit
+        const editId = searchParams.get('edit');
+        if (editId && auth) {
+          const item = portfolioItems.find(i => i.id === editId);
+          if (item) {
+            handleEdit(item);
+          }
+        }
+      } catch {
+        if (!cancelled) setIsLoggedIn(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [portfolioItems, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsAuthenticating(true);
-    const hashed = await sha256(password);
-    const targetHash = 'aeae67b513fc017766f20f6dbfca5621b575bc62bfcc880748cf091f58287f39';
-    
-    if (hashed === targetHash) {
-
-      setIsLoggedIn(true);
-      localStorage.setItem('isAdmin', 'true');
-      setLoginError('');
-    } else {
-      setLoginError('Invalid credentials');
+    setLoginError('');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setIsLoggedIn(true);
+        setPassword('');
+      } else {
+        setLoginError('Invalid credentials');
+      }
+    } catch {
+      setLoginError('Authentication failed. Please try again.');
+    } finally {
+      setIsAuthenticating(false);
     }
-    setIsAuthenticating(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore network errors; clear local state regardless
+    }
     setIsLoggedIn(false);
-    localStorage.removeItem('isAdmin');
     router.push('/admin');
   };
 

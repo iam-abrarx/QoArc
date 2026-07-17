@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Linkedin, Star, FileText, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { usePortfolio } from '@/context/PortfolioContext';
+import { renderBold } from '@/lib/sanitize';
 
 export default function Testimonials() {
   const { testimonials } = usePortfolio();
@@ -110,7 +111,7 @@ export default function Testimonials() {
                         <div className="md:col-span-10 space-y-8">
                           <div 
                             className="text-xl text-white/80 leading-relaxed font-sans font-light italic"
-                            dangerouslySetInnerHTML={{ __html: t.content.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') }}
+                            dangerouslySetInnerHTML={{ __html: renderBold(t.content || '') }}
                           />
 
                           {/* Footer Links */}

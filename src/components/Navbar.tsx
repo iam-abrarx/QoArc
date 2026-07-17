@@ -121,6 +121,32 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const isAdminPage = pathname?.startsWith('/admin');
+
+  if (isAdminPage) {
+    return (
+      <motion.nav 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-0 left-0 w-full z-50 bg-transparent py-5"
+      >
+        <div className="max-w-screen-2xl mx-auto px-8 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-3 relative mr-8 group transition-opacity duration-300 hover:opacity-80">
+            <Image 
+              src="/images/logo/Qoarc_logo_White.svg" 
+              alt="QOARC Logo" 
+              width={120} 
+              height={36} 
+              priority
+              className="w-auto h-8 object-contain"
+            />
+          </Link>
+        </div>
+      </motion.nav>
+    );
+  }
+
   return (
     <motion.nav 
       initial={{ y: -100 }}

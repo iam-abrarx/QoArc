@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Loader2, Cpu, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { useLeadCapture } from '@/context/LeadCaptureContext';
 import { useChat } from '@/context/ChatContext';
+import { escapeHtml, isSafeUrl } from '@/lib/sanitize';
 
 type Message = {
   id: string;
@@ -121,12 +122,19 @@ export default function ChatWidget() {
   const formatMessageText = (text: string) => {
     // We do a very simple parse: convert **bold** and handle basic bullets
     return text.split('\n').map((line, i) => {
+       // Escape all HTML first so model/user text can never inject markup.
+       let formattedLine = escapeHtml(line);
+
        // Convert **bold** to <strong>bold</strong>
-       let formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-       
-       // Convert [Text](url) to <a href="url">Text</a>
-       formattedLine = formattedLine.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary-300 font-bold underline underline-offset-2 decoration-primary-300/50 hover:decoration-primary-300 transition-colors">$1</a>');
-       
+       formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+       // Convert [Text](url) to <a href="url">Text</a>, dropping unsafe schemes.
+       formattedLine = formattedLine.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label, url) =>
+         isSafeUrl(url)
+           ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary-300 font-bold underline underline-offset-2 decoration-primary-300/50 hover:decoration-primary-300 transition-colors">${label}</a>`
+           : label
+       );
+
        if (formattedLine.trim() === '') return <br key={i} />;
        
        if (formattedLine.startsWith('- ')) {
